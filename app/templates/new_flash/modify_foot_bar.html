@@ -1,0 +1,125 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/footbar_views">FootBar列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">编辑FootBar</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <h5>编辑FootBar</h5>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">是否隐藏</label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data["is_delete"] == 0 %}
+                                                <input id="is_delete" type="checkbox" name="push" value="{{ data["is_delete"] }}" class="input-small"/>
+                                            {% else %}
+                                                <input id="is_delete" type="checkbox" name="push" value="{{ data["is_delete"] }}" class="input-small" checked/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                <br>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">FootBar内容</label>
+                                        <div class="col-md-10">
+                                            <textarea name="editor1" id="editor1" class=”ckeditor”
+                                                      value="{{ data.content }}">{{ data.content }}</textarea>
+                                            <script>
+                                                // 用CKEditor替换<textarea id="editor1">
+                                                // 使用默认配置
+                                                var editor1 = CKEDITOR.replace('editor1');
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-11 text-right">
+                                            <button type="button" class="btn green" onclick="modify_FootBar_content()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green" onclick="stop_modify_FootBar_content()">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function modify_FootBar_content() {
+
+            var content = editor1.getData();
+            if (content == "") {
+                layer.msg("这得填", {time: 1500, icon: 2});
+                return false
+            }
+            var is_delete = $("#is_delete").is(":checked");
+            var i_delete = 0;
+            if (is_delete == true){
+                i_delete = 1;
+            }
+
+            layer.confirm('是否添加？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('new_flash.modify_footbar')}}' + "?id=" + {{ data.id }},
+                        type: 'post',
+                        data: {
+                            // content_text: editor1.document.getBody().getText(), // 只取文本
+                            content: content,    // 源码
+                            is_delete : i_delete
+                        },
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("修改成功！", {time: 1500, icon: 1});
+                                window.localStorage.setItem("footBar_reload", "true");
+                                window.history.go(-1);
+                            }
+                            else {
+                                layer.msg("修改失败！", {time: 1500, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1500, icon: 2});
+                    return false
+                });
+        }
+
+        function stop_modify_FootBar_content() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.location.href = "/footbar_views";
+            }, function () {
+{#                layer.msg('继续编辑', {time: 1500, icon: 6});#}
+                return false;
+            });
+        }
+    </script>
+{% endblock %}
+

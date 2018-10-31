@@ -1,0 +1,136 @@
+<style>
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    input {
+        text-align: center
+    }
+</style>
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('planet.invite_codes') }}">邀请码列表页</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">生成邀请码</span>
+                                <span id="base_pic" class=""></span>
+                            </li>
+                        </ul>
+                        <hr>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 生成邀请码数量 <br/></label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="invite_code_num" value="">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 使用次数 <br/></label>
+                                        <div class="col-md-3">
+                                            <div class="alert alert-info" role="alert">
+                                                暂不支持修改，默认为10。
+                                            </div>
+                                            <input type="number" class="form-control" id="use_num" value="10" disabled>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 是否可用 <br /><small style="color: #b7a6bd;">默认不展示</small></label>
+                                        <label class="checkbox checkbox-inline" for="is_show">
+                                            <input id="is_show" type="checkbox" name="push"
+                                                   value="" class="input-small" checked/>
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 是否可见 <br /><small style="color: #b7a6bd;">默认可用</small></label>
+                                        <label class="checkbox checkbox-inline" for="is_visibility">
+                                            <input type="checkbox" id="is_visibility" value="" class="input-small"  />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title=" 生成邀请码 " onclick="generate_invite_code()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title=" 取消 " onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        // 生成验证码
+        function generate_invite_code() {
+            var formData = new FormData();
+            var invite_code_num = $("#invite_code_num").val();
+            if (invite_code_num == ""){
+                layer.msg("生成邀请码数量必填");
+                return false
+            }
+
+            var use_num = $("#use_num").val();
+
+            var is_show = $("#is_show").is(":checked");
+            var ishow = 0;
+            if (is_show == true) {
+                ishow = 1
+            }
+            var is_visibility = $("#is_visibility").is(":checked");
+            var ivisibility = 0;
+            if (is_visibility == true){
+                ivisibility = 1
+            }
+
+            formData.append("invite_code_num", invite_code_num);
+            formData.append("status", ishow);
+            formData.append("is_visibility", ivisibility);
+            layer.confirm('是否生成？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.generate_invite_code')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            layer.msg("验证码已成功生成！", {time: 1500, icon: 1});
+                            window.location.href = "{{ url_for('planet.invite_codes') }}"
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

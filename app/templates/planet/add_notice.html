@@ -1,0 +1,151 @@
+<style>
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    input {
+        text-align: center
+    }
+</style>
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('planet.notice_info') }}">星球公告</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">新增星球公告</span>
+                                <span id="base_pic" class=""></span>
+                            </li>
+                        </ul>
+                        <hr>
+                        {#                        <div class="portlet-title">#}
+                        {#                            <div class="caption">#}
+                        {#                                <i class="fa fa-adjust" style="font-size: 24px;"></i>#}
+                        {#                                <span class="caption-subject uppercase">新增星球公告</span>#}
+                        {#                            </div>#}
+                        {#                        </div>#}
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 公告类型 </label>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" id="notice_type" value="1" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 标题 <br/></label>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" id="notice_title" value="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 摘要 <br/></label>
+                                        <div class="col-md-5">
+                                            <textarea name="" id="notice_summary" cols="70" rows="5"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 内容 <br/></label>
+                                        <div class="col-md-5">
+                                            <textarea name="" id="notice_content" cols="70" rows="15"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 链接 <br/></label>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" id="notice_url" value="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 是否展示 </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            <input id="is_show" type="checkbox" name="push"
+                                                   value="" class="input-small"/>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title=" 确认新增 " onclick="add_notice()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title=" 取消新增 " onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        // 新增公告
+        function add_notice() {
+            var formData = new FormData();
+            var notice_type = $("#notice_type").val();
+
+            var notice_title = $("#notice_title").val();
+            if (notice_title == "") {
+                layer.msg("标题不可为空", {time: 1500, icon: 2});
+                return false
+            }
+
+            var notice_summary = $("#notice_summary").val();
+
+            var notice_content = $("#notice_content").val();
+            var notice_url = $("#notice_url").val();
+
+            var is_show = $("#is_show").is(":checked");
+            var ishow = 0;
+            if (is_show == true) {
+                ishow = 1
+            }
+
+            formData.append("notice_type", notice_type);
+            formData.append("notice_title", notice_title);
+            formData.append("notice_summary", notice_summary);
+            formData.append("notice_content", notice_content);
+            formData.append("notice_url", notice_url);
+            formData.append("is_show", ishow);
+            layer.confirm('是否添加？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.create_notice')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            layer.msg("添加成功！", {time: 1500, icon: 1});
+                            window.location.href = "{{ url_for('planet.notice_info') }}"
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

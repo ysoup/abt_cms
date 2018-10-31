@@ -1,0 +1,238 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/f10/relation_manage">关联关系列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">新增关联关系</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+
+                                <div class="form-body">
+
+
+                                    <style>
+                                        .coin_organ_data .col-md-11 {
+                                            position: relative;
+                                        }
+
+                                        .coin_organ_data .choice_first, .coin_organ_data .choice_second {
+                                            margin-bottom: 50px;
+                                        }
+
+                                        .coin_organ_data .choice_first_1, .coin_organ_data .choice_second_1 {
+                                            margin-bottom: 50px;
+                                        }
+
+                                        .coin_organ_data select {
+                                            display: inline-block;
+                                            width: 150px;
+                                            vertical-align: middle;
+                                        }
+
+                                        .coin_organ_data input {
+                                            text-align: center;
+                                            display: inline-block;
+                                            width: 150px;
+                                            vertical-align: middle;
+                                        }
+
+                                        .coin_organ_data a {
+                                            position: absolute;
+                                            left: 330px;
+                                            bottom: 10px;
+                                        }
+                                    </style>
+
+                                    <div class="form-group coin_organ_data">
+                                        <div class="alert alert-danger" role="alert">提示：关联关系可为空 。</div>
+                                        <div class="row">
+                                            <label class="col-md-1 control-label"><b>请选择 <br></b></label>
+                                            <div class="col-md-11">
+                                                <div class="first_choice">
+                                                    <select class="form-control choice_first" id="choice_type_1"
+                                                            style="">
+                                                        <option value="0">---</option>
+                                                        <option value="1">人物</option>
+                                                        <option value="2">币种</option>
+                                                        <option value="3">机构</option>
+                                                    </select>
+
+                                                    <select class="form-control choice_second" style=""
+                                                            id="type_name_1">
+                                                        <option value="0">---</option>
+                                                        {#                                                        {% for obj_list in data %}#}
+                                                        {#                                                            <option value="{{ obj_list[0] }}">{{ obj_list[1] }}</option>#}
+                                                        {#                                                        {% endfor %}#}
+
+                                                    </select>
+                                                </div>
+
+                                                <div class="second_choice">
+                                                    <select class="form-control choice_first_1" id="choice_type_2"
+                                                            style="">
+                                                        <option value="0">---</option>
+                                                        <option value="1">人物</option>
+                                                        <option value="2">币种</option>
+                                                        <option value="3">机构</option>
+                                                    </select>
+
+                                                    <select class="form-control choice_second_1" style=""
+                                                            id="type_name_2">
+                                                        <option value="0">---</option>
+                                                        {#                                                        {% for obj_list in data %}#}
+                                                        {#                                                            <option value="{{ obj_list[0] }}">{{ obj_list[1] }}</option>#}
+                                                        {#                                                        {% endfor %}#}
+
+                                                    </select>
+                                                </div>
+
+                                                <input id="relation_intro" placeholder="关系" type="text"
+                                                       class="form-control" style="margin-top: 10px;">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title="确认新增" onclick="add_relation()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title="取消新增" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function add_relation() {
+            // 拿值
+            var obj1 = $("#choice_type_1").val();
+            var obj2 = $("#choice_type_2").val();
+            var obj1_id = $("#type_name_1").val();
+            var obj2_id = $("#type_name_2").val();
+            var relation_intro = $("#relation_intro").val();
+
+            console.log(obj1, obj2, obj1_id, obj2_id, relation_intro);
+
+
+            if (obj1 == 0 || obj2 == 0 || obj1_id == 0 || obj2_id == 0) {
+                layer.msg("内容有误，请再次确认!", {time: 1500, icon: 2});
+                return false
+            }
+                        layer.confirm('是否添加？', {
+                            btn: ['确认', '取消']
+                        }, function () {
+                            $.ajax({
+                                // 处理ajax
+                                url: '{{ url_for('ften.add_relation')}}',
+                                type: 'post',
+                                data: {
+                                    obj1: obj1,
+                                    obj2: obj2,
+                                    obj1_id : obj1_id,
+                                    obj2_id : obj2_id,
+                                    relation_intro : relation_intro
+                                },
+                                success: function (data) {
+                                    if (data.status == 'ok') {
+                                        layer.msg(data.msg, {time: 1500, icon: 1});
+                                        window.location.href = "/f10/relation_manage";
+                                    }
+                                    else {
+                                        layer.msg(data.msg, {time: 1500, icon: 5});
+                                        return false
+                                    }
+                                }
+                            });
+                        }, function () {
+                            layer.msg("已取消", {time: 1500, icon: 2});
+                            return false
+                        });
+        }
+
+
+        $(function () {
+            $("#choice_type_1").change(function () {
+                var this_val = $("#choice_type_1").val();
+                tag_type_1(this_val)
+            });
+
+            $("#choice_type_2").change(function () {
+                var this_val_2 = $("#choice_type_2").val();
+                tag_type_2(this_val_2)
+            })
+        });
+
+        //change tag_name
+        function tag_type_1(num) {
+            $("#type_name_1").empty();
+            $.ajax({
+                url: '{{ url_for("ften.get_choice_type") }}',
+                data: {"choice_type": num},
+                success: function (data) {
+                    if (data.success == "ok") {
+                        var this_data = data.choice_data;
+                        if (this_data == -1) {
+                            $("#type_name_1").append('<option selected="selected" value="' + 0 + '">' + "---" + '</option>');
+                        }
+                        else {
+                            $.each(this_data, function (i, n) {
+                                {
+                                    $("#type_name_1").append('<option value="' + n[0] + '">' + n[1] + '</option>');
+                                }
+                            })
+                        }
+                    }
+                }
+            });
+        }
+
+        function tag_type_2(num) {
+            $("#type_name_2").empty();
+            $.ajax({
+                url: '{{ url_for("ften.get_choice_type") }}',
+                data: {"choice_type": num},
+                success: function (data) {
+                    if (data.success == "ok") {
+                        var this_data = data.choice_data;
+                        if (this_data == -1) {
+                            $("#type_name_2").append('<option selected="selected" value="' + 0 + '">' + "---" + '</option>');
+                        }
+                        else {
+                            $.each(this_data, function (i, n) {
+                                {
+                                    $("#type_name_2").append('<option value="' + n[0] + '">' + n[1] + '</option>');
+                                }
+                            })
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,368 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        #uploadfile_input{
+            opacity: 0;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">资讯内容新增</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">资讯标题</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" id="title" value="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">标题图片</label>
+                                        <div class="col-md-10">
+                                            <span id="base_pic" class=""></span>
+                                            <img src="" alt="" id="title_img" width="268" height="200">
+                                            <input type="file" id="uploadfile_input" value=""
+                                                   accept="image/png,image/jpg,image/jpeg,image/JPG">
+                                            <label for="uploadfile_input" class='btn btn-danger'>选择图片</label>
+                                            {#                                            <span style="color: red;">提示：标题图片大小不超过100KB</span>#}
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">资讯内容</label>
+                                        <div class="col-md-10">
+                                            <textarea name="editor1" id="editor1" class=”ckeditor” rows="100" cols="200"
+                                                      value=""></textarea>
+                                            <script>
+                                                // 用CKEditor替换<textarea id="editor1">
+                                                // 使用默认配置
+                                                var editor1 = CKEDITOR.replace('editor1');
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">Foot Bar </label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="footbar">
+                                                {% for row in footbar_list %}
+                                                    <option value="{{ row['id'] }}">{{ row['id'] }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">F10 类型</label>
+                                        <div class="col-md-10">
+                                            <div class="alert alert-danger" role="alert">提示：F10发现页相关。如果是<b>新增 解盘、
+                                                视频、音频</b> 以及 <b>PDF相关</b>（后期待扩展），务必在F10类型选中相关选项。其他类型资讯正常添加即可。
+                                            </div>
+                                            <select class="form-control input-small" id="content_type">
+                                                <option value=1>原创</option>
+                                                <option value=2>解盘(币莱解盘)</option>
+                                                <option value=3>视频(币莱播报)</option>
+                                                <option value=4>音频</option>
+                                                <option value=5>PDF</option>
+                                                <option value=6>早报</option>
+                                                <option value=7>晚报</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label"> 创建时间 <br />（可不填） </label>
+                                        <div class="col-md-3"><div class="alert alert-danger" role="alert">提示：不填 即为 <b>当前时间</b> 。如有特殊需要，再选择。</div>
+                                            <input type="text" class="form-control form_datetime" style="text-align: center" id="iptStartTime"
+                                                   value="" readonly>
+                                        </div>
+                                    </div>
+                                    <hr>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">资讯源链接</label>
+                                        <div class="col-md-10">
+                                            <input class="form-control" type="text" id="source_url" value=""
+                                                   placeholder="非必填，默认为空">
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">展示</label>
+                                        <div class="col-md-10">
+                                            <div class="mt-checkbox-list">
+                                                <label class="checkbox mt-checkbox-outline" for="debugInfo">
+                                                    <input id="is_show" name="push" type="checkbox"
+                                                           class="input-small"/>
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">备注</label>
+                                        <div class="col-md-10">
+                                            <textarea id="remarks" class="form-control" rows="3" value=""></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-group">
+                                    <label class="col-md-1 control-label">类型</label>
+                                    <div class="col-md-10">
+                                        <select class="form-control input-small" id="category">
+                                            {% for row in rows %}
+                                                <option value="{{ row['id'] }}">{{ row['catname'] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-1 control-label">标签</label>
+                                    <div class="col-md-10">
+                                        <input class="form-control" type="text" id="tag" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-1 control-label">作者</label>
+                                    <div class="col-md-10">
+                                        <input class="form-control" type="text" id="author" value="">
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class=" col-md-11  text-right">
+                                            <button type="button" class="btn green" onclick="add_information_content()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green"
+                                                    onclick="stop_information_content()">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        $(function () {
+            initDatePlugin();
+        });
+
+        $("#iptStartTime").click(showStart);
+        {#    $("#iptEndTime").click(showEnd);#}
+        // 开始和结束时间窗状态（fasle：关闭状态，true：打开状态）
+        var startStatus = false;
+
+        //初始化时间插件
+        function initDatePlugin() {
+            $("#iptStartTime").datetimepicker({
+                minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+                language: 'zh-CN', // 语言
+                autoclose: true, //  true:选择时间后窗口自动关闭
+                format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+                todayHighlight: true, //高亮当日
+                // clearBtn:true,   //清除按钮
+                todayBtn: true
+
+            }).on("changeDate", function () {
+                var startTime = $("#iptStartTime").val();
+                $("#iptEndTime").datetimepicker("setStartDate", startTime);
+
+                // 清除开始时间时，结束时间取消限制
+                if (!this.value) {
+                    $("#iptEndTime").datetimepicker("setStartDate", "1970-01-01");
+                    $("#iptEndTime").datetimepicker("setEndDate", "3000-01-01");
+                }
+
+            });
+
+            $("#iptEndTime").datetimepicker({
+                minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+                language: 'zh-CN', // 语言
+                autoclose: true, //  true:选择时间后窗口自动关闭
+                format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+                todayHighlight: true,
+                todayBtn: true // 如果此值为true 或 "linked"，则在日期时间选择器组件的底部显示一个 "Today" 按钮用以选择当前日期。
+            }).on("changeDate", function () {
+
+                // 清楚结束时间时，开始时间取消限制
+                if (!this.value) {
+                    $("#iptStartTime").datetimepicker("setEndDate", "3000-01-01");
+                    $("#iptStartTime").datetimepicker("setStartDate", "1970-01-01");
+                } else {
+                }
+            });
+        }
+
+        // 控制开始时间弹窗显示还是隐藏
+        function showStart() {
+            if (startStatus) {
+                $("#iptStartTime").datetimepicker("hide");
+                startStatus = false;
+            } else {
+                $("#iptStartTime").datetimepicker("show");
+                startStatus = true;
+            }
+            // 失去焦点时，时间窗为关闭状态
+            $("#iptStartTime").blur(function () {
+                startStatus = false;
+            })
+        }
+
+
+        $(function () {
+            $("#title_img").click(function () {
+                $("#uploadfile_input").trigger("click");
+            });
+            $("#uploadfile_input").change(function () {
+
+                var file = $("#uploadfile_input").val();
+                if (!/.(gif|jpg|jpeg|png|JPG)$/.test(file)) {
+                    layer.msg("图片类型必须是.jpeg,jpg,png中的一种", {time: 2000, icon: 2});
+                    return false;
+                } else {
+
+                    var image = $("#uploadfile_input")[0].files[0];
+                    {#                    filesize = image.size;#}
+                    {#                    console.log(filesize);#}
+                    {#                    if (filesize > 102400) {#}
+                    {#                        layer.msg('图片大小不能100k的图片', {time: 2000, icon: 2});#}
+                    {#                        return false;#}
+                    {#                    }#}
+                }
+                layer.msg("图片通过", {time: 2000, icon: 6});
+
+                var img_src = $("#uploadfile_input").val();
+                var formData = new FormData();
+                formData.append("file", image);
+                formData.append('base_pic_url', $('#title_img').attr("src"));
+                formData.append('img_url', img_src);
+                $.ajax({
+                    url: "{{ url_for("new_flash.get_info_img_url") }}",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        $('#title_img').attr("src", data['base_pic_url']);
+                        $('#base_pic').attr("class", data['img_url']);
+                    }
+                })
+            });
+        });
+
+        function add_information_content() {
+
+            if ($('#title').val() == "" || $("#title_img").attr("src") == "") {
+                layer.msg("图片和标题不可为空，请重新操作！", {time: 1000, icon: 2});
+                return false
+            }
+
+            var content = editor1.getData();
+            var category = $("#category").val();
+            var remarks = $('#remarks').val();
+            if (content == "") {
+                layer.msg("快讯内容都不填，你想干啥？", {time: 1000, icon: 2});
+                return false
+            }
+            var source_url = $("#source_url").val();
+            var formData = new FormData();
+            var is_show = $("#is_show").is(":checked");
+            var show = 0;
+            if (is_show == true) {
+                show = 1;
+            }
+            {#            var is_push = $("#is_push").is(":checked");#}
+            {#            var push = 0;#}
+            {#            if (is_push == true) {#}
+            {#                push = 1;#}
+            {#            }#}
+            formData.append("img", $("#uploadfile_input")[0].files[0]);
+            formData.append('title', $('#title').val());
+            formData.append('base_pic_url', $('#title_img').attr("src"));
+            formData.append('img_url', $('#base_pic').attr("class"));
+            formData.append('is_show', show);
+            formData.append('remarks', $('#remarks').val());
+            formData.append('content', editor1.getData());
+            formData.append('category', $("#category").val());
+            formData.append('tag', $("#tag").val());
+            formData.append('author', $("#author").val());
+            formData.append("source_url", $("#source_url").val());
+            formData.append("footbar_id", $("#footbar").val());
+            formData.append("content_type", $("#content_type").val());
+            formData.append("create_time", $("#iptStartTime").val());
+
+            layer.confirm('是否添加？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('new_flash.add_information')}}',
+                        type: 'post',
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("添加成功！", {time: 1000, icon: 1});
+                                window.location.href = "/information_list";
+                            }
+                            else {
+                                layer.msg(data.msg, {time: 1000, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+                });
+        }
+
+
+        function stop_information_content() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.location.href = "/information_list";
+            }, function () {
+                layer.msg('未放弃，真棒！', {time: 1000, icon: 6});
+                return false;
+            });
+        }
+
+
+        $(function () {
+            $("input[name=push]").click(function () {
+                var this_checked = $(this).prop("checked");
+                if (this_checked) {
+                    $("input[name=push]").prop("checked", false);
+                    $(this).prop("checked", true);
+                } else {
+                    $(this).prop("checked", false);
+                }
+            });
+        })
+    </script>
+{% endblock %}
+

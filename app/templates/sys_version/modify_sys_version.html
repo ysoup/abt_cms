@@ -1,0 +1,192 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        input {
+            text-align: center
+        }
+
+        #uploadfile_input {
+            opacity: 0;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('sys_version.sys_versions') }}">版本信息列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">编辑版本信息</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-adjust" style="font-size: 24px;"></i>
+                                <span class="caption-subject uppercase">编辑版本</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 序号 </label>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" id="sn"
+                                                   value="{{ data.sn }}" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 版本号 </label>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" id="version_no"
+                                                   value="{{ data.version_no }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 类型 </label>
+                                        <div class="col-md-5">
+                                            <div class="alert alert-info" role="alert">安卓：请直接上传APK文件。
+                                                <br/>IOS：请在IOS链接处，输入下载链接。
+                                            </div>
+                                            <select class="form-control input-small" id="version_type">
+                                                <option value='1' {% if data.version_type == "1" %}
+                                                        selected {% endif %} >其他
+                                                </option>
+                                                <option value='2' {% if data.version_type == "2" %}
+                                                        selected {% endif %} >Android
+                                                </option>
+                                                <option value='3' {% if data.version_type == "3" %}
+                                                        selected {% endif %} >IOS
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> Android下载文件 </label>
+                                        <div class="col-md-10">
+{#                                            <input type="file" id="uploadfile_input" value="" style="display: none">#}
+
+{#                                            <label for="uploadfile_input" class='btn btn-danger'>选择要上传的文件</label>#}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;<span id="file_name_req">{% if data.version_type == "2" %}{{ data.download_link }}{% endif %}
+                                        </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> IOS下载链接 </label>
+                                        <div class="col-md-5">
+                                            {% if data.version_type == '3' %}
+                                            <input type="text" class="form-control" id="ios_url"
+                                                   value="{{ data.download_link }}">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <br>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title=" 确认修改 " onclick="modify_sys_version()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title=" 取消修改 " onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+{#        // 上传文件到服务器#}
+{#        $(function () {#}
+{#            $("#uploadfile_input").change(function () {#}
+{#                var file_url = $("#uploadfile_input").val();#}
+{##}
+{#                var formData = new FormData();#}
+{#                formData.append("file", $("#uploadfile_input")[0].files[0]);#}
+{#                formData.append('file_url', file_url);#}
+{#                $.ajax({#}
+{#                    url: "{{ url_for("sys_version.upload_file") }}",#}
+{#                    type: "POST",#}
+{#                    data: formData,#}
+{#                    contentType: false,#}
+{#                    processData: false,#}
+{#                    success: function (data) {#}
+{#                        if (data.success == "ok") {#}
+{#                            $("#file_name_req").text(data.base_file_url);#}
+{#                            layer.msg("上传成功!", {time: 1500, icon: 1});#}
+{#                        }#}
+{#                        else {#}
+{#                            layer.msg(data.failed, {time: 1500, icon: 5});#}
+{#                            return false#}
+{#                        }#}
+{#                    }#}
+{#                })#}
+{#            });#}
+{#        });#}
+
+        // 创建版本信息
+        function modify_sys_version() {
+            var formData = new FormData();
+            var version_no = $("#version_no").val();
+            if (version_no == "") {
+                layer.msg("版本号不能为空", {time: 1500, icon: 2});
+                return false
+            }
+            var version_type = $("#version_type").val();
+            var download_link = $("#file_name_req").text();
+            var ios_url = $('#ios_url').val();
+            var sn = $("#sn").val();
+
+
+            formData.append("sn", sn);
+            formData.append("version_no", version_no);
+            formData.append("version_type", version_type);
+            formData.append("download_link", download_link);
+            formData.append("ios_url", ios_url);
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('sys_version.modify_sys_version')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            window.location.href = "{{ url_for('sys_version.sys_versions') }}"
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

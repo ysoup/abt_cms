@@ -1,0 +1,91 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">添加用户</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-group">
+                                    <label for="inputEmail" class="col-sm-3 control-label">Email</label>
+                                    <div class="col-sm-2">
+                                        <input type="email" class="form-control" id="inputEmail" placeholder="Email">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword" class="col-sm-3 control-label">Password</label>
+                                    <div class="col-sm-2">
+                                        <input type="password" class="form-control" id="inputPassword"
+                                               placeholder="Password">
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn blue btn-circle-left" onclick="add_user()">
+                                                确认
+                                            </button>
+                                            <button type="button" class="btn red btn-circle-right" onclick="esc()">取消</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% if pagination %}
+                            {{ macro_pagination.pagination_widget(pagination,'user_auh.user_list') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+    function add_user() {
+        var username = $('#inputEmail').val();
+        var password = $("#inputPassword").val();
+        if (username == "" || password == ""){
+            layer.msg("邮箱和密码不能为空！！！", {time:1000, icon:2});
+            return false
+        }
+
+        layer.confirm('是否添加该用户？', {
+            btn: ['确认', '取消']
+        }, function () {
+            $.ajax({
+                // 处理ajax
+                url: '{{ url_for('user_auh.add_user') }}',
+                type: 'POST',
+                data: {
+                    username: username,
+                    password: password
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("添加成功！", {time: 1000, icon: 1});
+                        window.location.href = "{{ url_for('user_auh.user_list') }}";
+                    }
+                    else {
+                        layer.msg("添加失败！", {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            });
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            return false
+        });
+    }
+
+        function esc() {
+            window.location.href="{{ url_for('user_auh.user_list') }}"
+        }
+    </script>
+{% endblock %}

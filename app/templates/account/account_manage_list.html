@@ -1,0 +1,155 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="">账户管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">账户列表</span>
+                            </li>
+                        </ul>
+                        <!-- Single button -->
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+
+                                <button type="button" class="btn blue btn-circle" onclick='add_monitor_info()'
+                                        style="margin-left: 10px">新增账户信息
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <input id="excelFile" type="file">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="portlet-body col-lg-12">
+                                <div class="table-scrollable">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>账户名称</th>
+                                            <th>账户等级</th>
+                                            <th>已文章数量</th>
+                                            <th>创建日期</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for row in data %}
+                                            <tr id="tr-{{ row['id'] }}">
+                                                <td>{{ row["id"] }}</td>
+                                                <td>{{ row["account_name"]}}</td>
+                                                <td>{{ row["account_rank"] }}</td>
+                                                <td>{{ row["account_article_num"] }}</td>
+                                                <td>{{ row["create_time"] }}</td>
+                                                <td>
+                                                    <br>
+                                                    <button type="button"
+                                                            class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"
+                                                            onclick="modify_monitor_data({{ row['id'] }})"></button>
+                                                    <br>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div id="import" class="modal fade bs-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">文件导入</h4>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:right;padding:5px">
+                    <a href="~/Content/Template/TestUser-模板.xls" onclick="javascript:Preview();">
+                        <img alt="测试用户信息-模板" src="~/Content/images/ico_excel.png" />
+                        <span style="font-size:larger;font-weight:200;color:red">TestUser-模板.xls</span>
+                    </a>
+                </div>
+                <hr/>
+                <form id="ffImport" method="post">
+                    <div title="Excel导入操作" style="padding: 5px">
+                        <input type="hidden" id="AttachGUID" name="AttachGUID" />
+                        <input id="excelFile" type="file">
+                    </div>
+                </form>
+
+                <!--数据显示表格-->
+                <table id="gridImport" class="table table-striped table-bordered table-hover" cellpadding="0" cellspacing="0" border="0">
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="SaveImport()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+                    <input id="hidden_val" type="hidden" value="">
+
+{#                    {% if pagination %}#}
+{#                        {{ macro_pagination.pagination_widget(pagination,'new_flash.new_flash_list') }}#}
+{#                    {% endif %}#}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        $(function () {
+          //添加界面的附件管理
+          $('#file_upload').uploadify({
+            'swf': '/Content/JQueryTools/uploadify/uploadify.swf', //FLash文件路径
+            'buttonText': '浏 览',                 //按钮文本
+            'uploader': '/FileUpload/Upload',            //处理上传的页面
+            'queueID': 'fileQueue',             //队列的ID
+            'queueSizeLimit': 1,              //队列最多可上传文件数量，默认为999
+            'auto': false,                 //选择文件后是否自动上传，默认为true
+            'multi': false,                 //是否为多选，默认为true
+            'removeCompleted': true,            //是否完成后移除序列，默认为true
+            'fileSizeLimit': '10MB',            //单个文件大小，0为无限制，可接受KB,MB,GB等单位的字符串值
+            'fileTypeDesc': 'Excel Files',         //文件描述
+            'fileTypeExts': '*.xls',            //上传的文件后缀过滤器
+            'onQueueComplete': function (event, data) {   //所有队列完成后事件
+              //业务处理代码
+              //提示用户Excel格式是否正常，如果正常加载数据
+            },
+            'onUploadStart': function (file) {
+
+                InitUpFile();//上传文件前 ，重置GUID，每次不同
+                $("#file_upload").uploadify("settings", 'formData', { 'folder': '数据导入文件', 'guid': $("#AttachGUID").val() }); //动态传参数
+            },
+            'onUploadError': function (event, queueId, fileObj, errorObj) {
+              //alert(errorObj.type + "：" + errorObj.info);
+            }
+          });
+        });
+
+        function ShowImport() {
+            $("#import").modal("show");
+        }
+        function add_monitor_info() {
+            window.location.href = "/add_monitor"
+        }
+
+        function modify_monitor_data(id) {
+            window.location.href = "/modify_monitor_data?id=" + id;
+        }
+
+    </script>
+{% endblock %}
+

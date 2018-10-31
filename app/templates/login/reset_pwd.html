@@ -1,0 +1,86 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">修改密码</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-group">
+                                    <label for="inputEmail" class="col-sm-3 control-label">Email</label>
+                                    <div class="col-sm-2">
+                                        <p class="form-control-static">{{ current_user.email }}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword" class="col-sm-3 control-label">Password</label>
+                                    <div class="col-sm-2">
+                                        <input type="password" class="form-control" id="inputPassword"
+                                               placeholder="Password">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="rePassword" class="col-sm-3 control-label">rePassword</label>
+                                    <div class="col-sm-2">
+                                        <input type="password" class="form-control" id="rePassword"
+                                               placeholder="rePassword">
+                                        <div class="alert alert-danger hide" role="alert" id="re_errors">
+                                            <span class="glyphicon glyphicon-exclamation-sign"
+                                                  aria-hidden="true"></span>
+                                            <span class="sr-only">Error:</span>两次密码输入不一致，你再输！</div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn blue btn-circle-left" onclick="re_pwd()">
+                                                确认修改
+                                            </button>
+                                            <button type="button" class="btn red btn-circle-right" onclick="esc()">
+                                                取消修改
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function re_pwd() {
+            var password = $("#inputPassword").val();
+            var repassword = $("#rePassword").val();
+            if (password != repassword) {
+                $('#re_errors').removeClass('hide');
+                return false;
+            }
+            alert("请牢记新密码");
+            $.ajax({
+                url: '{{ url_for('main.re_pwd')}}',
+                type: 'post',
+                data: {
+                    password: password
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        window.location.href = "{{ url_for('main.login') }}"
+                    }
+                }
+            })
+        }
+        function esc() {
+            window.location.href = "/index"
+        }
+    </script>
+{% endblock %}

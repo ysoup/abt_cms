@@ -1,0 +1,440 @@
+{% extends "/index.html" %}
+{% import "macro_pagination.html" as macro_pagination %}
+{% block content %}
+    <style>
+        #ul>li>span{
+            display:inline-block;
+            width:125px;
+        }
+        #ul input{
+            vertical-align: bottom;
+        }
+        #ul>li{
+            margin-top:10px;
+        }
+        #ul>li>span>label>input{
+            vertical-align: bottom;
+            margin-right:10px;
+        }
+        #ul>li>input{
+            width: 550px;
+        }
+        #ul>li>textarea{
+            width: 550px;
+        }
+        #field_setup>div>span{
+            display: inline-block;
+            width: 110px;
+        }
+    </style>
+
+<script>
+    $('textarea').removeClass("input-circle");
+    $('input').removeClass("input-circle");
+</script>
+
+
+
+
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">网址设置</span>
+                            </div>
+                        </div>
+
+                        <form class="form-horizontal" role="form">
+                            <ul id="ul" style="list-style:none;">
+                                <li>
+                                    <span>爬虫中文名称:</span>
+                                    <input type="text" placeholder="请输入中文名称" id="spider_ch_name">
+                                </li>
+                                <li>
+                                    <span>爬虫英文名称:</span>
+                                    <input type="text" placeholder="请输入英文名称" id="spider_en_name">
+                                </li>
+                                <li>
+                                    <span>目标URL:</span>
+                                    <input type="url" placeholder="请输入URL链接" id="target_url">
+                                </li>
+                                <li>
+                                    <span>请求headers:</span>
+                                    <textarea cols="20" rows="3" placeholder="请输入请求headers" id="req_headers" style="vertical-align: top;"></textarea>
+                                </li>
+                                <li>
+                                    <span>爬取资讯类别</span>
+                                    <b><input type="radio" name="information_type" value=0>快讯</b>
+                                    <b><input type="radio" name="information_type" value=1>资讯</b>
+                                </li>
+                                <li>
+                                    <span>请求方式:</span>
+                                    <select name="req" id="req_method">
+                                        <option value="0" onclick="$('#req_post').css('display','none')">get</option>
+                                        <option value="1" onclick="$('#req_post').css('display','block')">post</option>
+                                    </select>
+                                    <br>
+                                    <textarea id="req_post" cols="20" rows="3" placeholder="请输入post参数" style="margin-left: 130px;display: none"></textarea>
+                                </li>
+                                <li>
+                                    <span>请求编码:</span>
+                                    <input type="text" placeholder="请输入请求编码" id="req_code">
+                                </li>
+                                <li>
+                                    <span>
+                                        <label for="fliter"><input type="checkbox" id="fliter">过滤处理</label>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span>
+                                        <label for="watermark"><input type="checkbox" id="watermark">水印处理</label>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span>列表标签规则:</span>
+                                    <b><input type="radio" name="ls_rule_type" value=0 checked>dom</b>
+                                    <b><input type="radio" name="ls_rule_type" value=1>json</b>
+                                    <b><input type="radio" name="ls_rule_type" value=2 disabled>字符串</b>
+                                    <b><input type="radio" name="ls_rule_type" value=3 disabled>字段组合</b> <br>
+                                    <textarea name="tag_rule" id="html_ls_tag" cols="30" rows="3" placeholder="请输入标签规则" style="vertical-align:top;margin-left: 130px"></textarea>
+                                </li>
+                                <li>
+                                    <span>抓取时间间隔:</span>
+                                     <input type="text" placeholder="请输入抓取时间间隔" id="time_interval" style="width:150px">秒
+                                </li>
+                                <li>
+                                    <span>
+                                        <label for="is_userful"><input type="checkbox" id="is_userful">爬虫可用</label>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span>抓取条数:</span>
+                                    <input type="text" placeholder="请输入抓取条数" id="get_num" style="width:150px">
+                                </li>
+                                <li style="margin: 10px 0 10px 0;">
+                                    <span>抓取字段:</span>
+{#                                    <button class="btn btn-info" type="button" onclick="add_field()">增加字段</button>#}
+                                    <div class="dropdown" style="display: inline-block" >
+                                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            增加字段
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li onclick="add_field(this)"><a>内容</a></li>
+                                            <li onclick="add_field(this)"><a>标题</a></li>
+                                            <li onclick="add_field(this)"><a>作者</a></li>
+                                            <li onclick="add_field(this)"><a>详情链接</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span></span>
+                                    <ul style="list-style: none;display: inline-block;padding:0px;" id="field_li">
+                                        <li>
+                                            <button class="btn btn-default" type="button">内容</button>
+                                            &nbsp;&nbsp;
+                                            <a onclick="var prev=$(this).prev();var name=window.prompt('修改名称为：');if(name!=null){prev.text(name)}">编辑</a>
+                                            &nbsp;
+                                            <a onclick="$(this).parent().remove();">删除</a>
+                                            <div style="border: 1px solid #818181;width: 400px;height: auto;margin:0;padding: 10px;">
+                                                <div>
+                                                    <span>字段获取规则:</span>
+                                                    <textarea name="tag_rule" id="" cols="30" rows="3" placeholder="请输入标签规则" style="vertical-align:top;width: 250px;"></textarea>
+                                                </div>
+                                                <div>
+                                                    <span>数据获取方式：</span>
+                                                    <select name="get_way" id="get_way">
+                                                        <option value="0">列表页</option>
+                                                        <option value="1">详情页</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <span>
+                                                        <input type="checkbox" style="vertical-align:bottom;margin-right: 10px;">开启循环
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span>解析编码：</span>
+                                                    <input type="text" placeholder="请输入解析编码">
+                                                </div>
+                                                <div>
+                                                    <span>数据处理：</span>
+                                                    <div class="dropdown" style="display: inline-block" >
+                                                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                            +添加项目
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                            <li onclick="delete_item(this)"><a>删除</a></li>
+                                                            <li onclick="replace_item(this)"><a>替换</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div style="display: inline-block;" id="add_item"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <P>
+                                <button type="button" class="btn btn-danger" onclick="stop_url_setup()" style="margin: 0 20px 0 150px;">取消</button>
+                                <button type="button" class="btn btn-success" onclick="save_url_setup()">保存</button>
+                            </P>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+
+
+
+
+
+            $("#req_select").change(function () {
+                var value = $("#req_select").find("option:selected").text();
+                if(value == "post"){
+                    $("#req_post").css("display","block");
+                }else{
+                    $("#req_post").css("display","none");
+                }
+            });
+            // 删除项目函数
+            function delete_item(obj) {
+                var div = '<div style="margin-top: 15px;">\
+                                <span>删除项目:</span>\
+                                <div style="display: inline-block;vertical-align: middle">\
+                                    <input type="radio" name="del_content" value="0" checked style="vertical-align: bottom">DOM\
+                                    <input type="radio" name="del_content" value="1" style="vertical-align: bottom">字符串\
+                                    <i class="glyphicon glyphicon-trash" style="margin-left: 50px;" onclick="$(this).parent().parent().remove();"></i>\
+                                    <br>\
+                                    <textarea id="" cols="30" rows="3"></textarea>\
+                                </div>\
+                            </div>';
+                $(obj).parent().parent().parent().next().append(div);
+            }
+            // 替换项目函数
+            function replace_item(obj){
+                var div = '<div style="margin-top: 15px">\
+                                <span>替换项目:</span>\
+                                <div style="display: inline-block;vertical-align: middle">\
+                                    <span>将</span>\
+                                    <i class="glyphicon glyphicon-trash" style="margin-left: 156px;" onclick="$(this).parent().parent().remove();"></i>\
+                                    <br>\
+                                    <textarea id="" cols="30" rows="3"></textarea> <br>\
+                                    <span>替换成</span> <br>\
+                                    <textarea id="" cols="30" rows="3"></textarea>\
+                                </div>\
+                            </div>';
+                $(obj).parent().parent().parent().next().append(div);
+            }
+            // 增加字段函数
+            function add_field(obj) {
+{#                var field_name = window.prompt("输入字段名称");#}
+                var li = '<li style="margin-top:20px;"><button class="btn btn-default" type="button">'+$(obj).children("a").text()+'</button>&nbsp;&nbsp;\
+                     <a onclick="var prev=$(this).prev();var name=window.prompt(\'修改名称为：\');if(name!=null){prev.text(name)}">编辑</a>\
+                     &nbsp; <a onclick="$(this).parent().remove();">删除</a>\
+                     <div style="border: 1px solid #818181;width: 400px;height: auto;margin:0;padding: 10px;">\
+                                                <div>\
+                                                    <span>字段获取规则:</span>\
+                                                    <textarea name="tag_rule" id="" cols="30" rows="3" placeholder="请输入标签规则" style="vertical-align:top;width: 250px;"></textarea>\
+                                                </div>\
+                                                <div>\
+                                                    <span>数据获取方式：</span>\
+                                                    <select name="get_way" id="get_way">\
+                                                        <option value="0">列表页</option>\
+                                                        <option value="1">详情页</option>\
+                                                    </select>\
+                                                </div>\
+                                                <div>\
+                                                    <span>\
+                                                        <input type="checkbox" style="vertical-align:bottom;margin-right: 10px;">开启循环\
+                                                    </span>\
+                                                </div>\
+                                                <div>\
+                                                    <span>解析编码：</span>\
+                                                    <input type="text" placeholder="请输入解析编码">\
+                                                </div>\
+                                                <div>\
+                                                    <span>数据处理：</span>\
+                                                    <div class="dropdown" style="display: inline-block">\
+                                                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">\
+                                                            +添加项目\
+                                                            <span class="caret"></span>\
+                                                        </button>\
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">\
+                                                            <li onclick="delete_item(this)"><a>删除</a></li>\
+                                                            <li onclick="replace_item(this)"><a>替换</a></li>\
+                                                        </ul>\
+                                                    </div>\
+                                                </div>\
+                                                <div style="display: inline-block;">\
+                                                </div>\
+                                            </div>\
+                     </li>';
+{#                if(field_name != null && field_name != ""){#}
+{#                    $("#field_li").append(li);#}
+{#                }#}
+                $("#field_li").append(li);
+            }
+
+            function stop_url_setup() {
+                layer.confirm("是否要放弃当前的配置？",{
+                   btn:['确认','取消']
+                },function(){
+                    window.localStorage.setItem("reload","true");
+                    window.history.go(-1);
+                },function () {
+                    layer.msg('不放弃!', {time:1000, icon:6});
+                    return false;
+                });
+            }
+
+            function save_url_setup() {
+                var $ul = $("#ul>li");
+                var spider_ch_name = $("#spider_ch_name").val();
+                var spider_en_name = $("#spider_en_name").val();
+                var target_url = $("#target_url").val();
+                if(target_url == ""){
+                    layer.msg("目标URL不能为空！", {time:1000, icon:2});
+                    return false;
+                }
+                var req_headers = $("#req_headers").val();
+                var information_type = $("input[name='information_type']:checked").val();
+                if(information_type == undefined){
+                    layer.msg("请选择爬取资讯类别！", {time:1000, icon:2});
+                    return false;
+                }
+                var req_method = $("#req_method").children("option:selected").val();
+                var req_params = "";
+                if(req_method=="1"){
+                    req_params = $("#req_post").val();
+                }
+                var req_code = $("#req_code").val();
+                var fliter = $("#fliter").prop("checked");
+                if(fliter == true){
+                    fliter_a_tag = 1;
+                }else{
+                    fliter_a_tag = 0;
+                }
+                var watermark = $("#watermark").prop("checked");
+                if(watermark == true){
+                    img_watermark = 1;
+                }else{
+                    img_watermark = 0;
+                }
+                var ls_rule_type = $("input[name='ls_rule_type']:checked").val();
+                var html_ls_tag = $("#html_ls_tag").val();
+                var time_interval = $("#time_interval").val();
+                if(time_interval==""){time_interval=0}
+                var is_userful = $("#is_userful").prop("checked");
+                if(is_userful == true){
+                    is_userful = 1;
+                }else{
+                    is_userful = 0;
+                }
+                var get_num = $("#get_num").val();
+                if(get_num==""){get_num=5}
+                // 抓取字段
+　　　　　　　　　 var $field_lis = $("#field_li>li");
+                var all_field = new Array();
+                for(var i=0;i<$field_lis.length;i++){
+                    var $li = $field_lis.eq(i);
+                    var ch_name = $li.children("button").text();
+                    var $divs = $li.children("div").children("div");
+                    var get_column_rule = $divs.eq(0).children("textarea").val();
+                    var get_data_way = $divs.eq(1).find("option:selected").val();
+                    var start_for = $divs.eq(2).find("input:checked").val();
+                    if(start_for == "on"){
+                        start_for = 1;
+                    }else{
+                        start_for = 0;
+                    }
+                    var analysis_code = $divs.eq(3).children("input").val();
+                    var data = {
+                        "ch_name":ch_name,
+                        "get_column_rule":get_column_rule,
+                        "get_data_way":get_data_way,
+                        "start_for":start_for,
+                        "analysis_code":analysis_code
+                    };
+                    var $items = $("#add_item").children("div");
+                    var type = 0;
+                    var all_item = new Array();
+                    for(var j=0;j<$items.length;j++){
+                        var $div = $items.eq(j);
+                        var delete_tag = "";
+                        var replace_tag = "";
+                        var end_replace_tag = "";
+                        if($div.children("span").text()=="删除项目:"){
+                            type = 1;
+                            delete_tag = $div.find("textarea").val();
+                        }else if($div.children("span").text()=="替换项目:"){
+                            type = 2;
+                            replace_tag = $div.find("textarea").eq(0).val();
+                            end_replace_tag = $div.find("textarea").eq(1).val();
+                        }
+                        var item = {
+                            "type":type,
+                            "delete_tag":delete_tag,
+                            "replace_tag":replace_tag,
+                            "end_replace_tag":end_replace_tag
+                        };
+                        all_item[j]=item;
+                    }
+                    data["all_item"] = all_item;
+                    all_field[i]=data;
+                }
+                layer.confirm('是否保存？',{
+                    btn:["确认","取消"]
+                }, function () {
+                    $.ajax({
+                        url:"{{ url_for("crawler.add_target_url") }}",
+                        type:"post",
+                        data:{
+                            field:JSON.stringify(all_field),
+                            spider_ch_name:spider_ch_name,
+                            spider_en_name:spider_en_name,
+                            target_url:target_url,
+                            req_headers:req_headers,
+                            information_type:information_type,
+                            req_method:req_method,
+                            req_params:req_params,
+                            req_code:req_code,
+                            fliter_a_tag:fliter_a_tag,
+                            img_watermark:img_watermark,
+                            ls_rule_type:ls_rule_type,
+                            html_ls_tag:html_ls_tag,
+                            time_interval:time_interval,
+                            is_userful:is_userful,
+                            get_num:get_num
+                        },
+                        success:function(data){
+                            if(data.success == 'ok'){
+                                layer.msg("添加成功！", {time:2000, icon: 1});
+                                window.localStorage.setItem("reload", "true");
+                                window.history.go(-1);
+                            }else{
+                                layer.msg(data.failed, {time:1000, icon:5});
+                            }
+                        }
+                    });
+                });
+            }
+
+    $(function () {
+        setTimeout(function () {
+            $('textarea').removeClass("input-circle");
+            $('input').removeClass("input-circle");
+        },500)
+    })
+
+
+        </script>
+    </div>
+{% endblock %}

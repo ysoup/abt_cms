@@ -1,0 +1,793 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        .checkbox-inline + .checkbox-inline, .radio-inline + .radio-inline {
+            margin-left: 0;
+            margin-right: 10px;
+        }
+    </style>
+
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            {#                            <h3>币信息编辑</h3>#}
+                            <div class="caption">
+                                <i class="fa fa-btc" style="font-size: 24px"></i>
+                                <span class="caption-subject sbold uppercase">币信息编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <ul id="myTab" class="nav nav-tabs">
+                                        <li class="active"><a href="#coin" data-toggle="tab"><h5><b>币种简介</b></h5></a>
+                                        </li>
+                                        <li><a href="#link" data-toggle="tab"><h5><b>相关链接</b></h5></a></li>
+                                        <li><a href="#info" data-toggle="tab"><h5><b>公募信息</b></h5></a></li>
+                                        <li><a href="#team" data-toggle="tab"><h5><b>团队介绍</b></h5></a></li>
+                                        <li><a href="#concept" data-toggle="tab"><h5><b>相关概念</b></h5></a></li>
+                                        <li><a href="#map" data-toggle="tab"><h5><b>路线图</b></h5></a></li>
+                                        <li><a href="#atlas-coin" data-toggle="tab"><h5><b>知识图谱-币种</b></h5></a></li>
+                                        <li><a href="#atlas-person" data-toggle="tab"><h5><b>知识图谱-人物</b></h5></a></li>
+                                        <li><a href="#atlas-organ" data-toggle="tab"><h5><b>知识图谱-机构</b></h5></a></li>
+                                    </ul>
+
+                                    <div id="myTabContent" class="tab-content" style="padding-top: 20px">
+                                        <div class="tab-pane fade in active" id="coin">
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">简介</label>
+                                                <div class="col-md-10">
+                                                <textarea id="coin_intro" class="form-control" rows="8">{{ base_obj.intro }}</textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <span id="log_pic" class=""></span>
+                                                <label class="control-label col-md-1">Logo</label>
+                                                <div class="col-md-10">
+                                                    <img src="{{ base_obj.logo_img }}" alt="" id="log_img" width="40"
+                                                         height="40">
+                                                    <input class="btn" type="file" id="upload_log" value="">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">中文名</label>
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="coin_chi"
+                                                           value="{{ base_obj.chinese_name }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">英文名</label>
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="coin_eng"
+                                                           value="{{ base_obj.english_name }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">简称</label>
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="coin_code"
+                                                           value="{{ base_obj.code }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">发行时间</label>
+                                                <div class="col-md-2">
+                                                    <input type="date" class="form-control" id="coin_publish_time"
+                                                           value="{{ base_obj.publish_time }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">发行总量</label>
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="coin_max_supply"
+                                                           value="{{ base_obj.max_supply }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">上架交易所数量</label>
+                                                <div class="col-md-2">
+                                                    <input type="number" class="form-control" id="coin_shelf_num"
+                                                           value="{{ base_obj.shelf_exchange_num }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">算法</label>
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="coin_algorithm"
+                                                           value="{{ base_obj.algorithm }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">共识机制</label>
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="coin_proof_type"
+                                                           value="{{ base_obj.proof_type }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="link">
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">官网</label>
+
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_website_url"
+                                                           value="{{ base_obj.website_url }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">钱包</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_wallet_url"
+                                                           value="{{ base_obj.wallet_url }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">论坛</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_forum_urls"
+                                                           value="{{ base_obj.forum_urls }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">白皮书</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_wp_url"
+                                                           value="{{ base_obj.white_paper }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">区块链浏览器</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_be_urls"
+                                                           value="{{ base_obj.block_explorer_urls }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">GitHub</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_github_url"
+                                                           value="{{ base_obj.github_url }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">Reddit</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_reddit_url"
+                                                           value="{{ base_obj.reddit_url }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">Twitter</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_twitter_url"
+                                                           value="{{ base_obj.twitter_url }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">Facebook</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_facebook_url"
+                                                           value="{{ base_obj.facebook_url }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="info">
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">代币分配</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_ico_plan"
+                                                           value="{{ base_obj.ico_plan }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">众筹价格<br>(IOC成本)</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_ico_cost"
+                                                           value="{{ base_obj.ico_cost }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">募集资金</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_ico_capital"
+                                                           value="{{ base_obj.capital }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">公募时间</label>
+                                                <div class="col-md-5">
+                                                    <input type="text" class="form-control" id="coin_ico_time"
+                                                           value="{{ base_obj.ico_time }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="team">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="alert alert-info" role="alert">提示：如果要修改人物信息，请前往
+                                                        <b>人物相关</b> 页面。本页面只提供 <b>删除关联关系</b> 。
+                                                    </div>
+                                                    <div class="table-scrollable">
+                                                        <table class="table table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="20"></th>
+                                                                <th>姓名</th>
+                                                                <th>职位</th>
+                                                                <th>描述</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            {% for team_info in team_list %}
+                                                                <tr>
+                                                                    <td><a href="javascript:;"
+                                                                           id="{{ team_info.per_id }}" title="删除"
+                                                                           class="btn glyphicon glyphicon-remove remove_per"></a>
+                                                                    </td>
+                                                                    <td class="col-md-2">
+                                                                        <p>{{ team_info.per_name }}</p>
+                                                                    </td>
+                                                                    <td class="col-md-2">
+                                                                        <p>{{ team_info.desc }}</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p>{{ team_info.per_intro }}</p>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="concept">
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">标签</label>
+                                                <div class="col-md-10">
+                                                    <input type="text" class="form-control" id="coin_tags"
+                                                           value="{{ base_obj.tags }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 control-label">所属板块</label>
+                                                <div class="col-md-10">
+                                                    {% for coin_board in coin_board_list %}
+                                                        <label class="checkbox-inline">
+                                                            {% if coin_board.id in boards_list %}
+                                                                <input type="checkbox" name="coin_board"
+                                                                       value={{ coin_board.id }} checked>
+                                                                {{ coin_board.name }}
+                                                            {% else %}
+                                                                <input type="checkbox" name="coin_board"
+                                                                       value={{ coin_board.id }}>
+                                                                {{ coin_board.name }}
+                                                            {% endif %}
+                                                        </label>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="map">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="table-scrollable">
+                                                        <table class="table table-hover table-bordered">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="20"></th>
+                                                                <th width="180">时间</th>
+                                                                <th width="130">占比</th>
+                                                                <th>规划</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            {% for roadmap_obj in roadmap_obj_list %}
+                                                                <tr>
+                                                                    <td><a href="javascript:;" title="删除"
+                                                                           class="btn glyphicon glyphicon-remove remove_roadmap"></a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                               class="form-control btn-circle work_time_desc"
+                                                                               style="text-align: center"
+                                                                               placeholder="请填写时间"
+                                                                               value="{{ roadmap_obj.work_time_desc }}">
+                                                                    </td>
+                                                                    <td><input type="number"
+                                                                               class="form-control coin_start_time"
+                                                                               value="{{ roadmap_obj.start_time }}">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                               class="form-control work_item"
+                                                                               value="{{ roadmap_obj.work_item }}">
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <a href="javascript:;" class="btn btn-circle blue" id="add_roadmap">添加新路线图</a>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="atlas-coin">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="alert alert-info" role="alert"><b>提示：</b>本页面只提供添加或删除关联币种关系。如果需要修改
+                                                        <b> 币种基本信息</b>，请前往 <b>该币种基本页</b>。
+                                                    </div>
+                                                    <div class="table-scrollable">
+                                                        <table class="table table-hover table-bordered"
+                                                               id="base_coin_table">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="20"></th>
+                                                                <th width=150">ID</th>
+                                                                <th width="200">币种Code</th>
+                                                                <th>关联关系</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for coin_info in coin_list %}
+                                                                <tr>
+                                                                    <td><a href="javascript:;" title="删除"
+                                                                           class="btn glyphicon glyphicon-remove remove_coin"></a>
+                                                                    </td>
+                                                                    <td><input type="text"
+                                                                               class="form-control btn-circle coin_id"
+                                                                               style="text-align: center"
+                                                                               disabled="disabled"
+                                                                               value="{{ coin_info.coin_id }}">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                               class="form-control btn-circle coin_info"
+                                                                               style="text-align: center"
+                                                                               disabled="disabled"
+                                                                               value="{{ coin_info.coin_code }}">
+                                                                    </td>
+                                                                    <td><input type="text"
+                                                                               class="form-control btn-circle coin_desc"
+                                                                               style="text-align: center"
+                                                                               value="{{ coin_info.desc }}"></td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="form-inline">
+                                                        <select name="" class="form-control choice_coin"
+                                                                id="base_coin_name">
+                                                            {% for base_coin in base_coin_list %}
+                                                                <option value="{{ base_coin.id }}">{{ base_coin.code }}</option>
+
+                                                            {% endfor %}
+
+
+                                                        </select>
+                                                        <a href="javascript:;" class="btn btn-circle blue"
+                                                           id="add_base_coin">添加币种</a>
+                                                    </div>
+                                                    <script>
+                                                        $(function () {
+                                                            $("#add_base_coin").click(function () {
+                                                                var coin_id = $("#base_coin_name").val();
+                                                                var coin_code = $("#base_coin_name option[value=" + coin_id + "]").text();
+                                                                var base_coin_tr = '<tr><td><a href="javascript:;" title="删除" class="btn glyphicon glyphicon-remove remove_coin"></a></td><td><input type="text" class="form-control btn-circle coin_id" style="text-align: center" disabled="disabled" value="' + coin_id + '"></td><td><input type="text" class="form-control btn-circle coin_info input-circle" style="text-align: center" disabled="disabled" value="' + coin_code + '"></td><td><input type="text" class="form-control btn-circle coin_desc input-circle" style="text-align: center" value=""></td></tr>'
+                                                                $("#base_coin_table").append(base_coin_tr);
+                                                            });
+                                                            $(document).on("click", ".remove_coin", function () {
+                                                                $(this).parents("tr").remove();
+                                                            });
+
+                                                        })
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="atlas-person">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="alert alert-info" role="alert"><b>提示：</b>本页面只提供添加或删除关联人物关系。如果需要修改
+                                                        <b> 人物基本信息</b>，请前往 <b>该人物基本页</b>。
+                                                    </div>
+                                                    <div class="table-scrollable">
+                                                        <table class="table table-hover table-bordered"
+                                                               id="base_person_table">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="20"></th>
+                                                                <th width=150">人物ID</th>
+                                                                <th width="300">人物名称</th>
+                                                                <th>关联关系</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for person_info in team_list %}
+                                                                <tr>
+                                                                    <td><a href="javascript:;" title="删除"
+                                                                           class="btn glyphicon glyphicon-remove remove_person"></a>
+                                                                    </td>
+                                                                    <td><input type="text"
+                                                                               class="form-control btn-circle person_id"
+                                                                               style="text-align: center"
+                                                                               disabled="disabled"
+                                                                               value="{{ person_info.per_id }}">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                               class="form-control btn-circle person_name"
+                                                                               style="text-align: center"
+                                                                               disabled="disabled"
+                                                                               value="{{ person_info.per_name }}">
+                                                                    </td>
+                                                                    <td><input type="text"
+                                                                               class="form-control btn-circle person_desc"
+                                                                               style="text-align: center"
+                                                                               value="{{ person_info.desc }}"></td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="form-inline">
+                                                        <select name="" class="form-control choice_person"
+                                                                id="base_person_name">
+                                                            {% for base_person in base_person_list %}
+                                                                <option value="{{ base_person.id }}">{{ base_person.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <a href="javascript:;" class="btn btn-circle blue"
+                                                           id="add_base_person">添加人物关系</a>
+                                                    </div>
+                                                    <script>
+                                                        $(function () {
+                                                            $("#add_base_person").click(function () {
+                                                                var person_id = $("#base_person_name").val();
+                                                                var person_name = $("#base_person_name option[value=" + person_id + "]").text();
+                                                                var base_person_tr = '<tr><td><a href="javascript:;" title="删除" class="btn glyphicon glyphicon-remove remove_person"></a></td><td><input type="text" class="form-control btn-circle person_id" style="text-align: center" disabled="disabled" value="' + person_id + '"></td><td><input type="text" class="form-control btn-circle person_name input-circle" style="text-align: center" disabled="disabled" value="' + person_name + '"></td><td><input type="text" class="form-control btn-circle person_desc input-circle" style="text-align: center" value=""></td></tr>';
+                                                                $("#base_person_table").append(base_person_tr);
+                                                            });
+                                                            $(document).on("click", ".remove_person", function () {
+                                                                $(this).parents("tr").remove();
+                                                            });
+                                                        })
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="atlas-organ">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="alert alert-info" role="alert"><b>提示：</b>本页面只提供添加或删除关联机构关系。如果需要修改
+                                                        <b> 机构基本信息</b>，请前往 <b>该机构基本页</b>。
+                                                    </div>
+                                                    <div class="table-scrollable">
+                                                        <table class="table table-hover table-bordered"
+                                                               id="base_organ_table">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="20"></th>
+                                                                <th width=150">机构ID</th>
+                                                                <th width="300">机构名称</th>
+                                                                <th>关联关系</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for organ_info in organ_list %}
+                                                                <tr>
+                                                                    <td><a href="javascript:;" title="删除"
+                                                                           class="btn glyphicon glyphicon-remove remove_organ"></a>
+                                                                    </td>
+                                                                    <td><input type="text"
+                                                                               class="form-control btn-circle organ_id"
+                                                                               style="text-align: center"
+                                                                               disabled="disabled"
+                                                                               value="{{ organ_info.organ_id }}">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text"
+                                                                               class="form-control btn-circle organ_name"
+                                                                               style="text-align: center"
+                                                                               disabled="disabled"
+                                                                               value="{{ organ_info.organ_name }}">
+                                                                    </td>
+                                                                    <td><input type="text"
+                                                                               class="form-control btn-circle organ_desc"
+                                                                               style="text-align: center"
+                                                                               value="{{ organ_info.desc }}"></td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="form-inline">
+                                                        <select name="" class="form-control choice_organ"
+                                                                id="base_organ_name">
+                                                            {% for base_organ in base_organ_list %}
+                                                                <option value="{{ base_organ.id }}">{{ base_organ.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <a href="javascript:;" class="btn btn-circle blue"
+                                                           id="add_base_organ">添加机构关系</a>
+                                                    </div>
+                                                    <script>
+                                                        $(function () {
+                                                            $("#add_base_organ").click(function () {
+                                                                var organ_id = $("#base_organ_name").val();
+                                                                var organ_name = $("#base_organ_name option[value=" + organ_id + "]").text();
+                                                                var base_organ_tr = '<tr><td><a href="javascript:;" title="删除" class="btn glyphicon glyphicon-remove remove_organ"></a></td><td><input type="text" class="form-control btn-circle organ_id" style="text-align: center" disabled="disabled" value="' + organ_id + '"></td><td><input type="text" class="form-control btn-circle organ_name input-circle" style="text-align: center" disabled="disabled" value="' + organ_name + '"></td><td><input type="text" class="form-control btn-circle organ_desc input-circle" style="text-align: center" value=""></td></tr>';
+                                                                $("#base_organ_table").append(base_organ_tr);
+                                                            });
+                                                            $(document).on("click", ".remove_organ", function () {
+                                                                $(this).parents("tr").remove();
+                                                            });
+                                                        })
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class=" col-md-11 text-right">
+                        <button type="button" class="btn btn-info" onclick="edit_coin_info()">提交</button>
+                        <button type="button" class="btn btn-danger" onclick="stop_edit_coin_info()">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+
+     function getUrlParms(name){
+       var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+       var r = window.location.search.substr(1).match(reg);
+       if(r!=null)
+       return unescape(r[2]);
+       return null;
+        }
+     var select_id = getUrlParms("select_id");
+     var page = getUrlParms("page");
+
+
+
+
+
+        $(function () {
+            $("#log_img").click(function () {
+                $("#upload_log").trigger("click");
+            });
+            $("#upload_log").change(function () {
+                var img_src = $("#upload_log").val();
+                var formData = new FormData();
+                formData.append("file", $("#upload_log")[0].files[0]);
+                formData.append('id', {{ base_obj.id }});
+                formData.append('img_url', img_src);
+                $.ajax({
+                    url: "{{ url_for("ften.get_log_url") }}",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        $('#log_img').attr("src", data['base_pic_url']);
+                        $('#log_pic').attr("class", data['img_url']);
+                    }
+                })
+            });
+
+
+            $("#add_roadmap").click(function () {
+                $("#map table").append('<tr><td><a href="javascript:;" title="删除" class="btn glyphicon glyphicon-remove remove_roadmap"></a></td><td><input type="text" class="form-control btn-circle input-circle work_time_desc" style="text-align: center" placeholder="请填写时间" value=""></td><td><input type="number" class="form-control btn-circle input-circle coin_start_time" value=""></td><td><input type="text" placeholder="请输入简介" class="form-control input-circle work_item" value=""></td></tr>')
+            });
+            $(document).on("click", ".remove_roadmap", function () {
+                $(this).parents("tr").remove();
+            });
+
+            delete_pers_id = [];
+            $(document).on("click", ".remove_per", function () {
+                var per_id = $(this).attr('id');
+                $(this).parents("tr").remove();
+                delete_pers_id.push(per_id);
+            });
+        });
+
+        function edit_coin_info() {
+            // 币种简介 9
+            var intro = $("#coin_intro").val();
+            var chinese_name = $('#coin_chi').val();
+            var english_name = $("#coin_eng").val();
+            var code = $("#coin_code").val();
+            var publish_time = $("#coin_publish_time").val();
+            var max_supply = $("#coin_max_supply").val();
+            var shelf_num = $("#coin_shelf_num").val();
+            var algorithm = $("#coin_algorithm").val();
+            var proof_type = $("#coin_proof_type").val();
+
+            // 头像
+            var log_img = $("#log_img").attr("src");
+            var img_url = $("#log_pic").attr("class");
+
+            // 相关链接 9
+            var website_url = $("#coin_website_url").val();
+            var wallet_url = $("#coin_wallet_url").val();
+            var forum_urls = $("#coin_forum_urls").val();
+            var wp_url = $("#coin_wp_url").val();
+            var be_urls = $("#coin_be_urls").val();
+            var github_url = $("#coin_github_url").val();
+            var reddit_url = $('#coin_reddit_url').val();
+            var twitter_url = $("#coin_twitter_url").val();
+            var facebook_url = $("#coin_facebook_url").val();
+
+            // 公募信息 4
+            var ico_plan = $("#coin_ico_plan").val();    // 代币分配
+            var ico_cost = $("#coin_ico_cost").val();    // ICO成本，众筹价格
+            var capital = $("#coin_ico_capital").val();      // 募集资金
+            var ico_time = $("#coin_ico_time").val();    // 公募时间
+
+            // 相关概念 2
+            var coin_tags = $("#coin_tags").val();
+            var board_id_list = [];
+            $("input[name=coin_board]:checked").each(function () {
+                board_id_list.push($(this).val());
+            });
+
+            // 路线图 2
+            var roadmap_data = [];
+            $("#map tr").each(function (i) {
+                var this_time = $(this).find(".work_time_desc").val();
+                var this_desc = $(this).find(".work_item").val();
+                var coin_start_time = $(this).find(".coin_start_time").val();
+                if (i != 0) {
+                    roadmap_data.push({
+                        "coin_start_time": coin_start_time,
+                        "work_time_desc": this_time,
+                        "work_item": this_desc
+                    });
+                }
+            });
+
+
+            // 知识图谱 Coin
+            var base_coin_data = [];
+            $("#base_coin_table tr").each(function (i) {
+                var this_coin_id = $(this).find(".coin_id").val();
+                var this_coin_code = $(this).find(".coin_info").val();
+                var this_coin_desc = $(this).find(".coin_desc").val();
+                if (i != 0) {
+                    base_coin_data.push({
+                        "coin_id": this_coin_id,
+                        "coin_code": this_coin_code,
+                        "coin_desc": this_coin_desc
+                    });
+                }
+            });
+
+            // 知识图谱 Person
+            var base_person_data = [];
+            $("#base_person_table tr").each(function (i) {
+                var this_person_id = $(this).find('.person_id').val();
+                var this_person_desc = $(this).find(".person_desc").val();
+                if (i != 0) {
+                    base_person_data.push({
+                        "person_id": this_person_id,
+                        "person_desc": this_person_desc
+                    })
+                }
+            });
+
+            // 知识图谱 Organization
+            var base_organ_data = [];
+            $("#base_organ_table tr").each(function (i) {
+                var this_organ_id = $(this).find('.organ_id').val();
+                var this_organ_desc = $(this).find(".organ_desc").val();
+                if (i != 0) {
+                    base_organ_data.push({
+                        "organ_id": this_organ_id,
+                        "organ_desc": this_organ_desc
+                    })
+                }
+            });
+{#            console.log(base_organ_data);#}
+
+            layer.confirm('数据较多，慎重！', {
+                btn: ["确定修改", "我再看看"]
+            }, function () {
+                $.ajax({
+                    type: "post",
+                    url: "/f10/modify_coin_info",
+                    data: {
+                        id: {{ base_obj.id }},
+                        intro: intro,
+                        chinese_name: chinese_name,
+                        english_name: english_name,
+                        code: code,
+                        publish_time: publish_time,
+                        max_supply: max_supply,
+                        shelf_num: shelf_num,
+                        algorithm: algorithm,
+                        proof_type: proof_type,
+                        // log
+                        log_img: log_img,
+                        img_url: img_url,
+
+                        website_url: website_url,
+                        wallet_url: wallet_url,
+                        forum_urls: forum_urls,
+                        wp_url: wp_url,
+                        be_urls: be_urls,
+                        github_url: github_url,
+                        reddit_url: reddit_url,
+                        twitter_url: twitter_url,
+                        facebook_url: facebook_url,
+
+                        ico_plan: ico_plan,
+                        ico_cost: ico_cost,
+                        capital: capital,
+                        ico_time: ico_time,
+
+                        coin_tags: coin_tags,
+                        board_id_list: JSON.stringify(board_id_list),
+
+                        // 团队去除人员team
+                        delete_pers_id: JSON.stringify(delete_pers_id),
+
+                        // 路线图RoadMap
+                        roadmap_data: JSON.stringify(roadmap_data),
+
+                        // 知识图谱Coin
+                        base_coin_data: JSON.stringify(base_coin_data),
+                        // 知识图谱Person
+                        base_person_data: JSON.stringify(base_person_data),
+                        // 知识图谱Organization
+                        base_organ_data: JSON.stringify(base_organ_data)
+                    },
+                    success: function (data) {
+                        if (data.status == "ok") {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            window.location.href = '{{ url_for("ften.coin_category_list") }}' + "?page="+page;
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 2});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg(data.msg, {time: 1500, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

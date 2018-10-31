@@ -1,0 +1,271 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        input {
+            text-align: center
+        }
+
+        #uploadfile_input {
+            opacity: 0;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('planet.planet_owner') }}">星球主</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">星球主编辑</span>
+                                <span id="base_pic" class=""></span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-edit" style="font-size: 25px"></i>
+                                <span class="caption-subject sbold uppercase">星球主编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    {#                                    <div class="form-group">#}
+                                    {#                                        <label class="control-label col-md-2">图片相关</label>#}
+                                    {#                                        <div class="col-md-10">#}
+                                    {#                                            <img src="{{ data['banner_img'] }}" alt="" id="banner_img" width=""#}
+                                    {#                                                 height="">#}
+                                    {#                                            <input type="file" id="uploadfile_input" value="">#}
+                                    {#                                        </div>#}
+                                    {#                                    </div>#}
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 序号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="owner_sn"
+                                                   value="{{ data.sn }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 星球主编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="owner_no"
+                                                   value="{{ data.owner_no }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 客户编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="customer_no"
+                                                   value="{{ data.customer_no }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 星球编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="planet_no"
+                                                   value="{{ data.planet_no }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 数字身份 </label>
+                                        <div class="col-md-3" readonly="true">
+                                            <input type="text" class="form-control" id="digital_identity"
+                                                   value="{{ data.digital_identity }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 客户级别 </label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="grade"
+                                                   value="{{ data.grade }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 财富 </label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="wealth"
+                                                   value="{{ data.wealth }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> Remark </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="remark"
+                                                   value="{{ data.remark }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 状态(是否可用) </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data.status == "1" %}
+                                                <input id="status" type="checkbox" name="push"
+                                                       value="{{ data.status }}" class="input-small" checked/>
+                                            {% else %}
+                                                <input id="status" type="checkbox" name="push"
+                                                       value="{{ data.status }}" class="input-small"/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 是否删除 </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data.is_delete == 0 %}
+                                                <input id="is_delete" type="checkbox" name="push"
+                                                       value="{{ data.is_delete }}" class="input-small"/>
+                                            {% else %}
+                                                <input id="is_delete" type="checkbox" name="push"
+                                                       value="{{ data.is_delete }}" class="input-small" checked/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    <br>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title=" 确认修改 " onclick="modify_planet_owner()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title=" 取消修改 " onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+{#        // 时间插件相关#}
+{#        $(function () {#}
+{#            initDatePlugin();#}
+{#        });#}
+{##}
+{#        $("#iptStartTime").click(showStart);#}
+        {#    $("#iptEndTime").click(showEnd);#}
+{#        // 开始和结束时间窗状态（fasle：关闭状态，true：打开状态）#}
+{#        var startStatus = false;#}
+{##}
+{#        //初始化时间插件#}
+{#        function initDatePlugin() {#}
+{#            $("#iptStartTime").datetimepicker({#}
+{#                minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示#}
+{#                language: 'zh-CN', // 语言#}
+{#                autoclose: true, //  true:选择时间后窗口自动关闭#}
+{#                format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00#}
+{#                todayHighlight: true, //高亮当日#}
+{#                // clearBtn:true,   //清除按钮#}
+{#                todayBtn: true#}
+{##}
+{#            }).on("changeDate", function () {#}
+{#                var startTime = $("#iptStartTime").val();#}
+{#                $("#iptEndTime").datetimepicker("setStartDate", startTime);#}
+{##}
+{#                // 清除开始时间时，结束时间取消限制#}
+{#                if (!this.value) {#}
+{#                    $("#iptEndTime").datetimepicker("setStartDate", "1970-01-01");#}
+{#                    $("#iptEndTime").datetimepicker("setEndDate", "3000-01-01");#}
+{#                }#}
+{##}
+{#            });#}
+{##}
+{#            $("#iptEndTime").datetimepicker({#}
+{#                minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示#}
+{#                language: 'zh-CN', // 语言#}
+{#                autoclose: true, //  true:选择时间后窗口自动关闭#}
+{#                format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00#}
+{#                todayHighlight: true,#}
+{#                todayBtn: true // 如果此值为true 或 "linked"，则在日期时间选择器组件的底部显示一个 "Today" 按钮用以选择当前日期。#}
+{#            }).on("changeDate", function () {#}
+{##}
+{#                // 清楚结束时间时，开始时间取消限制#}
+{#                if (!this.value) {#}
+{#                    $("#iptStartTime").datetimepicker("setEndDate", "3000-01-01");#}
+{#                    $("#iptStartTime").datetimepicker("setStartDate", "1970-01-01");#}
+{#                } else {#}
+{#                }#}
+{#            });#}
+{#        }#}
+{##}
+{#        // 控制开始时间弹窗显示还是隐藏#}
+{#        function showStart() {#}
+{#            if (startStatus) {#}
+{#                $("#iptStartTime").datetimepicker("hide");#}
+{#                startStatus = false;#}
+{#            } else {#}
+{#                $("#iptStartTime").datetimepicker("show");#}
+{#                startStatus = true;#}
+{#            }#}
+{#            // 失去焦点时，时间窗为关闭状态#}
+{#            $("#iptStartTime").blur(function () {#}
+{#                startStatus = false;#}
+{#            })#}
+{#        }#}
+
+        // 编辑PlanetOwner
+        function modify_planet_owner() {
+            var formData = new FormData();
+
+            var i_delete = $("#is_delete").is(":checked");
+            var is_delete = 0;
+            if (i_delete == true) {
+                is_delete = 1
+            }
+
+            var istatus = $("#status").is(":checked");
+            var status = 0;
+            if (istatus == true) {
+                status = 1
+            }
+
+            formData.append("sn", {{ data.sn }});
+            formData.append("owner_no", $("#owner_no").val());
+            formData.append("customer_no", $("#customer_no").val());
+            formData.append("planet_no", $("#planet_no").val());
+            formData.append("digital_identity", $("#digital_identity").val());
+            formData.append("status", status);
+            formData.append("wealth", $("#wealth").val());
+            formData.append("grade", $("#grade").val());
+            formData.append("remark", $("#remark").val());
+            formData.append("is_delete", is_delete);
+
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.modify_planet_owner')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            window.localStorage.setItem("planet_owner_reload", "true");
+                            window.history.go(-1);
+                        }else {
+                            layer.msg(data.msg, {time: 1500, icon: 2});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

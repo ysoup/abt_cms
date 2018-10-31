@@ -1,0 +1,331 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for("activity.act_lx") }}">拉新活动</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">编辑该轮活动</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">拉新活动编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"><b>当前轮数 </b></label>
+                                        <div class="col-md-6 form-inline">
+                                            <div class="mt-checkbox-list">
+                                                <input type="text" class="text-center form-control" id="stage" readonly value="{{ data.stage }}">
+                                                <span style="color: red;">（不可编辑）</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>活动开始与结束时间 </b></label>
+                                        <div class="col-md-10">
+
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="input-group input-group-sm startT">
+                                                        <span class="input-group-addon" id="startTime">起始时间</span>
+                                                        <input type="text" name="startTime" readonly value="{{ data.start_time }}"
+                                                               class="form-control form_datetime" id="iptStartTime"/>
+                                                        <a class="btn glyphicon glyphicon-remove" style="pointer-events:auto; position: absolute; z-index: 2;left:88%"></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group input-group-sm endT">
+                                                        <span class="input-group-addon" id="endTime">结束时间</span>
+                                                        <input type="text" name="endTime" readonly value="{{ data.end_time }}"
+                                                               class="form-control form_datetime" id="iptEndTime"/>
+                                                        <a class="btn glyphicon glyphicon-remove" style="pointer-events:auto; position: absolute; z-index: 2;left:88%"></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"><b>本轮奖金总额 / BTC </b></label>
+                                        <div class="col-md-6 form-inline">
+                                            <div class="mt-checkbox-list">
+                                                <input type="number" step="0.01" class="form-control" id="total_amount"
+                                                       placeholder="设置奖金总额" value="{{ data.total_amount }}"> BTC
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"><b>本轮活动获奖名额 </b></label>
+                                        <div class="col-md-6 form-inline">
+                                            <input type="number" class="form-control" id="total_member"
+                                                   value="{{ data.total_member}}" placeholder="本轮活动获奖名额"> 人
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"><b>奖金 / 人 </b></label>
+                                        <div class="col-md-6 form-inline">
+                                            <input readonly type="number" step="0.1" class="form-control text-center" id="per_amount"
+                                                   value="{{ data.per_amount }}" placeholder="奖金"> mBTC
+                                            <span style="color: red;">（不可编辑）</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-11 text-right">
+                                            <button type="button" class="btn green" onclick="modify_act()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green" onclick="stop_modify_act()">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+    $('#total_amount').bind('input propertychange', function () {
+        $('#total_member').val(($(this).val() * 100000) / ($("#per_amount").val() * 100));
+    });
+
+    $('#total_member').bind('input propertychange', function () {
+        $('#total_amount').val(($(this).val() * 100000) * ($("#per_amount").val() * 100));
+    });
+
+
+
+    $(function () {
+        $("#per_amount").val($("#per_amount").val() *1000)
+    });
+
+    // 日期选择框清空
+    $(".startT .glyphicon-remove").click(function () {
+        $("#iptStartTime").val("")});
+
+    $(".endT .glyphicon-remove").click(function () {
+        $("#iptEndTime").val("")});
+
+
+    function modify_act() {
+        var stage = $("#stage").val();
+        var start_time = $("#iptStartTime").val();   // 活动开始时间
+        var end_time = $("#iptEndTime").val();       // 活动结束时间
+        var total_amount = $("#total_amount").val(); // 本轮奖金总额
+        var total_member = $("#total_member").val(); // 本轮获奖名额
+        var per_amount = $("#per_amount").val();     // 每人获得的奖金数额
+
+        if (start_time == "" || end_time == "") {
+            layer.msg("请选择时间!", {time: 1000, icon: 2});
+            return false
+        }
+        if (total_amount == "" || total_member == "" || per_amount == "") {
+            layer.msg("填满，谢谢!", {time: 1000, icon: 2});
+            return false
+        }
+
+        start_time = $("#iptStartTime").val().substr(0, 16) + ":00";
+        end_time = $("#iptEndTime").val().substr(0, 16) + ":00";
+
+        layer.confirm('是否修改？', {
+            btn: ['确认', '取消']
+        }, function () {
+            $.ajax({
+                // 处理ajax
+                url: "{{ url_for('activity.modify_act')}}",
+                type: 'post',
+                data: {
+                    stage : stage,
+                    start_time : start_time,
+                    end_time : end_time,
+                    total_amount : total_amount,
+                    total_member : total_member,
+                    per_amount : per_amount
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("编辑成功！", {time: 1000, icon: 1});
+                        window.location.href = "{{ url_for('activity.act_lx') }}"
+                    }
+                    else {
+                        layer.msg(data.failed, {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            });
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            return false
+        });
+    }
+
+
+
+
+
+{#    function modify_act() {#}
+{#        var stage = $("#stage").val();#}
+{#        var start_time = $("#iptStartTime").val();   // 活动开始时间#}
+{#        var end_time = $("#iptEndTime").val();       // 活动结束时间#}
+{#        var total_amount = $("#total_amount").val(); // 本轮奖金总额#}
+{#        var total_member = $("#total_member").val(); // 本轮获奖名额#}
+{#        var per_amount = $("#per_amount").val();     // 每人获得的奖金数额#}
+{#        console.log(per_amount);#}
+{#        if(start_time == "" || end_time == ""){#}
+{#            console.log(start_time);#}
+{#            console.log(end_time);#}
+{#            console.log(start_time == "" || end_time == "");#}
+{#            alert("请选择时间后，再提交!");#}
+{#            return false#}
+{#        }#}
+{#        if(total_amount == "" || total_member == "" || per_amount == ""){#}
+{#            alert("填满，谢谢!");#}
+{#            return false#}
+{#        }#}
+        {#        start_time += ":00";   // 活动开始时间#}
+        {#        end_time += ":00";       // 活动结束时间#}
+{#        start_time = $("#iptStartTime").val().substr(0,16)+":00";#}
+{#        end_time = $("#iptEndTime").val().substr(0,16)+":00";#}
+{##}
+{#        $.ajax({#}
+{#            url: "{{ url_for('activity.modify_act')}}",#}
+{#            type: 'post',#}
+{#            data: {#}
+{#                stage : stage,#}
+{#                start_time : start_time,#}
+{#                end_time : end_time,#}
+{#                total_amount : total_amount,#}
+{#                total_member : total_member,#}
+{#                per_amount : per_amount#}
+{#            },#}
+{#            success: function (data) {#}
+{#                if (data.success == 'ok') {#}
+{#                    alert("编辑成功");#}
+{#                    window.location.href = "{{ url_for('activity.act_lx') }}"#}
+{#                }#}
+{#                else{#}
+{#                    alert(data.failed);#}
+{#                }#}
+{#            }#}
+{#        })#}
+{#    }#}
+
+
+    function stop_modify_act() {
+          layer.confirm('是否放弃当前编辑内容？', {
+              btn: ['确认','取消'] //按钮
+            }, function(){
+              window.location.href = "{{ url_for('activity.act_lx') }}";
+            }, function(){
+              layer.msg({time: 1000, icon: 6});
+              return false;
+            });
+        }
+
+
+
+    // 时间插件相关
+    $(function () {
+        initDatePlugin();
+    });
+
+    $("#iptStartTime").click(showStart);
+    $("#iptEndTime").click(showEnd);
+    // 开始和结束时间窗状态（fasle：关闭状态，true：打开状态）
+    var startStatus = false;
+    var endStatus = false;
+
+    //初始化时间插件
+    function initDatePlugin() {
+        $("#iptStartTime").datetimepicker({
+            minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+            language: 'zh-CN', // 语言
+            autoclose: true, //  true:选择时间后窗口自动关闭
+            format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+            todayHighlight: true, //高亮当日
+            // clearBtn:true,   //清除按钮
+            todayBtn:true
+
+        }).on("changeDate", function () {
+            var startTime = $("#iptStartTime").val();
+            $("#iptEndTime").datetimepicker("setStartDate", startTime);
+
+            // 清除开始时间时，结束时间取消限制
+            if (!this.value) {
+                $("#iptEndTime").datetimepicker("setStartDate", "1970-01-01");
+                $("#iptEndTime").datetimepicker("setEndDate", "3000-01-01");
+            }
+
+        });
+
+        $("#iptEndTime").datetimepicker({
+            minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+            language: 'zh-CN', // 语言
+            autoclose: true, //  true:选择时间后窗口自动关闭
+            format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+            todayHighlight: true,
+            todayBtn:true // 如果此值为true 或 "linked"，则在日期时间选择器组件的底部显示一个 "Today" 按钮用以选择当前日期。
+        }).on("changeDate", function () {
+
+            // 清楚结束时间时，开始时间取消限制
+            if (!this.value) {
+                $("#iptStartTime").datetimepicker("setEndDate", "3000-01-01");
+                $("#iptStartTime").datetimepicker("setStartDate", "1970-01-01");
+            } else {
+            }
+        });
+    }
+
+    // 控制开始时间弹窗显示还是隐藏
+    function showStart() {
+        if (startStatus) {
+            $("#iptStartTime").datetimepicker("hide");
+            startStatus = false;
+        } else {
+            $("#iptStartTime").datetimepicker("show");
+            startStatus = true;
+        }
+        // 失去焦点时，时间窗为关闭状态
+        $("#iptStartTime").blur(function () {
+            startStatus = false;
+        })
+    }
+
+    // 控制结束时间弹窗显示还是隐藏
+    function showEnd() {
+        if (endStatus) {
+            $("#iptEndTime").datetimepicker("hide");
+            endStatus = false;
+        } else {
+            $("#iptEndTime").datetimepicker("show");
+            endStatus = true;
+        }
+        $("#iptEndTime").blur(function () {
+            endStatus = false;
+        })
+    }
+
+    </script>
+{% endblock %}
+

@@ -1,0 +1,160 @@
+{% extends "/index.html" %}
+{%import 'macro_pagination.html' as macro_pagination%}
+{% block content %}
+    <style>
+{#        .table th, .table td {#}
+{#            text-align: center;#}
+{#            vertical-align: middle !important;#}
+{#        }#}
+    table img{
+        max-width: 600px;
+    }
+    </style>
+
+    <div class="page-content-wrapper">
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content">
+                    <!-- BEGIN PAGE HEAD-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="">Report管理</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active">Report列表（按照修改时间先后排序）</span>
+                        </li>
+                    </ul>
+                            <div>
+                                <button type="button" class="btn btn-circle blue" onclick='add_rep()'>添加模板</button>
+                            </div>
+                                <div class="portlet-body">
+                                    <div class="table-scrollable">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <button onclick="invent()" type="button"
+                                                                class="btn btn-circle red btn-sm">全选
+                                                        </button>
+                                                    </th>
+                                                    <th>ID</th>
+                                                    <th>类型</th>
+                                                    <th>TOP指数源</th>
+                                                    <th>次级指数源</th>
+                                                    <th>内容</th>
+                                                    <th>创建时间</th>
+                                                    <th>修改时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for row in data %}
+                                                <tr>
+                                                    <td><label>
+                                                        <input type="checkbox" name="choice_checkbox" value="{{ row.id }}">
+                                                    </label></td>
+                                                    <td>{{ row['id'] }}</td>
+                                                    <td>
+                                                        {% if row.type==1 %}早报
+                                                        {% elif row.type==2 %}午报
+                                                        {% elif row.type==3 %}晚报
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ row["top_source"].source_name }}</td>
+                                                    <td>
+                                                        {% for sec in row.sec_source %}{{ sec.source_name }}<br />{% endfor %}
+                                                    </td>
+                                                    <td>{{ row["content"]|safe }}</td>
+                                                    <td>{{ row["create_time"] }}</td>
+                                                    <td>{{ row["update_time"] }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger glyphicon glyphicon-pencil" title="编辑" onclick="modify_rep({{row['id']}})"></button>
+{#                                                        <button type="button" class="btn btn-danger glyphicon glyphicon-eyes" title="预览" onclick=""></button>#}
+                                                        <button type="button" class="btn btn-primary glyphicon glyphicon-download" title="下载" onclick="download_rep({{ row['id'] }}, this)"></button>
+                                                        <button type="button" class="btn btn-success glyphicon glyphicon-trash" title="删除" onclick="delete_rep(this,{{row['id']}})"></button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {%if pagination%}
+                                {{macro_pagination.pagination_widget(pagination,'report.rep_list')}}
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <script type="text/JavaScript">
+
+        function delete_rep(obj,id) {
+            layer.confirm('真删？', {
+                btn: ['真', '假']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('report.delete_rep')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            $(obj).parents("tr").remove();
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+        function add_rep() {
+            window.location.href="/add_rep"
+        }
+
+        function modify_rep(id) {
+            window.location.href="/modify_rep?id="+id;
+        }
+
+        // 反选
+        function invent() {
+            $("input[name='choice_checkbox']").each(function () {
+                if ($(this).prop("checked")) {
+                    $(this).attr("checked", false);
+                }
+                else {
+                    $(this).prop("checked", true);
+                }
+            })
+        }
+
+        function download_rep(id,obj) {
+
+            layer.msg('即将进入预览页面', {
+                icon: 6,
+                time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                , anim: 1
+            }, function () {
+                //do something
+                window.open('/download_rep?id=' + id)
+            });
+        }
+
+
+    </script>
+{% endblock %}
+

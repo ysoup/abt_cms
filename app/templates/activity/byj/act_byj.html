@@ -1,0 +1,430 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+
+    <style>
+        .my_input {
+            width: 100%;
+            display: block;
+            line-height: 60px;
+            text-align: center;
+        }
+
+        .my_input input[type="checkbox"] {
+            display: none;
+        }
+
+        .my_input input[type="checkbox"] + label {
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            position: relative;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            margin: 0px 20px;
+            box-sizing: border-box;
+        }
+
+        .my_input input[type="checkbox"] + label:after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 20px;
+            height: 20px;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .my_input .inset_put:checked + label.pink {
+            background: #fb7575;
+        }
+
+        .my_input .inset_put:checked + label.pink:after {
+            background: #fff;
+        }
+
+        .my_input .inset_put:checked + label:after {
+            left: calc(100% - 18px);
+        }
+
+        .my_input .inset_put + label {
+            background: #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .my_input .inset_put + label:after {
+            background: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            top: 2px;
+            left: 2px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #img_radio img {
+            border-radius: 50%
+        }
+
+        .up_down_btn {
+            position: relative;
+            display: inline-block;
+            width: 30px;
+            height: 24px;
+            padding: 3px 0;
+            vertical-align: middle;
+        }
+
+        .up_down_btn .glyphicon {
+            position: absolute;
+            left: 6px;
+            height: 12px;
+            font-size: 12px;
+            line-height: 12px;
+            color: #999;
+        }
+
+        .up_down_btn .glyphicon-menu-up {
+            top: 2px;
+            bottom: auto;
+        }
+
+        .up_down_btn .glyphicon-menu-down {
+            top: auto;
+            bottom: 2px;
+        }
+
+        .up_btn .glyphicon-menu-up {
+            color: #fb7575;
+        }
+
+        .down_btn .glyphicon-menu-down {
+            color: #fb7575;
+        }
+
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>毕业季活动展示页
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false" style="background: #fb7575;color: #fff;">已展示&nbsp;&nbsp;<span
+                                            class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/act_byj?select_id=0" class="btn btn-circle ">全部</a></li>
+                                        <li><a href="/act_byj?select_id=1" class="btn btn-circle ">已展示</a></li>
+                                        <li><a href="/act_byj?select_id=2" class="btn btn-circle ">未展示</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+{#                            <div class="col-md-4">#}
+{#                                <button onclick="delete_choice_byj()" class="btn btn-circle pull-right"#}
+{#                                        style="background: #fb7575;color: #fff;">批量删除#}
+{#                                </button>#}
+{#                            </div>#}
+                        </div>
+
+                        <!--<button type="button" class="btn btn-circle-left" onclick='$("#dialog_push_config").modal("show")'>自动推送时间段设置</button>-->
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+{#                                        <th>#}
+{#                                            <button onclick="invent()" type="button"#}
+{#                                                    class="btn green btn-circle btn-sm">全选#}
+{#                                            </button>#}
+{#                                        </th>#}
+                                        <th>序号</th>
+                                        <th>用户头像</th>
+                                        <th>用户昵称</th>
+                                        <th>评论图片</th>
+                                        <th>评论内容</th>
+                                        <th>评论时间</th>
+                                        <th>地址</th>
+
+                                        <th>点赞数量
+                                            <a id="positive_sort" href="javascript:;" class="up_down_btn">
+                                                <i class="glyphicon glyphicon-menu-up"></i>
+                                                <i class="glyphicon glyphicon-menu-down"></i>
+                                            </a>
+                                        </th>
+                                        <th>状态</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for info in data %}
+                                        <tr>
+                                            <td><label>
+                                                <input type="checkbox" name="choice_checkbox" value="{{ info.id }}">
+                                            </label></td>
+
+                                            <td>
+                                                {% if info.headimg %}
+                                                    <img src="{{ info.headimg }}" alt="" width="=70px" height="70px">
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if info.name %}
+                                                    {{ info.name }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+{#                                                {% for img_item in info.image.value%}#}
+                                                {% for img_item in info.image.values() %}
+                                                    <img src="{{ index_url }}{{ img_item }}" alt="" width="50px"
+                                                         height="50px">
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ info.text|safe }}</td>
+
+                                            <td>{{ info.time }}</td>
+                                            <td>{{ info.address }}</td>
+                                            <td>{{ info.positive }}</td>
+                                            <td>
+                                                {% if info.delete == 0 %}
+                                                    <div class="row my_input">
+{#                                                    <span>{{ info.delete }}</span>#}
+                                                        <input type="checkbox" checked id="inset_input-{{ info.id }}"
+                                                               class="inset_put">
+                                                        <label for="inset_input-{{ info.id }}" class="pink" data-id="{{ info.id }}" data-flag="1"></label>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="row my_input">
+{#                                                        <span>{{ info.delete }}</span>#}
+                                                        <input type="checkbox" id="inset_input-{{ info.id }}"
+                                                               class="inset_put">
+                                                        <label for="inset_input-{{ info.id }}" class="pink" data-id="{{ info.id }}" data-flag="0"></label>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+
+
+{#                                    <tr>#}
+{#                                        <td><label>#}
+{#                                            <input type="checkbox" name="choice_checkbox" value="">#}
+{#                                        </label></td>#}
+{#                                        <td>1</td>#}
+{#                                        <td><img src="/static/paper/paper_img.png" alt="user_img" width="150px"#}
+{#                                                 height="150px">#}
+{#                                        </td>#}
+{#                                        <td>uuu</td>#}
+{#                                        <td id="img_radio"><img src="/static/paper/paper_img.png" alt="user_img"#}
+{#                                                                width="60px" height="60px">#}
+{#                                            <img src="/static/paper/paper_img.png" alt="user_img" width="60px"#}
+{#                                                 height="60px">#}
+{#                                            <img src="/static/paper/paper_img.png" alt="user_img" width="60px"#}
+{#                                                 height="60px">#}
+{#                                        </td>#}
+{#                                        <td>1111</td>#}
+{#                                        <td>2018-06-26 14:59:43</td>#}
+{#                                        <td>eluosi</td>#}
+{#                                        <td>1111</td>#}
+{#                                        <td>#}
+{#                                            <div class="row my_input">#}
+{#                                                <input type="checkbox" class="inset_input" checked="checked" id="inset_input">#}
+{#                                                <label for="inset_input" class="pink" onclick="del_show()"></label>#}
+{#                                            </div>#}
+{#                                        </td>#}
+{#                                    </tr>#}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // 反选
+        function invent() {
+            $("input[name='choice_checkbox']").each(function () {
+                if ($(this).prop("checked")) {
+                    $(this).attr("checked", false);
+                }
+                else {
+                    $(this).prop("checked", true);
+                }
+            })
+        }
+
+
+        // 批量删除
+{#        function delete_choice_byj() {#}
+{#            var byj_id_list = [];#}
+{#            $("input[name='choice_checkbox']:checked").each(function () {#}
+{#                byj_id_list.push($(this).val());#}
+{#            });#}
+{#            if (byj_id_list == "") {#}
+{#                layer.msg("你好像一个都没选", {time: 1000, icon: 2});#}
+{#                return false#}
+{#            }#}
+{#            layer.confirm('继续操作？', {#}
+{#                btn: ['是', '否']#}
+{#            }, function () {#}
+{#                $.ajax({#}
+{#                    // 处理ajax#}
+{#                    url: '{{ url_for('activity.delete_user_byj_list')}}',#}
+{#                    type: 'post',#}
+{#                    data: JSON.stringify(byj_id_list),#}
+{##}
+{#                    success: function (data) {#}
+{#                        if (data.success == 'ok') {#}
+{#                            layer.msg("操作成功！", {time: 1000, icon: 1});#}
+{#                            window.location.reload()#}
+{#                        }#}
+{#                        else {#}
+{#                            layer.msg("操作失败！", {time: 1000, icon: 5});#}
+{#                            return false#}
+{#                        }#}
+{#                    }#}
+{#                });#}
+{#            }, function () {#}
+{#                layer.msg("已取消", {time: 1000, icon: 2});#}
+{#                return false#}
+{#            });#}
+{#        }#}
+
+
+        function tr_index() {
+            $("table").each(function (i) {
+                $(this).find("tr").each(function (i) {
+                    if (i != 0) {
+                        $(this).find("td").eq(0).text(i);
+                    }
+                })
+            })
+        }
+
+        $(document).on("click",".my_input label",function () {
+            var $this = $(this);
+            var this_id = $this.data("id");
+            var this_flag = $this.data("flag");
+            $.ajax({
+                url: "/delete_user_byj",
+                type: 'POST',
+                data: {
+                    id: this_id,
+                    flag: this_flag
+                },
+                success: function (data) {
+                    if (data.success == "ok") {
+                        if (this_flag == '1') {
+                            $('#inset_input-' + this_id).removeAttr("checked");
+                            $this.data("flag","0");
+                            layer.msg("取消展示成功", {time:1500, icon:6})
+                        }
+                        else if(this_flag == '0') {
+                            $('#inset_input-' + this_id).attr("checked");
+                            $this.data("flag","1");
+                            layer.msg("展示成功", {time:1500, icon:1})
+                        }
+
+                    }
+                    else {
+                        layer.msg("操作失败！", {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            })
+        });
+
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+
+
+
+        $(function () {
+            var sort_pos = getUrlParms("sort_pos");
+            var select_id = getUrlParms("select_id");
+            tr_index();
+
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('已展示 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('未展示 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+
+
+
+
+
+                $(".up_down_btn").click(function () {
+                    var $this = $(this);
+                    var this_up = $this.hasClass("up_btn");
+                    var this_down = $this.hasClass("down_btn");
+                    if (this_down) {
+                        $this.addClass("up_btn").removeClass("down_btn");
+                        window.location.href = "/act_byj?sort_pos=2"
+                    } else if (this_up) {
+                        $this.removeClass("up_btn");
+                        window.location.href = "/act_byj"
+                    } else {
+                        $this.addClass("down_btn").removeClass("up_btn");
+                        window.location.href = "/act_byj?sort_pos=1";
+                    }
+                });
+
+            if(sort_pos == 1){
+                $("#positive_sort").addClass("down_btn").removeClass("up_btn");
+            }
+            else if(sort_pos == 2){
+                $("#positive_sort").addClass("up_btn").removeClass("down_btn");
+            }
+            else{
+                $("#positive_sort").removeClass("up_btn");
+            }
+        })
+
+
+    </script>
+{% endblock %}

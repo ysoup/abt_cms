@@ -1,0 +1,162 @@
+{% extends "/index.html" %}
+<style>
+</style>
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/news_notification">星球动态信息</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active"></span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">星球动态信息编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">序号</label>
+                                        <div class="col-md-6">
+                                            <input type="text" id="sn" style="text-align: center" class="form-control"
+                                                   value="{{ data.sn }}" placeholder="" name="sn" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">星球编号<br />（不可修改）</label>
+                                        <div class="col-md-6">
+                                            <input type="text" id="planet_no" style="text-align: center"
+                                                   class="form-control" value="{{ data.planet_no }}" placeholder=""
+                                                   name="planet_no" readonly>
+                                        </div>
+                                    </div>
+                                    {#                                            <div class="form-group">#}
+                                    {#                                                <label class="control-label col-md-2">动态类型</label>#}
+                                    {#                                                <div class="col-md-6">#}
+                                    {#                                                    <input type="text" style="text-align: center" id="news_type" class="form-control" value="{{ data.note }}" placeholder=""  name="news_type">#}
+                                    {#                                                </div>#}
+                                    {#                                            </div>#}
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">动态类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="news_type">
+                                                <option value=1 {% if data.news_type == 1 %}
+                                                        selected
+                                                {% endif %} >星球
+                                                </option>
+                                                <option value=2 {% if data.news_type == 2 %}
+                                                        selected
+                                                {% endif %} >星球币
+                                                </option>
+                                                <option value=3 {% if data.news_type == 3 %}
+                                                        selected
+                                                {% endif %} >居民币
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">内容</label>
+                                        <div class="col-md-6">
+                                            <textarea id="news_content" class="form-control input-circle" rows="8" placeholder="请输入Content">{{ data.news_content }}</textarea>
+                                        </div>
+{#                                        <div class="col-md-6">#}
+{#                                            <input type="number" style="text-align: center" id="news_content"#}
+{#                                                   class="form-control" value="{{ data.news_content }}" placeholder="内容"#}
+{#                                                   name="news_content">#}
+{#                                        </div>#}
+                                    </div>
+                                </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">是否显示</label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data.is_show == 1 %}
+                                                <input id="is_show" type="checkbox" name="is_show"
+                                                       value="{{ data.is_show }}" class="input-small"
+                                                       checked/>
+                                            {% else %}
+                                                <input id="is_show" type="checkbox" name="is_show"
+                                                       value="{{ data.is_show }}" class="input-small"/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title="确认修改" onclick="modify_news_notification()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title="取消修改" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function modify_news_notification() {
+            // 拿值
+            var sn = $("#sn").val();
+            var planet_no = $("#planet_no").val();
+            var news_type = $("#news_type").val();
+            var news_content = $("#news_content").val();
+            var ishow = $("#is_show").is(":checked");
+            var is_show = 0;
+            if (ishow == true) {
+                is_show = 1;
+            }
+
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    // 处理ajax
+                    url: '{{ url_for('planet.modify_news_notification')}}',
+                    type: 'post',
+                    data: {
+                        sn : sn,
+                        planet_no : planet_no,
+                        news_type : news_type,
+                        news_content : news_content,
+                        is_show : is_show
+                    },
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            window.localStorage.setItem("news_notification_reload", "true");
+                            window.history.go(-1);
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}
+

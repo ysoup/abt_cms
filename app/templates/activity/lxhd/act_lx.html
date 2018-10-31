@@ -1,0 +1,277 @@
+{% extends "/index.html" %}
+{#{% import 'macro_pagination.html' as macro_pagination %}#}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="javascript:;">拉新活动管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">拉新活动列表</span>
+                            </li>
+                        </ul>
+                        <!-- Single button -->
+                        <br>
+
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#user" data-toggle="tab">用户列表</a>
+                            </li>
+                            <li><a href="#act" data-toggle="tab">活动列表</a></li>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="tab-pane fade in active  text-center" id="user">
+                                <div class="pull-right input-group input-medium" style="padding-bottom: 10px">
+                                    <input type="text" class="form-control" style="text-align: center" id="search_user"
+                                           placeholder="输入手机号或轮数试试">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn blue" style="z-index: 2"
+                                                onclick="search_user()">查询</button>
+                                    </span>
+                                </div>
+
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>用户ID</th>
+                                        <th>用户名称</th>
+                                        <th>手机号</th>
+                                        <th>注册时间</th>
+                                        <th>来源</th>
+                                        <th>获奖轮数</th>
+                                        <th>获奖数量/mBTC</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for info in data %}
+                                        <tr>
+                                            <td></td>
+                                            <td>{{ info.id }}</td>
+                                            <td>{{ info.name }}</td>
+                                            <td>{{ info.telephone }}</td>
+                                            <td>{{ info.createtime }}</td>
+                                            <td>{{ info.source }}</td>
+                                            <td>{{ info.stage }}</td>
+                                            <td class="info_amount" data-aper="{{ info.amount }}"><span></span></td>
+                                            <td>
+                                                <button type="button" class="btn btn-success glyphicon glyphicon-trash" title="删除"
+                                                        onclick="delete_user(this,'{{ info['id'] }}', '{{ info.stage }}')"></button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
+                                <nav aria-label="Page navigation" class="text-center">
+                                    <ul class="pagination">
+                                        {{ html|safe }}
+                                    </ul>
+                                </nav>
+                            </div>
+
+
+                            <div class="tab-pane fade" id="act">
+                                <div class="pull-right" style="padding-bottom: 10px">
+                                    <button type="button" class="btn blue btn-circle pull-right" onclick='add_act()' style="margin-left: 10px">新增活动
+                                    </button>
+                                </div>
+                                <table class="table  table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>活动轮数</th>
+                                        <th>开始时间</th>
+                                        <th>结束时间</th>
+                                        <th>获奖总数/轮</th>
+                                        <th>奖金/人</th>
+                                        <th>获奖名额/轮</th>
+                                        <th>实际获奖名额/轮</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for info1 in data_act %}
+                                        <tr>
+                                        <td></td>
+                                        <td>{{ info1.stage }}</td>
+                                        <td>{{ info1.start_time }}</td>
+                                        <td>{{ info1.end_time }}</td>
+                                        <td>{{ info1.total_amount }} <b>BTC</b></td>
+                                        <td class="per_amount" data-per="{{ info1.per_amount }}"><span></span> <b>mBTC</b></td>
+                                        <td>{{ info1.total_member }}</td>
+                                        <td>{{ info1.member }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger glyphicon glyphicon-pencil" title="编辑" onclick="modify_act({{ info1['stage'] }})"></button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table> </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+        $(function () {
+            $(".per_amount").each(function (i) {
+                var per_amount = $(this).data("per")*1000;
+                $(this).find("span").text(per_amount);
+            });
+            $(".info_amount").each(function () {
+                var info_amount = $(this).data("aper")*1000;
+                $(this).find("span").text(info_amount);
+            })
+        });
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        function tr_index() {
+            $("table").each(function (i) {
+                $(this).find("tr").each(function (i) {
+                    if (i != 0) {
+                        $(this).find("td").eq(0).text(i);
+                    }
+                })
+            })
+        }
+        var select_id = getUrlParms("select_id");
+
+
+        {#        $(function () {#}
+        {#            switch (select_id) {#}
+        {#                case "1":#}
+        {#                    $("#toggle_menu").html('已展示Banner <span class="caret"></span>');#}
+        {#                    break;#}
+        {#                case "2":#}
+        {#                    $("#toggle_menu").html('已下架Banner <span class="caret"></span>');#}
+        {#                    break;#}
+        {#                default:#}
+        {#                    $("#toggle_menu").html('全部Banner <span class="caret"></span>');#}
+        {#            }#}
+        {#        });#}
+
+        // 删除用户
+        function delete_user(obj, id, stage) {
+            layer.confirm('是否删除该用户？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    // 处理ajax
+                    url: '{{ url_for('activity.delete_user_lx') }}',
+                    type: 'POST',
+                    data: {
+                        id: id,
+                        stage: stage
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            $(obj).parents("tr").remove();
+                            tr_index();
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+
+        // 删除用户
+{#        function delete_user(obj, id, stage) {#}
+{##}
+{#            $.ajax({#}
+{#                url: '{{ url_for('activity.delete_user') }}',#}
+{#                type: 'POST',#}
+{#                data: {#}
+{#                    id: id,#}
+{#                    stage: stage#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        $(obj).parents("tr").remove();#}
+{#                        tr_index();#}
+{#                        alert("删除成功");#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+        // 搜索用户
+        function search_user() {
+            var data = $("#search_user").val();
+            sessionStorage.setItem("search_val", data);
+            var stage = "";
+            var telephone = "";
+            data = data.trim();
+            if (data == "") {
+                window.location.href = "/act_lx";
+                return false;
+            }
+            var len = data.length;
+            if (len == 1) {
+                stage = data;
+                window.location.href = "/act_lx?stage=" + stage;
+                return false;
+            }
+            else if (len == 11) {
+                telephone = data;
+                window.location.href = "/act_lx?telephone=" + telephone;
+                return false;
+            }
+            else {
+                layer.msg("您的输入有误，请重新输入", {time:1000, icon:2});
+                return false;
+            }
+        }
+
+        // 搜索框保存值
+        $(function () {
+            tr_index();
+            var search_val = sessionStorage.getItem("search_val");
+            $("#search_user").val(search_val);
+        });
+    
+        
+        // 编辑活动
+        function modify_act(stage) {
+            window.location.href = '/modify_act_lx' + "?stage=" +stage
+        }
+
+        // 新增一轮活动
+        function add_act() {
+            window.location.href = 'add_act_lx'
+        }
+    </script>
+{% endblock %}

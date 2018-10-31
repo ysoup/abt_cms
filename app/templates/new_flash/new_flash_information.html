@@ -1,0 +1,474 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="javascript:;">资讯管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">资讯列表</span>
+                            </li>
+                        </ul>
+                        <!-- Single button -->
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-9 form-inline">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-circle blue dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/information_list?select_id=0" class="btn btn-circle ">所有资讯</a></li>
+                                        <li><a href="/information_list?select_id=1" class="btn btn-circle ">已展示资讯</a></li>
+                                        <li><a href="/information_list?select_id=2" class="btn btn-circle ">未展示资讯</a>
+                                        </li>
+                                        <li><a href="/information_list?select_id=3" class="btn btn-circle ">原创资讯</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn blue btn-circle" onclick='add_info()'
+                                            style="margin-left: 10px">新增资讯
+                                    </button>
+                                </div>
+
+                                <div class="form-group searchT" style="position: relative; margin-left: 10px;">
+                                    <input type="text" name="searchTime" readonly placeholder="请选择查询日期"
+                                           class="form-control form_datetime btn-circle" id="searchTime"
+                                           style="height: 33px; width: 210px;"/>
+                                    <a class="btn glyphicon glyphicon-remove"
+                                       style="pointer-events:auto;position: absolute;z-index: 2;right: 50px;"></a>
+                                    <button type="button" class="btn blue btn-circle"
+                                            style="position: absolute; top:0; right: 0; z-index: 3;"
+                                            onclick="info_by_date()">查询
+                                    </button>
+                                </div>
+
+                                <div class="form-group search_word" style="position: relative; margin-left: 10px;">
+                                    <input type="text" class="form-control btn-circle" id="keyword" placeholder="请输入关键字"
+                                           style="height: 33px; width: 210px;"/>
+                                    <a class="btn glyphicon glyphicon-remove"
+                                       style="pointer-events:auto;position: absolute;z-index: 2;right: 50px;"></a>
+                                    <button type="button" class="btn blue btn-circle pull-right"
+                                            style="position: absolute; top:0; right: 0; z-index: 3;"
+                                            onclick="search_info_keyword()">搜索
+                                    </button>
+                                </div>
+
+                                {#                                        <div class="input-group input-medium date date-picker"#}
+                                {#                                             data-date-format="yyyy-mm-dd" data-date-viewmode="years">#}
+                                {#                                            <input type="text" class="form-control btn btn-circle-left"#}
+                                {#                                                   style="text-align: left" id="query_time" readonly>#}
+                                {#                                            <a class="btn glyphicon glyphicon-remove"#}
+                                {#                                               style="pointer-events:auto; position: absolute; left: 105px; z-index: 2;"></a>#}
+                                {#                                            <span class="input-group-btn">#}
+                                {#                                                <button class="btn blue btn-circle-right" type="button"#}
+                                {#                                                        style="margin-right: 5px;">#}
+                                {#                                                    <i class="fa fa-calendar"></i>#}
+                                {#                                                </button>#}
+                                {#                                                <button type="button" class="btn blue btn-circle"#}
+                                {#                                                        onclick="info_by_date()">查询</button>#}
+                                {#                                            </span>#}
+                                {#                                        </div>#}
+
+                                {#                                </div>#}
+
+                            </div>
+                            <div class="col-md-3">
+                                <button onclick="delete_choice_info()" class="btn blue btn-circle pull-right">批量删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="portlet-body col-lg-12">
+                                <div class="table-scrollable">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            {#                                            <th><button onclick="all_choice()" type="button" class="btn btn-circle red btn-sm">全选</button></th>#}
+                                            <th>
+                                                <button onclick="invent()" type="button"
+                                                        class="btn btn-circle red btn-sm">全选
+                                                </button>
+                                            </th>
+                                            <th>资讯ID</th>
+                                            <th>资讯Title</th>
+                                            <th>FootBar ID</th>
+                                            <th>资讯类别</th>
+                                            <th>来源</th>
+                                            <th>数据源链接</th>
+                                            <th>标签</th>
+                                            <th>添加时间</th>
+                                            <th>更新时间</th>
+                                            <th>是否展示</th>
+                                            <th>是否推送</th>
+                                            <th>banner</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for row in data %}
+                                            <tr>
+                                                <td><label>
+                                                    <input type="checkbox" name="choice_checkbox" value="{{ row.id }}">
+                                                </label></td>
+                                                <td>{{ row.id }}</td>
+                                                <td>
+{#                                                    {% if row.possible_similarity == 1 %}#}
+{#                                                        <br>#}
+{#                                                        <b style="color: #fb7575">【疑似重复】</b><s>{{ row.title|safe }}</s>#}
+{#                                                    {% else %}#}
+{#                                                        <br>#}
+{#                                                        {{ row.title|safe }}#}
+{#                                                    {% endif %}#}
+                                                    {{ row.title }}
+
+                                                </td>
+                                            <td>{{ row.foot_bar_id }}</td>
+                                                <td>{{ row.info_cate.catname }}</td>
+                                                <td>{{ row.source_name }}</td>
+                                                <td>
+                                                    {% if row.source_url == "" or row.source_url == "''" %}
+
+                                                    {% else %}
+                                                        <a href="{{ row.source_url }}" target="_blank">点我 <span
+{#                                                                class="	fa fa-angellist"></span></a>#}
+                                                                class="fa fa-hand-spock-o"></span></a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ row.tag }}</td>
+                                                <td>{{ row.create_time }}</td>
+                                                <td>{{ row.update_time }}</td>
+                                                {% if row.is_show == 1 %}
+                                                    <td id="show_info">展示</td>
+                                                {% else %}
+                                                    <td id="show_info">不展示</td>
+                                                {% endif %}
+                                                {% if row.is_push == 1 %}
+                                                    <td id="push_info">是</td>
+                                                {% else %}
+                                                    <td id="push_info">否</td>
+                                                {% endif %}
+                                                {#                                                <td>{{ row["remarks"] }}</td>#}
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-info glyphicon glyphicon-camera"
+                                                            title="设定为Banner"
+                                                            onclick="set_banner({{ row['id'] }})"></button>
+                                                </td>
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-success glyphicon glyphicon-trash"
+                                                            title="删除资讯"
+                                                            onclick="delete_info({{ row['id'] }})"></button>
+                                                    <br>
+                                                    <button type="button"
+                                                            class="btn btn-danger glyphicon glyphicon-pencil"
+                                                            title="编辑资讯"
+                                                            onclick="modify_info({{ row['id'] }})"></button>
+                                                    <br>
+                                                    {% if row.is_show == 1 %}
+                                                        {#                                                        <span type="button" disabled="true" class="btn btn-default glyphicon glyphicon-eye-open" title="已展示"></span>#}
+                                                        <button type="button"
+                                                                class="btn btn-default glyphicon glyphicon-eye-close"
+                                                                title="取消展示"
+                                                                onclick="close_info({{ row['id'] }})"></button>
+                                                    {% else %}
+                                                        <button type="button"
+                                                                class="btn blue  btn-default glyphicon glyphicon-eye-open"
+                                                                title="展示"
+                                                                onclick="show_info({{ row['id'] }})"></button>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input id="hidden_val" type="hidden" value="">
+                    <input id="hidden_get_info" type="hidden" value="{{ info_since_id }}">
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+        var info_reload = window.localStorage.getItem("info_reload");
+        if (info_reload == "true") {
+            window.localStorage.setItem("info_reload", "false");
+            window.location.reload();
+        }
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var select_id = getUrlParms("select_id");
+
+        $(function () {
+            var info_since_id = $("#hidden_get_info").val();
+            localStorage.setItem("info_since_id", info_since_id);
+
+            var keyword = getUrlParms("keyword");
+            if (keyword) {
+                $('#keyword').val(keyword)
+            }
+            $(".search_word .glyphicon-remove").click(function () {
+                $("#keyword").val("");
+            });
+            // 搜时间用
+            var query_time = getUrlParms("query_time");
+            if (query_time) {
+                $("#searchTime").val(query_time);
+            }
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('已展示资讯 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('未展示资讯 <span class="caret"></span>');
+                    break;
+                case "3":
+                    $("#toggle_menu").html('原创 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('所有资讯 <span class="caret"></span>');
+            }
+        });
+
+        // 反选
+        function invent() {
+            $("input[name='choice_checkbox']").each(function () {
+                if ($(this).prop("checked")) {
+                    $(this).attr("checked", false);
+                }
+                else {
+                    $(this).prop("checked", true);
+                }
+            })
+        }
+
+        // 批量删除
+        function delete_choice_info() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一条资讯，再进行该操作");
+                return false
+            }
+            layer.confirm('是否批量删除？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.delete_choice_information')}}',
+                    type: 'post',
+                    data: JSON.stringify(info_id_list),
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layser.msg("批量删除成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                        }
+                        else {
+                            layer.msg("批量删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
+        // 关键词搜索
+        function search_info_keyword() {
+            var keyword = $('#keyword').val();
+            console.log(keyword);
+            if (keyword) {
+                window.open("/information_search_result?keyword=" + keyword);
+                localStorage.setItem("keyword", keyword);
+            }
+            else {
+                layer.msg("您好像并没输入任何东西", {time: 2000, icon: 5});
+                return false
+            }
+        }
+
+        // 展示功能
+        function show_info(id) {
+            $.ajax({
+                url: '{{ url_for('new_flash.show_information')}}',
+                type: 'post',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("展示成功", {time: 2000, icon: 1});
+                        window.location.reload()
+                    }
+                    else {
+                        layer.msg("展示不成功", {time: 2000, icon: 5});
+                        return false
+                    }
+                }
+            })
+        }
+
+        // 取消展示
+        function close_info(id) {
+            $.ajax({
+                url: '{{ url_for('new_flash.close_information')}}',
+                type: 'post',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("操作成功", {time: 2000, icon: 1});
+                        window.location.reload()
+                    }
+                    else {
+                        layer.msg("操作失败，请重试！", {time: 2000, icon: 5});
+                    }
+                }
+            })
+        }
+
+        // 删除资讯(单条)
+        function delete_info(id) {
+            layer.confirm("是否删除？", {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.delete_information')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("删除成功！", {time: 2000, icon: 1});
+                            window.location.reload()
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
+        // 添加资讯
+        function add_info() {
+            window.location.href = "/add_information"
+        }
+
+        // 编辑资讯
+        function modify_info(id) {
+            window.location.href = "/modify_information?id=" + id;
+        }
+
+        // 设定为banner
+        function set_banner(id) {
+            $.ajax({
+                url: '/set_banner',
+                type: 'post',
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("已成功添加到banner", {time: 2000, icon: 1})
+                    }
+                    else {
+                        layer.msg(data.failed, {time: 2000, icon: 5});
+                        return false;
+                    }
+                }
+            })
+        }
+
+        // 时间插件相关
+        $(function () {
+            initDatePlugin();
+        });
+
+        $("#searchTime").click(showStart);
+        // 开始和结束时间窗状态（fasle：关闭状态，true：打开状态）
+        var startStatus = false;
+
+        //初始化时间插件
+        function initDatePlugin() {
+            $("#searchTime").datetimepicker({
+                minView: "month", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+                language: 'zh-CN', // 语言
+                autoclose: true, //  true:选择时间后窗口自动关闭
+                format: 'yyyy-mm-dd', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+                todayHighlight: true, //高亮当日
+                // clearBtn:true,   //清除按钮
+                todayBtn: true
+
+            }).on("changeDate", function () {
+                var searchTime = $("#searchTime").val();
+            });
+        }
+
+        // 控制开始时间弹窗显示还是隐藏
+        function showStart() {
+            if (startStatus) {
+                $("#searchTime").datetimepicker("hide");
+                startStatus = false;
+            } else {
+                $("#searchTimee").datetimepicker("show");
+                startStatus = true;
+            }
+            // 失去焦点时，时间窗为关闭状态
+            $("#searchTime").blur(function () {
+                startStatus = false;
+            })
+        }
+
+        // 清空时间框
+        $(".searchT .glyphicon-remove").click(function () {
+            $("#searchTime").val("")
+        });
+
+        // 查询时间
+        function info_by_date() {
+            var query_time = $("#searchTime").val();
+            if (query_time) {
+                window.location.href = "/information_list?query_time=" + query_time
+            }
+            else {
+                window.location.href = "/information_list"
+            }
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        input {
+            text-align: center
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('planet_token_manage.config_list') }}">每日Token发放信息</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">编辑每日发放Token配置</span>
+                                <span id="base_pic" class=""></span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-adjust" style="font-size: 24px;"></i>
+                                <span class="caption-subject uppercase">编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> Token编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="token_no" value="{{ data.token_no }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 发放时间 <br/><span
+                                                style="color: red">（*必填）</span></label>
+                                        <div class="col-md-3">
+                                            <input type="date" class="form-control" id="issue_time" value="{{ data.issue_time }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 发放数量 <br/></label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="token_num" value="{{ data.token_num }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 是否生效 </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            <input id="status" type="checkbox" name="push"
+                                                   value="" class="input-small" {% if data.is_userful == 1 %} checked
+                                                   {% endif %} />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title=" 确认编辑 " onclick="modify_planet_config()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title=" 取消编辑 " onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+
+        // 编辑每日发放Token
+        function modify_planet_config() {
+            var formData = new FormData();
+            var token_no = $("#token_no").val();
+
+            var issue_time = $("#issue_time").val();
+            if (issue_time == "") {
+                layer.msg("发放时间不可为空", {time: 1500, icon: 2});
+                return false
+            }
+
+            var token_num = $("#token_num").val();
+            if (token_num == "") {
+                layer.msg("数量不可为空", {time: 1500, icon: 2});
+                return false
+            }
+
+            var istatus = $("#status").is(":checked");
+            var status = 0;
+            if (istatus == true) {
+                status = 1
+            }
+
+
+            formData.append("sn", {{ data.sn }});
+            formData.append("token_no", token_no);
+            formData.append("issue_time", issue_time);
+            formData.append("token_num", token_num);
+            formData.append("is_userful", status);
+            layer.confirm('是否编辑？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet_token_manage.modify_planet_config')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("编辑成功！", {time: 1500, icon: 1});
+                            window.location.href = "{{ url_for('planet_token_manage.config_list') }}"
+                        }
+                        else {
+                            layer.msg("编辑失败", {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

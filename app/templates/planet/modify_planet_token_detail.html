@@ -1,0 +1,490 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        input {
+            text-align: center
+        }
+
+        #uploadfile_input {
+            opacity: 0;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('planet.planet_token') }}">星球币信息列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">星球币编辑</span>
+                                <span id="base_pic" class=""></span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-edit" style="font-size: 25px"></i>
+                                <span class="caption-subject sbold uppercase">星球币编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 序号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="sn"
+                                                   value="{{ data.sn }}" disabled="disabled">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 星球币编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="token_no"
+                                                   value="{{ data.token_no }}" disabled="disabled">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 名称 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="token_name"
+                                                   value="{{ data.token_name }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 简称 </label>
+                                        <div class="col-md-3" readonly="true">
+                                            <input type="text" class="form-control" id="short_name"
+                                                   value="{{ data.short_name }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> Token地址 </label>
+                                        <div class="col-md-3" readonly="true">
+                                            <input type="text" class="form-control" id="token_address"
+                                                   value="{{ data.token_address }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> Token类型 </label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="token_type">
+                                                <option value='2' {% if data.token_type == "2" %}
+                                                        selected
+                                                {% endif %}>居民币
+                                                </option>
+                                                <option value='1' {% if data.token_type == "1" %}
+                                                        selected
+                                                {% endif %} >星球币
+                                                </option>
+                                                <option value='0'  {% if data.token_type == "0" %}
+                                                        selected
+                                                {% endif %}>平台币
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 发行者(即星球主编号) </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="token_issuer"
+                                                   value="{{ data.token_issuer }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 发行团队（人数） </label>
+                                        <div class="col-md-3">
+                                            {#                                            <div class="alert alert-info" role="alert">提示：填写准确的 <b>星球主编号</b>。<br>#}
+                                            {#                                                <b>星球主信息页，有相关星球主编号，复制粘贴即可。</b>#}
+                                            {#                                            </div>#}
+                                            <input type="number" class="form-control" id="issue_team"
+                                                   value="{{ data.issue_team }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 发行总数 </label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="total_amount"
+                                                   value="{{ data.total_amount }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> Token邀请码 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="token_code"
+                                                   value="{{ data.token_code }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 精度 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="token_precision"
+                                                   value="{{ data.token_precision }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 抵押数（最多支持18位，不填则为0。） </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="mortgage_amount"
+                                                   value="{{ data.mortgage_amount }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 抵押资产 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="mortgage_asset"
+                                                   value="{{ data.mortgage_asset }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 星球编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="planet_no"
+                                                   value="{{ data.planet_no }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 星球币编号 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="planet_main_asset"
+                                                   value="{{ data.planet_main_asset }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 挖矿 </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data.ismined == "0" %}
+                                                <input id="is_mined" type="checkbox" name="push"
+                                                       value="{{ data.is_mined }}" class="input-small"/>
+                                            {% else %}
+                                                <input id="is_mined" type="checkbox" name="push"
+                                                       value="{{ data.is_mined }}" class="input-small" checked/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 权益（保留字段） </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="include_rights"
+                                                    {#                                                   value="{{ data.include_rights }}">#}
+                                                   value="1">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 通兑（保留字段） </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="allow_exchange"
+                                                    {#                                                   value="{{ data.allow_exchange }}">#}
+                                                   value="1">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 交易（保留字段） </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="allow_transaction"
+                                                    {#                                                   value="{{ data.allow_transaction }}">#}
+                                                   value="1">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 已发行量 </label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="issued_amount"
+                                                   value="{{ data.issued_amount }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 持有人数 </label>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" id="holder_number"
+                                                   value="{{ data.holder_number }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 图标（330*330） </label>
+                                        <div class="col-md-3">
+                                            <img src="{{ data.image_no }}" alt="" id="image_no" width="330px"
+                                                 height="330px">
+                                            <input type="file" id="uploadfile_input" value=""
+                                                   accept="image/png,image/jpg,image/jpeg,image/JPG">
+                                            <label for="uploadfile_input" class='btn btn-danger'>选择图片</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 状态(是否有效) </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data.status == "1" %}
+                                                <input id="status" type="checkbox" name="push"
+                                                       value="{{ data.status }}" class="input-small" checked/>
+                                            {% else %}
+                                                <input id="status" type="checkbox" name="push"
+                                                       value="{{ data.status }}" class="input-small"/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 备注 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="remark"
+                                                   value="{{ data.remark }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 发行时间 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control form_datetime" id="iptStartTime"
+                                                   value="{{ data.issue_time }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 是否删除 </label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data.is_delete == 0 %}
+                                                <input id="is_delete" type="checkbox" name="push"
+                                                       value="{{ data.isdelete }}" class="input-small"/>
+                                            {% else %}
+                                                <input id="is_delete" type="checkbox" name="push"
+                                                       value="{{ data.isdelete }}" class="input-small" checked/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 星球繁荣度 </label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="planet_srp"
+                                                   value="{{ data.planet_srp }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 计息倍数 </label>
+                                        <div class="col-md-3">
+                                            <input type="number" step="0.01" class="form-control" id="interest_base"
+                                                   value="{{ data.interest_base }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label"> 上期计息时间 </label>
+                                        <div class="col-md-3">
+                                            <input type="datetime" class="form-control" id="lastterm_interest_date"
+                                                   value="{{ data.lastterm_interest_date }}" readonly>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title=" 确认修改 " onclick="modify_planet_token_detail()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title=" 取消修改 " onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        // 获取预览
+        $(function () {
+            $("#img_icon").click(function () {
+                $("#uploadfile_input").trigger("click");
+            });
+            $("#uploadfile_input").change(function () {
+                var img_src = $("#uploadfile_input").val();
+                var formData = new FormData();
+                formData.append("file", $("#uploadfile_input")[0].files[0]);
+                formData.append('base_pic_url', $('#image_no').attr("src"));
+                formData.append('img_url', img_src);
+                $.ajax({
+                    url: "{{ url_for("planet.upload_icon") }}",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if (data.success == "ok") {
+                            $('#image_no').attr("src", data.new_img_url);
+                            layer.msg("图片上传成功", {time: 1500, icon: 1});
+                        }
+                        else {
+                            layer.msg(data.failed, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                })
+            });
+        });
+
+        // 时间插件相关
+        $(function () {
+            initDatePlugin();
+        });
+
+        $("#iptStartTime").click(showStart);
+        {#    $("#iptEndTime").click(showEnd);#}
+        // 开始和结束时间窗状态（fasle：关闭状态，true：打开状态）
+        var startStatus = false;
+
+        //初始化时间插件
+        function initDatePlugin() {
+            $("#iptStartTime").datetimepicker({
+                minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+                language: 'zh-CN', // 语言
+                autoclose: true, //  true:选择时间后窗口自动关闭
+                format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+                todayHighlight: true, //高亮当日
+                // clearBtn:true,   //清除按钮
+                todayBtn: true
+
+            }).on("changeDate", function () {
+                var startTime = $("#iptStartTime").val();
+                $("#iptEndTime").datetimepicker("setStartDate", startTime);
+
+                // 清除开始时间时，结束时间取消限制
+                if (!this.value) {
+                    $("#iptEndTime").datetimepicker("setStartDate", "1970-01-01");
+                    $("#iptEndTime").datetimepicker("setEndDate", "3000-01-01");
+                }
+
+            });
+
+            $("#iptEndTime").datetimepicker({
+                minView: "hour", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+                language: 'zh-CN', // 语言
+                autoclose: true, //  true:选择时间后窗口自动关闭
+                format: 'yyyy-mm-dd hh:ii', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+                todayHighlight: true,
+                todayBtn: true // 如果此值为true 或 "linked"，则在日期时间选择器组件的底部显示一个 "Today" 按钮用以选择当前日期。
+            }).on("changeDate", function () {
+
+                // 清楚结束时间时，开始时间取消限制
+                if (!this.value) {
+                    $("#iptStartTime").datetimepicker("setEndDate", "3000-01-01");
+                    $("#iptStartTime").datetimepicker("setStartDate", "1970-01-01");
+                } else {
+                }
+            });
+        }
+
+        // 控制开始时间弹窗显示还是隐藏
+        function showStart() {
+            if (startStatus) {
+                $("#iptStartTime").datetimepicker("hide");
+                startStatus = false;
+            } else {
+                $("#iptStartTime").datetimepicker("show");
+                startStatus = true;
+            }
+            // 失去焦点时，时间窗为关闭状态
+            $("#iptStartTime").blur(function () {
+                startStatus = false;
+            })
+        }
+
+        // 编辑Token
+        function modify_planet_token_detail() {
+            var formData = new FormData();
+
+            var image_no = $("#image_no").attr("src");
+            if (image_no === "") {
+                layer.msg("请上传Token图标", {time: 1500, icon: 5});
+                return false
+            }
+            var i_mined = $("#is_mined").is(":checked");
+            var is_mined = 0;
+            if (i_mined == true) {
+                is_mined = 1
+            }
+            var i_status = $("#status").is(":checked");
+            var status = 0;
+            if (i_status == true) {
+                status = 1
+            }
+            var i_delete = $("#is_delete").is(":checked");
+            var is_delete = 0;
+            if (i_delete == true) {
+                is_delete = 1
+            }
+
+            // 字段：29
+            formData.append("sn", $("#sn").val());
+            formData.append("image_no", image_no);
+            formData.append("token_no", $("#token_no").val());
+            formData.append("token_name", $("#token_name").val());
+            formData.append("short_name", $("#short_name").val());
+            formData.append("token_address", $("#token_address").val());
+            formData.append("token_type", $("#token_type").val());
+            formData.append("token_issuer", $("#token_issuer").val());
+            formData.append("issue_team", $("#issue_team").val());
+            formData.append("total_amount", $("#total_amount").val());
+            formData.append("token_code", $("#token_code").val());
+            formData.append("token_precision", $("#token_precision").val());
+            formData.append("mortgage_amount", $("#mortgage_amount").val());
+            formData.append("mortgage_asset", $("#mortgage_asset").val());
+            formData.append("planet_no", $("#planet_no").val());
+            formData.append("planet_main_asset", $("#planet_main_asset").val());
+            formData.append("is_mined", is_mined);
+            formData.append("include_rights", $("#include_rights").val());
+            formData.append("allow_exchange", $("#allow_exchange").val());
+            formData.append("allow_transaction", $("#allow_transaction").val());
+            formData.append("issued_amount", $("#issued_amount").val());
+            formData.append("holder_number", $("#holder_number").val());
+            formData.append("status", status);
+            formData.append("remark", $("#remark").val());
+            formData.append("issue_time", $("#iptStartTime").val());
+            formData.append("is_delete", is_delete);
+            formData.append("planet_srp", $("#planet_srp").val());
+            formData.append("interest_base", $("#interest_base").val());
+            formData.append("lastterm_interest_date", $("#lastterm_interest_date").val());
+
+
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.modify_planet_token')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            window.localStorage.setItem("planet_token_reload", "true");
+                            window.history.go(-1);
+                            {#                        }#}
+                            {#                        else if (data.code == 1) {#}
+                            {#                            layer.msg(data.msg, {time: 1500, icon: 5});#}
+                            {#                            return false#}
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}

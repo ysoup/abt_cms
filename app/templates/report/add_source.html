@@ -1,0 +1,87 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+                <div class="page-content">
+                    <div class="row ">
+                        <div class="col-md-12 ">
+                            <div class="portlet light bordered">
+                                <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="">指数源列表</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active">指数源</span>
+                        </li>
+                    </ul>
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-settings font-dark"></i>
+                                        <span class="caption-subject font-dark sbold uppercase">新增指数源</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" role="form" name="test">
+{#                                        {{form.hidden_tag()}}#}
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">指数源名称：</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="source_name" class="form-control" value="" placeholder=""  name="source_name">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-10">
+                                                    <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认新增" onclick="add_source()"></button>
+                                                    <button type="button" class="btn green btn-lg glyphicon glyphicon-remove" title="取消新增" onclick="window.history.go(-1)"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+   <script type="text/JavaScript">
+
+    function add_source() {
+        // 拿值
+        var source_name = $("#source_name").val();
+        if (source_name == "") {
+            layer.msg("填满!", {time: 1000, icon: 2});
+            return false
+        }
+        layer.confirm('是否添加？', {
+            btn: ['确认', '取消']
+        }, function () {
+            $.ajax({
+                // 处理ajax
+                url: '{{ url_for('report.add_source')}}',
+                type: 'post',
+                data: {
+                    source_name : source_name
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("添加成功！", {time: 1000, icon: 1});
+                        window.location.href = "/source_list";
+                    }
+                    else {
+                        layer.msg("添加失败！", {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            });
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            return false
+        });
+    }
+
+    </script>
+{% endblock %}
+

@@ -1,0 +1,224 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #hot_token_table td, #hot_token_table th {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .layui-layer-tips {
+            word-break: break-all;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>推荐卡券页
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+
+{#                        <div class="row" style="padding-top: 10px">#}
+{#                            <div class="col-md-8">#}
+{#                                <div class="btn-group">#}
+{#                                    <button type="button" class="btn btn-circle dropdown-toggle"#}
+{#                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"#}
+{#                                            aria-expanded="false" style="background: #fb7575;color: #fff;">全部 &nbsp;&nbsp;<span#}
+{#                                            class="caret"></span>#}
+{#                                    </button>#}
+{#                                    <ul class="dropdown-menu">#}
+{#                                        <li><a href="/planet/planet_info?select_id=0" class="btn btn-circle ">全部 </a>#}
+{#                                        </li>#}
+{#                                        <li><a href="/planet/planet_info?select_id=1" class="btn btn-circle ">状态1 </a>#}
+{#                                        </li>#}
+{#                                        <li><a href="/planet/planet_info?select_id=2" class="btn btn-circle ">状态2 </a>#}
+{#                                        </li>#}
+{#                                    </ul>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                                                        <div class="col-md-4">#}
+{#                                                            <button onclick="generate_invite_code()" class="btn btn-circle pull-right"#}
+{#                                                                    style="background: #b07cc6;color: #fff;">生成邀请码#}
+{#                                                            </button>#}
+{#                                                        </div>#}
+{#                        </div>#}
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="hot_token_table">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>Token编号</th>
+                                        <th>拥有者</th>
+                                        <th>卡券名称</th>
+                                        <th>最大<br />可发行量</th>
+{#                                        <th>发行数量</th>#}
+                                        <th>卡券简介</th>
+                                        <th>卡密</th>
+                                        <th>卡券URL</th>
+                                        <th>卡券图片</th>
+                                        <th>Note</th>
+                                        <th>卡券价值</th>
+                                        <th width="100">开始时间</th>
+                                        <th width="100">结束时间</th>
+                                        <th>权重</th>
+                                        <th>使用提示</th>
+                                        <th>是否删除</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for info in data %}
+                                        <tr>
+                                            <td><a href="/planet/modify_hot_business?card_no={{ info.card_no }}">{{ info.sn }}</a></td>
+                                            <td>
+                                            <button class="btn btn-group btn-primary card_no"
+                                                        title="{{ info.card_no }}">查看
+                                            </button></td>
+                                            <td><button class="btn btn-group btn-primary card_owner"
+                                                        title="{{ info.card_owner }}">查看
+                                            </button></td>
+{#                                            <td>{{ info.card_owner }}</td>#}
+                                            <td>{{ info.card_name }}</td>
+                                            <td>{{ info.max_num }}</td>
+{#                                            <td>{{ info.card_num }}</td>#}
+                                            <td><button class="btn btn-group btn-primary card_desc"
+                                                        title="{{ info.card_desc }}">查看
+                                            </button></td>
+                                            <td><button class="btn btn-group btn-primary card_secret"
+                                                        title="{{ info.card_secret }}">查看
+                                            </button></td>
+                                            <td><button class="btn btn-group btn-primary card_url"
+                                                        title="{{ info.card_url }}">查看
+                                            </button></td>
+
+                                            <td><img src="{{ info.card_img }}" alt="" width="50" height="50">     </td>
+                                            <td><button class="btn btn-group btn-primary card_note"
+                                                        title="{{ info.note }}">查看
+                                            </button></td>
+                                            <td>{{ info.card_worth }}</td>
+                                            <td>{{ info.start_time }}</td>
+                                            <td>{{ info.end_time }}</td>
+                                            <td>{{ info.weight }}</td>
+                                            <td>{{ info.card_remind }}</td>
+                                            <td>
+                                                {% if info.is_delete == 0 %}
+                                                    <button type="button"
+                                                            class="btn blue btn-default glyphicon glyphicon-trash del_hot_token"
+                                                            title="可删除" data-card_status="1"
+                                                            data-info-id="{{ info.sn }}"></button>
+                                                {% else %}
+                                                    <button type="button"
+                                                            class="btn btn-default glyphicon glyphicon-trash del_hot_token"
+                                                            title="已删除" data-card_status="0"
+                                                            data-info-id="{{ info.sn }}"></button>
+                                                {% endif %}
+                                            </td>
+                                        <td>
+                                            <a href="/planet/modify_hot_business?card_no={{ info.card_no }}"
+                                               class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"></a></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(".card_no, .card_desc, .code_note, .card_secret, .card_url, .card_owner").click(function () {
+            layer.tips($(this).attr('title'), $(this), {
+                tips: [1, '#0FA6D8'] //还可配置颜色
+            });
+        });
+
+        var hot_token_reload = window.localStorage.getItem("hot_token_reload");
+        if (hot_token_reload == "true") {
+            window.localStorage.setItem("hot_token_reload", "false");
+            window.location.reload();
+        }
+        $(document).on("click", ".del_hot_token", function () {
+            var $this = $(this);
+            var this_sn = $this.data("info-id");
+            var this_status = $this.data("card_status");
+
+            layer.confirm('是否从推荐列表中删除该卡券？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.modify_hot_business')}}',
+                    type: 'patch',
+                    data: {
+                        sn: this_sn,
+                        status : this_status
+                    },
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            location.reload();
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        });
+
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('状态1 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('状态2 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+        });
+
+
+    </script>
+{% endblock %}

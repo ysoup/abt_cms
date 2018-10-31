@@ -1,0 +1,321 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        .table tr {
+            cursor: pointer;
+        }
+
+        .table tr:hover, .table tr.on {
+            background: #f8f8f8;
+        }
+
+        #event_id_list a {
+            margin-right: 5px;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/calendar">事件页</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">添加事件关联（按创建时间，倒序排列）</span>
+                            </li>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="row" id="con_hd">
+                                    <div class="col-lg-6">
+                                        <form class="form-horizontal" role="form" name="sub_list">
+                                            <div class="form-body">
+                                                <div class="alert alert-info" role="alert">提示： 请先<b>选择</b>或<b>创建</b>(+号即创建)主题后，再向下操作！
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label">所属主题</label>
+                                                    <div class="col-md-10">
+                                                        <select class="form-control input-small" id="sub"
+                                                                style="display: inline-block; vertical-align: middle">
+                                                            {% for sub in sub_list %}
+                                                                <option value="{{ sub.id }}">{{ sub.name }}</option>
+                                                                <span id="sub_obj_id">
+                                                                     {% for event_obj in sub.sub_event %}
+                                                                         {{ event_obj.id }}
+                                                                     {% endfor %}
+
+                                                                     </span>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <a href="javascript:;" class="btn green"
+                                                           data-toggle="modal"
+                                                           data-target="#myModal" data-id="">
+                                                            <i class="glyphicon glyphicon-plus-sign"></i></a>
+                                                    </div>
+                                                </div>
+                                                <hr>
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-2">当前主题下已有事件ID</label>
+                                                    <div class="col-md-10" id="event_id_list"></div>
+                                                </div>
+                                                <hr>
+                                            </div>
+                                            <div class="form-actions">
+                                                <div class="row">
+                                                    <div class="col-md-11 text-right">
+                                                        <button type="button" class="btn green"
+                                                                onclick="add_event_relation()">
+                                                            提交
+                                                        </button>
+                                                        <button type="button" class="btn green"
+                                                                onclick="stop_add_event()">
+                                                            取消
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                    </div>
+
+
+                                    <div class="col-lg-6" style="overflow: scroll; height: 100%;">
+                                        <!--展示事件-->
+                                        <table class="table table-bordered" style="width: 1000px">
+                                            <thead>
+                                            <tr>
+                                                <th style="text-align: center;">
+                                                    选
+                                                </th>
+                                                <th width="40" style="text-align: center;">ID</th>
+                                                <th width="100" style="text-align: center;">创建时间</th>
+                                                <th width="100" style="text-align: center;">发生时间</th>
+                                                <th>事件内容</th>
+                                                <th>所属主题</th>
+                                                <th width="80">重要性</th>
+                                                <th width="120">关键词(后台)</th>
+                                                <th width="140">事件标签</th>
+
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for event in data %}
+                                                <tr data-id="{{ event.id }}">
+                                                    <td style="text-align: center;" id="cho_che"><label>
+                                                        <input type="checkbox" name="choice_checkbox"
+                                                               value="{{ event['id'] }}">
+                                                    </label></td>
+
+                                                    <td style="text-align: center;">{{ event.id }}</td>
+                                                    <td style="text-align: center;">{{ event.create_time }}</td>
+                                                    <td style="text-align: center;">{{ event.happened_date }}
+                                                        <br>
+                                                        {% if event.happened_time|safe == "00:00:00" %}
+                                                            时间待定
+                                                        {% else %}
+                                                            {{ event.happened_time }}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ event.content }}</td>
+                                                    <td>{{ event.event_sub.name }}</td>
+                                                    <td>
+                                                        {% if event.importance == '1' %}
+                                                            ✿
+                                                        {% elif event.importance == '2' %}
+                                                            ✿ ✿
+                                                        {% elif event.importance == '3' %}
+                                                            ✿ ✿ ✿
+                                                        {% endif %}
+                                                    </td>
+
+                                                    <td>{{ event.keywords }}</td>
+                                                    <!--事件标签-->
+                                                    {% if event.happened_tag_type == 1 %}
+                                                        <td>国家
+                                                            -
+                                                            {% for country_obj in country_list %}
+                                                                {% if country_obj.id == event.happened_tag_id %}
+                                                                    {{ country_obj.chinese_name }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </td>
+                                                    {% elif event.happened_tag_type == 2 %}
+                                                        <td>币种
+                                                            - {% for coin_obj in coin_list %}
+                                                            {% if coin_obj.id == event.happened_tag_id %}
+                                                                {{ coin_obj.code }}
+                                                            {% endif %}
+                                                        {% endfor %}</td>
+                                                    {% elif event.happened_tag_type == 3 %}
+                                                        <td>交易所
+                                                            - {% for exchange_obj in exchange_list %}
+                                                            {% if exchange_obj.id == event.happened_tag_id %}
+                                                                {{ exchange_obj.chinese_name }}
+                                                            {% endif %}
+                                                        {% endfor %}</td>
+                                                    {% endif %}
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        添加主题
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="portlet-body form">
+                        <form class="form-horizontal" role="form" name="sub_list">
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <label class="control-label col-md-2">主题名称</label>
+                                    <div class="col-md-10">
+                                        <input type="text" id="sub_name" class="form-control input-small" value=""
+                                               placeholder="" name="sub_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认新增" id="`_btn"
+                            onclick="add_subject()" data-dismiss=""></button>
+                    <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                            data-dismiss="modal" title="取消新增"></button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <script type="text/JavaScript">
+        var event_id_list = [];
+        $(function () {
+            change_sub(1);
+            $("#con_hd").css("height", $(window).height() - 240);
+            $(document).on("click", ".table tbody tr", function () {
+                var $this = $(this);
+                $this.toggleClass("on");
+                if ($this.hasClass("on")) {
+                    $this.find("input[name=choice_checkbox]").prop("checked", true);
+                } else {
+                    $this.find("input[name=choice_checkbox]").prop("checked", false);
+                }
+                event_id_list = [];
+                $("#event_id_list").empty();
+                var checked_input = $("tr.on");
+                checked_input.each(function () {
+                    this_val = $(this).find("input[name=choice_checkbox]").val();
+                    event_id_list.push(this_val);
+                    $("#event_id_list").append('<a href="javascript:;" class="btn btn-default" data-id="' + this_val + '">' + this_val + ' <i class="icon-close"></i></a>')
+                });
+            });
+            $(document).on("click", "#event_id_list a", function () {
+                {#                var $this = $(this);#}
+                var this_id = $(this).data("id");
+                {#                var index = $this.index();#}
+                {#                $this.remove();#}
+                {#                $("input[name=choice_checkbox]:checked").eq(index).trigger("click");#}
+
+                $("tr[data-id=" + this_id + "]").trigger("click");
+            });
+            $("#sub").change(function () {
+                var this_val = $(this).val();
+                change_sub(this_val);
+            })
+        });
+
+        //主题更改
+        function change_sub(this_val) {
+            $.get("{{ url_for('calendar.get_event_relation') }}?choice_sub_id=" + this_val, function (data) {
+                var data = data.event_id_list;
+                if (data) {
+                    change_list(data);
+                }
+            })
+        }
+        //内容更改
+        function change_list(data) {
+            event_id_list = data;
+            $("tr").removeClass("on");
+            $("tr").find("input[name=choice_checkbox]").prop("checked", false);
+            $("#event_id_list").empty();
+            $.each(data, function (i, n) {
+                var $this = $("tr[data-id=" + n + "]");
+                $this.addClass("on");
+                $this.find("input[name=choice_checkbox]").prop("checked", true);
+                $("#event_id_list").append('<a href="javascript:;" class="btn btn-default" data-id="' + n + '">' + n + ' <i class="icon-close"></i></a>');
+            })
+        }
+
+        // ajax  add_event_relation
+        function add_event_relation() {
+            sub_id = $("#sub").val();
+            event_id_list = event_id_list;
+            console.log(sub_id);
+            console.log(event_id_list);
+            $.ajax({
+                url: '{{ url_for('calendar.add_event_relation') }}',
+                type: "post",
+                data: {
+                    "sub_id": sub_id,
+                    "event_id_list": JSON.stringify(event_id_list)
+                }, success: function (data) {
+                    if (data.success = 'ok') {
+                        layer.msg("关联成功！", {time: 2000, icon: 1});
+                        window.location.reload()
+                    }
+                }
+            })
+        }
+
+        // add_subjects
+        function add_subject() {
+            var sub_name = $("#sub_name").val();
+            if (sub_name == "") {
+                layer.msg("主题不可为空！", {time: 1000, icon: 2});
+                return false;
+            }
+            $.ajax({
+                url: "{{ url_for('calendar.add_sub') }}",
+                type: 'post',
+                data: {'sub_name': sub_name},
+                success: function (data) {
+                    if (data.success = 'ok') {
+                        layer.msg("添加成功！", {time: 2000, icon: 1});
+                        window.location.reload()
+                    }
+                }
+            })
+        }
+
+    </script>
+{% endblock %}
+

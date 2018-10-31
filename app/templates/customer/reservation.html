@@ -1,0 +1,155 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #reservation_info_table td, #reservation_info_table th {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="page-head">
+                <div class="page-title">
+                    <h1>客户预约
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="portlet light bordered">
+
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false" style="background: #fb7575;color: #fff;">全部 &nbsp;&nbsp;<span
+                                            class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/customer/reservation?select_id=0" class="btn btn-circle ">全部 </a>
+                                        </li>
+                                        <li><a href="/customer/reservation?select_id=1" class="btn btn-circle ">状态1 </a>
+                                        </li>
+                                        <li><a href="/customer/reservation?select_id=2" class="btn btn-circle ">状态2 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="reservation_send_sms()" class="btn btn-circle pull-right"
+                                        style="background: #b07cc6;color: #fff;">短信通知
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered"
+                                       id="reservation_info_table">
+                                    <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>客户编号</th>
+                                        <th>活动编号</th>
+                                        <th>阶段</th>
+                                        <th width="100">开始时间</th>
+                                        <th>区号</th>
+                                        <th>手机号</th>
+                                        <th width="100">电话<br/>通知时间</th>
+                                        <th>邮箱</th>
+                                        <th width="100">邮件<br/>通知时间</th>
+                                        <th>备注</th>
+                                        <th width="100">最后登入</th>
+                                        <th width="100">最后登出</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for info in data %}
+                                        <tr>
+                                            <td>{{ info.id }}</td>
+                                            <td>{{ info.customer_no }}</td>
+                                            <td>{{ info.project_no }}</td>
+                                            <td>{{ info.project_stage }}</td>
+                                            <td>{{ info.start_time }}</td>
+                                            <td>{{ info.mobile_areacode }}</td>
+                                            <td>{{ info.mobile_no }}</td>
+                                            <td>{{ info.mobile_notification_time }}</td>
+                                            <td>{{ info.email }}</td>
+                                            <td>{{ info.email_notification_time }}</td>
+                                            <td>{{ info.remark }}</td>
+                                            <td>{{ info.create_time }}</td>
+                                            <td>{{ info.update_time }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function reservation_send_sms() {
+            layer.confirm("是否发送通知短信？", {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('customers.reservation_send_sms')}}',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.status == 'ok') {
+                            layer.msg(data.msg, {time: 3500, icon: 1});
+                        }
+                        else {
+                            layer.msg("信息发送失败！", {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        }
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('状态2 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('状态1 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+        });
+
+    </script>
+{% endblock %}

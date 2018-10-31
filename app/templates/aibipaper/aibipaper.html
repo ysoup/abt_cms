@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=750,user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta property="wb:webmaster" content="4e9b0bd7e98f0742"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <link rel="stylesheet" href="../static/layer/theme/default/layer.css">
+    <link href="/static/global/img/favicon.ico" rel="shortcut icon"/>
+    <link rel="stylesheet" type="text/css" href="../../static/apps/aibipaper/css/reset.css?t={{ VERSION_NO }}"/>
+    <style type="text/css">
+        body {
+            width: 750px;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        .news_con {
+            font-size: 26px;
+            padding: 20px;
+        }
+
+        .news_con p {
+            margin-top: 10px;
+        }
+
+        .index_1 {
+            position: relative;
+            padding: 10px 20px;
+        }
+
+        .index_1 h2 {
+            line-height: 48px;
+            font-size: 22px;
+        }
+
+        .index_1 h2 img {
+            position: relative;
+            top: -2px;
+        }
+
+        .index_1 h5 {
+            line-height: 74px;
+            font-size: 53px;
+            font-weight: bold;
+        }
+
+        .index_1 h5 i {
+            display: inline-block;
+            vertical-align: middle;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            position: relative;
+            top: -6px;
+        }
+
+        .index_1 h5.red i {
+            background: url(../../static/apps/aibipaper/images/jiantou_red.png) 0 0 no-repeat;
+            background-size: 100% auto;
+        }
+
+        .index_1 h5.green i {
+            background: url(../../static/apps/aibipaper/images/jiantou_green.png) 0 0 no-repeat;
+            background-size: 100% auto;
+        }
+
+        .index_1 h5 em {
+            font-weight: normal;
+            font-size: 36px;
+            top: -5px;
+            position: relative;
+            margin-left: 10px;
+        }
+
+        .index_1 #line_pic {
+            position: absolute;
+            right: 0;
+            top: 70px;
+            width: 410px;
+            height: 120px;
+        }
+
+        {#			.index_1 svg { position: absolute; right: 20px; top: 70px; width: 310px; height: 120px;}#}
+        .index_1 p {
+            line-height: 48px;
+            font-size: 22px;
+        }
+
+        .index_1 p em {
+            padding: 0 20px 0 0;
+        }
+
+        .index_2 li {
+            float: left;
+            width: 33.2%;
+            text-align: center;
+            border: 1px #ddd solid;
+            border-right: 0;
+        }
+
+        .index_2 li:first-child {
+            border-left: 0;
+        }
+
+        .index_2 li h4 {
+            line-height: 48px;
+            font-size: 22px;
+        }
+
+        .index_2 li h5 {
+            line-height: 50px;
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        .index_2 li p {
+            line-height: 40px;
+            font-size: 18px;
+        }
+
+        .index_2 li p em {
+            padding: 0 10px;
+        }
+
+        footer {
+            border-top: 5px {% if ab_type == 1 %}#FAB914{% elif ab_type == 3 %}#1b3045{% endif %} solid;
+        }
+
+        aside {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 100px;
+        }
+
+        aside a {
+            display: block;
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            font-size: 16px;
+            border: 1px #ddd solid;
+            background: #fff;
+            text-align: center;
+            margin-top: 10px;
+            border-radius: 5px;
+            -webkit-transition: all .2s;
+            transition: all .2s;
+        }
+
+        aside a:hover {
+            background: #f9b515;
+            border-color: #f9b515;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            -webkit-transition: all .2s;
+            transition: all .2s;
+        }
+
+        #container {
+            width: 180px;
+            margin: 0 auto;
+        }
+
+        #loading {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 11111;
+            top: 0;
+            left: 0;
+        }
+
+        #loading .loading_con {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 56px;
+            margin: -28px 0 0 -100px;
+            text-align: center;
+        }
+
+        #loading h4 {
+            color: white;
+            text-transform: uppercase;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            text-align: center;
+            width: 100%;
+            margin-top: 20px;
+            -webkit-animation: fade 2s infinite;
+            -moz-animation: fade 2s infinite;
+        }
+
+        .stick {
+            width: 30px;
+            height: 3px;
+            background: white;
+            display: inline-block;
+            margin-left: -8px;
+        }
+
+        .stick:nth-child(n) {
+            transform: rotate(30deg);
+            -ms-transform: rotate(30deg); /* IE 9 */
+            -webkit-transform: rotate(30deg); /* Safari and Chrome */
+            -moz-transform: rotate(30deg);
+            -webkit-animation: fall 2s infinite;
+            -moz-animation: fall 2s infinite;
+        }
+
+        .stick:nth-child(2n) {
+            transform: rotate(-30deg);
+            -ms-transform: rotate(-30deg); /* IE 9 */
+            -webkit-transform: rotate(-30deg); /* Safari and Chrome */
+            -moz-transform: rotate(-30deg);
+            -webkit-animation: rise 2s infinite;
+            -moz-animation: rise 2s infinite;
+        }
+
+        @-webkit-keyframes rise {
+            50% {
+                transform: rotate(30deg);
+                -ms-transform: rotate(30deg); /* IE 9 */
+                -webkit-transform: rotate(30deg);
+                -moz-transform: rotate(30deg);
+            }
+        }
+
+        @-moz-keyframes rise {
+            50% {
+                transform: rotate(30deg);
+                -ms-transform: rotate(30deg); /* IE 9 */
+                -webkit-transform: rotate(30deg);
+                -moz-transform: rotate(30deg);
+            }
+        }
+
+        @-o-keyframes rise {
+            50% {
+                transform: rotate(30deg);
+                -ms-transform: rotate(30deg); /* IE 9 */
+                -webkit-transform: rotate(30deg);
+                -moz-transform: rotate(30deg);
+            }
+
+        @keyframes rise {
+            50% {
+                transform: rotate(30deg);
+                -ms-transform: rotate(30deg); /* IE 9 */
+                -webkit-transform: rotate(30deg);
+                -moz-transform: rotate(30deg);
+            }
+        }
+
+        }
+        @-webkit-keyframes fall {
+            50% {
+                transform: rotate(-30deg);
+                -ms-transform: rotate(-30deg); /* IE 9 */
+                -webkit-transform: rotate(-30deg);
+                -moz-transform: rotate(30deg);
+            }
+        }
+
+        @-moz-keyframes fall {
+            50% {
+                transform: rotate(-30deg);
+                -ms-transform: rotate(-30deg); /* IE 9 */
+                -webkit-transform: rotate(-30deg);
+                -moz-transform: rotate(-30deg);
+            }
+        }
+
+        @-o-keyframes fall {
+            50% {
+                transform: rotate(-30deg);
+                -ms-transform: rotate(-30deg); /* IE 9 */
+                -webkit-transform: rotate(-30deg);
+                -moz-transform: rotate(30deg);
+            }
+
+        @keyframes fall {
+            50% {
+                transform: rotate(-30deg);
+                -ms-transform: rotate(-30deg); /* IE 9 */
+                -webkit-transform: rotate(-30deg);
+                -moz-transform: rotate(30deg);
+            }
+        }
+
+        }
+        @-webkit-keyframes fade {
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @-moz-keyframes fade {
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @-o-keyframes fade {
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+
+        @keyframes fade {
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        }
+
+    </style>
+    <title>ABReport</title>
+</head>
+<body>
+<div class="img_con">
+    <header>
+        <img src="../../static/apps/aibipaper/images/abp_hd{% if ab_type == 3 %}3{% endif %}.jpg"/>
+    </header>
+    <article>
+        <section class="index_1">
+            <h2><span></span>（<em class="now_time"></em>） <img
+                    src="/static/apps/aibipaper/images/logo{% if ab_type == 3 %}3{% endif %}.jpg"/></h2>
+            <h5 class="price red"><i></i>--.--<em></em></h5>
+            <p class="change_con green">
+                <em class="change_num">--.--</em>
+                <em class="change_index">--%</em>
+            </p>
+            {% if ab_type == 1 %}
+
+            {% elif ab_type == 3 %}
+
+            {% endif %}
+
+
+            <img id="line_pic" src="" alt="">
+
+            {#				<svg version="1.1" viewBox="10 0 230 55">#}
+            {#                    <polyline points="" style="stroke: none;stroke-width: 0;fill-opacity: 0.1;fill: rgb(0, 153, 51);"></polyline>#}
+            {#                    <polyline points="" style="stroke: rgb(0, 153, 51); stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; fill: none;"></polyline>#}
+            {#                </svg>#}
+        </section>
+        <section class="index_2 clearfix">
+            <ul></ul>
+        </section>
+        <section class="news_con">
+
+            {{ data.content|safe }}
+
+        </section>
+    </article>
+    <footer>
+        <img src="/static/apps/aibipaper/images/abp_ft.jpg?t=20180906"/>
+    </footer>
+</div>
+<aside>
+    <a href="javascript:;" class="refresh_btn">刷新</a>
+    <a href="javascript:;" class="download_btn">下载</a>
+</aside>
+<div id="loading">
+    <div class="loading_con">
+        <div class="stick"></div>
+        <div class="stick"></div>
+        <div class="stick"></div>
+        <div class="stick"></div>
+        <div class="stick"></div>
+        <div class="stick"></div>
+        <h4>Loading...</h4>
+    </div>
+</div>
+<script src="/static/apps/aibipaper/js/bluebird.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/global/plugins/jquery.min.js" type="text/javascript"></script>
+<script src="/static/apps/aibipaper/js/html2canvas.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/apps/aibipaper/js/canvas2image.js" type="text/javascript" charset="utf-8"></script>
+<script src="../static/layer/layer.js"></script>
+<script>
+
+    var index_1 = '{{ top_source_name }}';
+    var index_2 = {{ sec_list|safe }};
+    var index_data = {{ index_data|safe }};
+    var alink = document.createElement("a");
+    var now_time = (new Date()).getTime();
+    function share_img() {
+        var cntElem = $('.img_con')[0];
+        var shareContent = cntElem;//需要截图的包裹的（原生的）DOM 对象
+        var width = shareContent.offsetWidth; //获取dom 宽度
+        var height = shareContent.offsetHeight; //获取dom 高度
+        var canvas = document.createElement("canvas"); //创建一个canvas节点
+        var scale = 1.5; //定义任意放大倍数 支持小数
+        canvas.width = width * scale; //定义canvas 宽度 * 缩放
+        canvas.height = height * scale; //定义canvas高度 *缩放
+        canvas.getContext("2d").scale(scale, scale); //获取context,设置scale
+        var opts = {
+            scale: scale, // 添加的scale 参数
+            canvas: canvas, //自定义 canvas
+            // logging: true, //日志开关，便于查看html2canvas的内部执行流程
+            width: width, //dom 原始宽度
+            height: height,
+            useCORS: true // 【重要】开启跨域配置
+        };
+
+        html2canvas(shareContent, opts).then(function (canvas) {
+            var context = canvas.getContext('2d');
+            // 【重要】关闭抗锯齿
+            context.mozImageSmoothingEnabled = false;
+            context.webkitImageSmoothingEnabled = false;
+            context.msImageSmoothingEnabled = false;
+            context.imageSmoothingEnabled = false;
+
+            // 【重要】默认转化的格式为png,也可设置为其他格式
+
+            var img = Canvas2Image.convertToJPEG(canvas, canvas.width, canvas.height);
+            var img_b = img.src;
+            $('body').append('<div class="hide_img" style="display:none;position:fixed;left:0;top:0;z-index:10;"><img src="' + img_b + '" /></div>')
+            $.ajax({
+                url: '/convert_img',
+                type: "post",
+                timeout: 5000,
+                data: {
+                    info_id: {{ info_id }},
+                    img_b: img_b,
+                    ab_type: {{ ab_type }}
+                },
+                success: function (data) {
+                    if (data.success == "ok") {
+                        alink.href = data.img;
+                        console.log(data.img);
+                        setTimeout(function () {
+                            $("#loading").fadeOut();
+                        }, 1000);
+                    }
+                    else {
+                        alert(data.msg)
+                    }
+                },
+                error: function (err) {
+                    $("#loading").fadeOut();
+                    $(".hide_img").show();
+                    layer.msg("错误提示！！！请鼠标移动到页面，右键图片另存为。", {time: 1500, icon: 5})
+
+                },
+                complete: function (XMLHttpRequest, status) { //请求完成后最终执行参数
+                    if (status == 'timeout') {//超时,status还有success,error等值的情况
+                        $("#loading").fadeOut();
+                        $(".hide_img").show();
+                        layer.msg("超时提示！！！请鼠标移动到页面，右键图片另存为。", {time: 1500, icon: 5})
+                    }
+                }
+            });
+        });
+    }
+    var myDate = new Date();
+    var year = myDate.getFullYear().toString();
+    var month = (myDate.getMonth() + 1).toString();
+    var this_date = myDate.getDate().toString();
+    var hour = myDate.getHours();
+    if (hour < 10) {
+        hour = "0" + hour
+    }
+    var min = myDate.getMinutes();
+    if (min < 10) {
+        min = "0" + min
+    }
+    if (month.length == 1) {
+        month = "0" + month;
+    }
+    if (this_date.length == 1) {
+        this_date = "0" + this_date;
+    }
+    var exchange_symbols = {};
+    exchange_symbols[index_1] = [];
+    exchange_symbols[index_1].push("INDEX_" + index_1, "AIBILINK", "0");
+    for (var i = 0; i < index_2.length; i++) {
+        exchange_symbols[index_2[i]] = [];
+        exchange_symbols[index_2[i]].push("INDEX_" + index_2[i], "AIBILINK", "0");
+    }
+
+    function change_message(data) {
+        var num = (Number(data.last) - Number(data.open)).toFixed(2);
+        var num1 = ((Number(data.last) - Number(data.open)) * 100 / Number(data.open)).toFixed(2) + "%";
+
+        for (var i in exchange_symbols) {
+            if (exchange_symbols[i][0] == data.symbol) {
+                if (data.last - exchange_symbols[i][2] < 0) {
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .price').addClass("green");
+                } else {
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .price').addClass("red");
+                }
+                exchange_symbols[i][2] = data.last;
+
+                if (data.symbol == "INDEX_DA") {
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .price').html("<i></i>" + changePrice2money(data.last) + "<em>点</em>");
+                } else {
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .price').html("<i></i>$ " + changePrice2money(data.last));
+                }
+                if (num > 0) {
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .change_num').html("+" + num);
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .change_index').html("+" + num1);
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .change_num').parent().removeClass("green").addClass("red");
+
+                    $('.' + exchange_symbols[i][0] + "_con svg").find('polyline:nth-child(1)').css("fill", "rgb(255,0,0)");
+                    $('.' + exchange_symbols[i][0] + "_con svg").find('polyline:nth-child(2)').css("stroke", "rgb(251,206,199)");
+                    $('.' + exchange_symbols[i][0] + "_con svg").find('circle').css("fill", "red");
+
+                } else {
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .change_num').html(num);
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .change_index').html(num1);
+                    $('.' + exchange_symbols[i][0] + "_con" + ' .change_num').parent().removeClass("red").addClass("green");
+                    $('.' + exchange_symbols[i][0] + "_con svg").find('polyline:nth-child(1)').css("fill", "rgb(0, 153, 51)");
+                    $('.' + exchange_symbols[i][0] + "_con svg").find('polyline:nth-child(2)').css("stroke", "rgb(0, 153, 51)");
+                    $('.' + exchange_symbols[i][0] + "_con svg").find('circle').css("fill", "#0e9f3e");
+                }
+                break;
+            }
+
+
+        }
+    }
+    function changePrice2money(s) {
+        var s = s.toString();
+        s = s.replace(/^(\d*)$/, "$1.");
+        s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+        s = s.replace(".", ",");
+        var re = /(\d)(\d{3},)/;
+        while (re.test(s))
+            s = s.replace(re, "$1,$2");
+        s = s.replace(/,(\d\d)$/, ".$1");
+        return s.replace(/^\./, "0.");
+    }
+    $(function () {
+        $(".now_time").html(month + "月" + this_date + "日 " + hour + ":" + min);
+        $(".index_1").addClass("INDEX_" + index_1 + "_con");
+        for (var i = 0; i < index_2.length; i++) {
+            $(".index_2 ul").append('<li class="INDEX_' + index_2[i] + '_con">\
+						<h4>' + index_2[i] + '/爱币指数</h4>\
+						<h5 class="price red">$--.--</h5>\
+						<p class="change_con green">\
+							<em class="change_num">--.--</em>\
+							<em class="change_index">--%</em>\
+						</p>\
+					</li>');
+        }
+        if (index_1 == "DA") {
+            $('.index_1.INDEX_DA_con h2 span').html("爱币数字资产综合指数 — DAI");
+        } else {
+            $('.index_1 h2 span').html(index_1 + " — 爱币数字资产全球指数");
+        }
+        $('.index_2 .INDEX_DA_con h4').html("DAI/爱币综指");
+        $.each(index_data, function (i, n) {
+            change_message(n);
+        });
+        $.ajax({
+            url: '/download_rep',
+            type: 'post',
+            data: {
+                id:{{ data.id }}
+            },
+            success: function (data) {
+                if (data.success == "ok") {
+                    $('#line_pic').attr("src", data.img_url + "?" + now_time);
+                    share_img();
+                }
+                else {
+                    alert(data.failed)
+                }
+            }
+        });
+        $(".download_btn").click(function () {
+            var myDate = new Date();
+            var year = myDate.getFullYear().toString();
+            var month = (myDate.getMonth() + 1).toString();
+            var day = myDate.getDate().toString();
+            var hour = myDate.getHours();
+            var min = myDate.getMinutes();
+            var second = myDate.getSeconds();
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            if (day.length == 1) {
+                day = "0" + day;
+            }
+            if (second.length == 1) {
+                second = "0" + second;
+            }
+            alink.download = "AiBi_Zao_Paper-" + year + "_" + month + "_" + day + "-" + hour + "~" + min + "~" + second + ".png";
+            alink.click();
+        });
+        $(".refresh_btn").click(function () {
+            location.reload();
+        });
+    });
+</script>
+
+</body>
+</html>
+
+

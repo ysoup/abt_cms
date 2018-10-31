@@ -1,0 +1,140 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/f10/person_organ_manage">人物机构管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+{#                            <li>#}
+{#                                <span class="active">人物编辑</span>#}
+{#                            </li>#}
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="	fa fa-drupal" style="font-size: 24px"></i>
+                                <span class="caption-subject font-dark sbold uppercase">人物信息编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>人物名称</b></label>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" id="person_name"
+                                                   value="{{ person_obj["name"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>人物简介</b></label>
+                                        <div class="col-md-10">
+                                            <textarea class="form-control" id="person_intro" cols="30" rows="8">{{ person_obj.intro }}</textarea>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>相关币种</b></label>
+                                        <div class="col-md-2">
+                                            {% for coin in p_coin_list %}
+                                                {{ coin }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>相关机构</b></label>
+                                        <div class="col-md-2">
+                                            {% for organ in p_organ_list %}
+                                                {{ organ }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+
+                                    {#                                    <div class="form-group">#}
+                                    {#                                        <label class="col-md-2 control-label">相关币种</label>#}
+                                    {#                                        <div class="col-md-10">#}
+                                    {#                                            {% for coin_obj in coin_list %}#}
+                                    {#                                                <label class="checkbox-inline">#}
+                                    {#                                                    {% if coin_obj.id in p_coin_list %}#}
+                                    {#                                                        <input type="checkbox" name="coin"#}
+                                    {#                                                               value={{ coin_obj.id }} checked>#}
+                                    {#                                                        {{ coin_obj.code }}#}
+                                    {#                                                    {% else %}#}
+                                    {#                                                        <input type="checkbox" name="coin"#}
+                                    {#                                                               value={{ coin_obj.id }}>#}
+                                    {#                                                        {{ coin_obj.code }}#}
+                                    {#                                                    {% endif %}#}
+                                    {#                                                </label>#}
+                                    {#                                            {% endfor %}#}
+                                    {#                                        </div>#}
+                                    {#                                    </div>#}
+
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title="确认修改" onclick="modify_person()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title="取消修改" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        // 编辑人物信息
+        function modify_person(){
+            var person_name = $("#person_name").val();
+            var person_intro = $("#person_intro").val();
+
+            if(person_name == ""){
+                layer.msg("姓名不可为空！", {time:1500, icon:2});
+                return false
+            }
+
+            layer.confirm("是否修改？",{
+                btn: ['确认', "取消"]
+            },function () {
+                $.ajax({
+                    url : '{{ url_for("ften.modify_person_info") }}',
+                    type : 'post',
+                    data :{
+                        id : {{ person_obj.id }},
+                        name : person_name,
+                        intro : person_intro
+                    },
+                    success: function (data) {
+                        if (data.status == "ok"){
+                            layer.msg(data.msg, {time: 1500, icon: 6});
+                            window.location.href = "{{ url_for('ften.person_organ_manage') }}"
+                        }
+                        else{
+                            layer.msg(data.msg, {time:1500, icon:5});
+                            return false
+                        }
+                    }
+                })
+            }, function () {
+                 layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+            })
+        }
+
+    </script>
+{% endblock %}
+

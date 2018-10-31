@@ -1,0 +1,88 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+                <div class="page-content">
+                    <div class="row ">
+                        <div class="col-md-12 ">
+                            <div class="portlet light bordered">
+                                <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="">指数源列表</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active">指数源</span>
+                        </li>
+                    </ul>
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-settings font-dark"></i>
+                                        <span class="caption-subject font-dark sbold uppercase">编辑指数源</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" role="form" name="test">
+{#                                        {{form.hidden_tag()}}#}
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">指数源名称：</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="source_name" class="form-control" value="{{ data.source_name }}" placeholder=""  name="source_name">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-10">
+                                                    <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认修改" onclick="modify_source()"></button>
+                                                    <button type="button" class="btn green btn-lg glyphicon glyphicon-remove" title="取消修改" onclick="window.history.go(-1)"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+   <script type="text/JavaScript">
+
+    function modify_source() {
+        // 拿值
+        var source_name = $("#source_name").val();
+        if (source_name == "") {
+            layer.msg("填!", {time: 1000, icon: 2});
+            return false
+        }
+        layer.confirm('是否修改？', {
+            btn: ['确认', '取消']
+        }, function () {
+            $.ajax({
+                // 处理ajax
+                url: '{{ url_for('report.modify_source')}}',
+                type: 'post',
+                data: {
+                    id : {{ data.id }},
+                    source_name : source_name
+                },
+                success: function (data) {
+                    if (data.success == 'ok') {
+                        layer.msg("修改成功！", {time: 1000, icon: 1});
+                        window.location.href = "/source_list";
+                    }
+                    else {
+                        layer.msg("修改失败！", {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            });
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            return false
+        });
+    }
+
+    </script>
+{% endblock %}
+

@@ -1,0 +1,165 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="{{ url_for('activity.activity_lx') }}">拉新活动管理（2）</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">拉新活动列表（2）</span>
+                            </li>
+                        </ul>
+
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-circle blue dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" id="toggle_menu" aria-expanded="false">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                                    class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="/activity/activity_lx?select_id=0" class="btn btn-circle ">全部用户</a></li>
+                                <li><a href="/activity/activity_lx?select_id=1" class="btn btn-circle ">真实用户</a></li>
+                                <li><a href="/activity/activity_lx?select_id=2" class="btn btn-circle ">虚拟用户</a></li>
+                            </ul>
+                        </div>
+
+
+                        <button type="button" class="btn btn-circle blue" onclick='add_lx_person()'>添加用户</button>
+
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>客户姓名</th>
+                                        <th>获得奖励</th>
+                                        <th>邀请码</th>
+                                        <th>算力</th>
+                                        <th>手机号码</th>
+                                        <th>时间</th>
+                                        <th>客户属性</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for row in data %}
+                                        <tr>
+                                            <td>{{ row.id }}</td>
+                                            <td>{{ row.name }}</td>
+                                            <td>{{ row.total_amount }}</td>
+                                            <td>{{ row.code }}</td>
+                                            <td>{{ row.number }}</td>
+                                            <td>{{ row.telephone }}</td>
+                                            <td>{{ row.time }}</td>
+                                            <td>{{ row.flag }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger glyphicon glyphicon-plus"
+                                                        title="增加算力"
+                                                        onclick="add_participation({{ row.code }})"></button>
+                                                <button type="button" class="btn btn-success glyphicon glyphicon-trash"
+                                                        title="删除（暂不可用）" disabled="disabled"
+                                                        onclick="delete_lx_person(this,{{ row['id'] }})"></button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var select_id = getUrlParms("select_id");
+
+
+        $(function () {
+            switch (select_id) {
+                case "2":
+                    $("#toggle_menu").html('虚拟用户 <span class="caret"></span>');
+                    break;
+                case "1":
+                    $("#toggle_menu").html('真实用户 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部用户 <span class="caret"></span>');
+            }
+        });
+
+
+        function add_participation(code) {
+            window.location.href = "{{ url_for('activity.add_participation') }}?code=" + code
+        }
+
+        {#        function delete_rule(obj,id) {#}
+        {#            layer.confirm('真删？', {#}
+        {#                btn: ['真', '假']#}
+        {#            }, function () {#}
+        {#                $.ajax({#}
+        {#                    url: '{{ url_for('new_flash.delete_rule')}}',#}
+        {#                    type: 'post',#}
+        {#                    data: {#}
+        {#                        id: id#}
+        {#                    },#}
+        {#                    success: function (data) {#}
+        {#                        if (data.success == 'ok') {#}
+        {#                            $(obj).parents("tr").remove();#}
+        {#                            layer.msg("删除成功！", {time: 1000, icon: 1});#}
+        {#                        }#}
+        {#                        else {#}
+        {#                            layer.msg("删除失败！", {time: 1000, icon: 5});#}
+        {#                            return false#}
+        {#                        }#}
+        {#                    }#}
+        {#                });#}
+        {#            }, function () {#}
+        {#                layer.msg("已取消", {time: 1000, icon: 2});#}
+        {#                return false#}
+        {#            });#}
+        {#        }#}
+        {#        #}
+        {#        #}
+        function add_lx_person() {
+            window.location.href = '{{ url_for('activity.add_lx_person') }}'
+        }
+        {##}
+        {#        function modify_rule(id) {#}
+        {#            window.location.href="/modify_rule?id="+id;#}
+        {#        }#}
+
+    </script>
+{% endblock %}
+

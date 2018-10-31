@@ -1,0 +1,154 @@
+{% extends "/index.html" %}
+{% block content %}
+    <style>
+        #uploadfile_input{
+            opacity: 0;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/banner_list">Banner列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">Banner编辑</span>
+                                <span id="base_pic" class=""></span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">Banner编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">Banner图片</label>
+                                        <div class="col-md-10">
+                                            <img src="{{ data['banner_img'] }}" alt="" id="banner_img" width="750"
+                                                 height="340">
+                                            <input type="file" id="uploadfile_input" value="">
+                                            <label for="uploadfile_input" class='btn btn-danger'>选择图片</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">描述</label>
+                                        <div class="col-md-10">
+                                            <textarea class="form-control" name="desc" rows="3" id="desc"
+                                                      value="{{ data["banner_desc"] }}">{{ data["banner_desc"] }}</textarea>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label">是否上架</label>
+                                        <label class="checkbox checkbox-inline" for="debugInfo">
+                                            {% if data["is_show"] == 0 %}
+                                                <input id="is_show" type="checkbox" name="push" value="{{ data["is_show"] }}" class="input-small"/>
+                                            {% else %}
+                                                <input id="is_show" type="checkbox" name="push" value="{{ data["is_show"] }}" class="input-small" checked/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title="确认修改" onclick="modify_banner()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title="取消修改" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+        $(function () {
+            $("#banner_img").click(function () {
+                $("#uploadfile_input").trigger("click");
+            });
+            $("#uploadfile_input").change(function () {
+                var img_src = $("#uploadfile_input").val();
+                var formData = new FormData();
+                formData.append("file", $("#uploadfile_input")[0].files[0]);
+                formData.append('id', {{ data['id'] }});
+                formData.append('img_url', img_src);
+                $.ajax({
+                    url: "{{ url_for("new_flash.get_img_url") }}",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        $('#banner_img').attr("src", data['base_pic_url']);
+                        $('#base_pic').attr("class", data['img_url']);
+                    }
+                })
+            });
+        });
+
+
+        // 编辑banner
+        function modify_banner() {
+            var formData = new FormData();
+            var is_show = $("#is_show").is(":checked");
+            var show = 0;
+            if (is_show == true) {
+                show = 1;
+            }
+            var img = $("#uploadfile_input")[0].files[0];
+            if(img == ""){
+                layer.msg("图片不可为空！", {time: 1000, icon: 2});
+                return false
+            }
+            var banner_img = $("#banner_img").attr("src");
+            formData.append("img", $("#uploadfile_input")[0].files[0]);
+            formData.append('id', {{ data['id'] }});
+            formData.append("banner_img", banner_img);
+            formData.append('desc', $('#desc').val());
+            formData.append('base_pic_url', $('#banner_img').attr("src"));
+            formData.append('img_url', $('#base_pic').attr("class"));
+            formData.append('is_show', show);
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.modify_banner')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("修改成功！", {time: 1000, icon: 1});
+                            window.location.href = "/banner_list"
+                        }
+                        else {
+                            layer.msg(data.failed, {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+    </script>
+{% endblock %}
+

@@ -1,0 +1,131 @@
+
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                          <!--面包屑导航-->
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="">爬虫管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">爬虫列表</span>
+                            </li>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn blue btn-circle" onclick="add_url()">添加爬虫任务</button>
+                            </div>
+                        </div>
+
+                        <!--表格展示部分-->
+                        <div class="row">
+                            <div class="portlet-body col-lg-12">
+                                <div class="table-scrollable">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th width="40px">
+                                                    <input type="checkbox">
+                                                </th>
+                                                <th width="700px">名称</th>
+                                                <th>总数据</th>
+                                                <th>未导入</th>
+                                                <th>发布失败</th>
+                                                <th>附件</th>
+                                                <th>速度</th>
+                                                <th>状态</th>
+                                                <th width="200px">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in data %}
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" id="tr-{{ row.id }}">
+                                                    </td>
+                                                    <td>
+                                                        {{ row.spider_ch_name }}
+                                                    </td>
+
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>
+                                                        <a href="/crawler/modify_target_url?id={{ row.id }}">修改</a>&nbsp;&nbsp;
+                                                        <a onclick="delete_target_url(this,{{ row.id }})">删除</a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+{#                            <div class="col-lg-offset-1 col-lg-2">#}
+{#                                <div class="btn-group" role="group" aria-label="...">#}
+{#                                    <button type="button" class="btn btn-danger">删除</button>#}
+{#                                    <button type="button" class="btn btn-danger">移动</button>#}
+{#                                    <button type="button" class="btn btn-danger">导出</button>#}
+{#                                </div>#}
+{#                            </div>#}
+                            <div class="col-lg-offset-9 col-lg-2">
+                               {% if pagination %}
+                                {{ macro_pagination.pagination_widget(pagination,'crawler.index') }}
+                               {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function add_url(){
+                window.location.href="/crawler/add_target_url";
+            }
+
+            function delete_target_url(object,id) {
+                var r = window.confirm("确认删除吗？");
+                if(r==true){
+                    $.ajax({
+                        url:"{{ url_for("crawler.delete_target_url") }}",
+                        type:"post",
+                        data:{
+                            b_id:id
+                        },
+                        success:function (data) {
+                            if(data.success=="ok"){
+                                $(object).parent().parent().remove();
+                            }else{
+                                layer.msg(data.failed, {time:1000, icon:5});
+                            }
+                        }
+                    });
+                }
+            }
+
+
+
+    $(function () {
+        setTimeout(function () {
+            $('textarea').removeClass("input-circle");
+            $('input').removeClass("input-circle");
+        },500)
+    })
+        </script>
+    </div>
+{% endblock %}

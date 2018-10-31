@@ -1,0 +1,269 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        .my_input {
+            width: 100%;
+            display: block;
+            line-height: 60px;
+            text-align: center;
+        }
+
+        .my_input input[type="checkbox"] {
+            display: none;
+        }
+
+        .my_input input[type="checkbox"] + label {
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            position: relative;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            margin: 0px 20px;
+            box-sizing: border-box;
+        }
+
+        .my_input input[type="checkbox"] + label:after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 20px;
+            height: 20px;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .my_input .inset_put:checked + label.pink {
+            background: #fb7575;
+        }
+
+        .my_input .inset_put:checked + label.pink:after {
+            background: #fff;
+        }
+
+        .my_input .inset_put:checked + label:after {
+            left: calc(100% - 18px);
+        }
+
+        .my_input .inset_put:checked + label.disabled {
+            background: #bbb;
+        }
+
+        .my_input .inset_put + label {
+            background: #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .my_input .inset_put + label:after {
+            background: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            top: 2px;
+            left: 2px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="">F10管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">币种信息列表</span>
+                            </li>
+                        </ul>
+                        <div class="form-group search_word" style="position: relative; margin-left: 10px;">
+                            <input type="text" class="form-control btn-circle pull-right" id="keyword"
+                                   placeholder="请输入关键字"
+                                   style="height: 33px; width: 210px;"/>
+                            <a class="btn glyphicon glyphicon-remove"
+                               style="pointer-events:auto;position: absolute;z-index: 2;right: 50px;"></a>
+                            <button type="button" class="btn blue btn-circle pull-right"
+                                    style="position: absolute; top:0; right: 0; z-index: 3;"
+                                    onclick="search_coin_keyword()">搜索
+                            </button>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>币种</th>
+                                        <th>中文名称</th>
+                                        <th>英文名称</th>
+                                        <th>行情状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for row in data %}
+                                        <tr>
+                                            <td>{{ row['id'] }}</td>
+                                            <td>{{ row["code"] }}</td>
+                                            <td>{{ row["chinese_name"] }}</td>
+                                            <td>{{ row["english_name"] }}</td>
+
+                                            <td>
+                                                {% if row.is_available == 1 %}
+                                                    <div class="row my_input">
+                                                        <input type="checkbox" checked id="inset_input-{{ row.id }}"
+                                                               class="inset_put">
+{#                                                        <label for="inset_input-{{ row.id }}" class="pink disabled"#}
+                                                        <label for="inset_input-{{ row.id }}" class="pink"
+                                                               data-id="{{ row.id }}" data-flag="1"></label>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="row my_input">
+                                                        <input type="checkbox" id="inset_input-{{ row.id }}"
+                                                               class="inset_put">
+                                                        <label for="inset_input-{{ row.id }}" class="pink "
+                                                               data-id="{{ row.id }}" data-flag="0"></label>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                <button type="button" class="btn btn-danger glyphicon glyphicon-pencil"
+                                                        title="编辑"
+                                                        onclick="modify_coin_info({{ row['id'] }})"></button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% if pagination %}
+                        {{ macro_pagination.pagination_widget(pagination,'ften.coin_category_list') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+
+        var coin_reload = window.localStorage.getItem("coin_reload");
+        if (coin_reload == "true") {
+            window.localStorage.setItem("coin_reload", "false");
+            window.location.reload();
+        }
+
+
+        $(function () {
+            var keyword = getUrlParms("keyword");
+            if (keyword) {
+                $('#keyword').val(keyword)
+            }
+            $(".search_word .glyphicon-remove").click(function () {
+                $("#keyword").val("");
+            });
+        });
+
+        // 关键词搜索
+        function search_coin_keyword() {
+            var keyword = $('#keyword').val();
+            console.log(keyword);
+            if (keyword) {
+                window.open("/f10/coin_search_result?keyword=" + keyword);
+                localStorage.setItem("keyword", keyword);
+            }
+            else {
+                layer.msg("您好像并没输入任何东西", {time: 2000, icon: 5});
+                return false
+            }
+        }
+
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var select_id = getUrlParms("select_id");
+        var page = getUrlParms("page");
+
+        function modify_coin_info(id) {
+            window.location.href = "/f10/modify_coin_info?id=" + id + "&select_id=" + select_id + "&page=" + page;
+        }
+
+
+        // 状态操作相关
+        $(document).on("click", ".my_input label", function () {
+            if ($(this).hasClass("disabled")) {
+                layer.msg("不可编辑!!!", {time: 1500, icon: 1});
+                return false;
+            }
+
+            var $this = $(this);
+            var this_id = $this.data("id");
+            var this_flag = $this.data("flag");
+
+            layer.confirm('是否改变当前状态？（不会抹去数据）', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: "/f10/modify_coin_state",
+                    type: 'POST',
+                    data: {
+                        id: this_id,
+                        flag: this_flag
+                    },
+                    success: function (data) {
+                        if (data.status == "ok") {
+                            if (this_flag == '1') {
+                                $('#inset_input-' + this_id).removeAttr("checked");
+                                $this.data("flag", "0");
+                                layer.msg(data.msg, {time: 1500, icon: 6})
+                            }
+                            else if (this_flag == '0') {
+                                $('#inset_input-' + this_id).attr("checked");
+                                $this.data("flag", "1");
+                                layer.msg(data.msg, {time: 1500, icon: 1})
+                            }
+
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                })
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                window.location.reload();
+                return false
+            })
+        });
+
+
+    </script>
+{% endblock %}
+

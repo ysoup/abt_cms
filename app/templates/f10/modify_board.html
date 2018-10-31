@@ -1,0 +1,106 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <i class="fa fa-circle"></i><a href="/f10/concept_board_manage">概念板块管理</a>
+                            </li>
+{#                            <li>#}
+{#                                <span class="active">概念板块编辑</span>#}
+{#                            </li>#}
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="fa fa-wrench" style="font-size: 24px"></i>
+                                <span class="caption-subject font-dark sbold uppercase">概念板块编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">板块名称</label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" id="board_name" value="{{ data["name"] }}">
+                                        </div>
+                                    </div>
+{#                                    <div class="form-group">#}
+{#                                        <label class="col-md-2 control-label">相关币种</label>#}
+{#                                        <div class="col-md-10">#}
+{##}
+{#                                            {% for coin_board in coin_board_list %}#}
+{#                                                <label class="checkbox-inline">#}
+{#                                                    {% if coin_board.id in boards_list %}#}
+{#                                                        <input type="checkbox" name="coin_board"#}
+{#                                                               value={{ coin_board.id }} checked>#}
+{#                                                        {{ coin_board.name }}#}
+{#                                                    {% else %}#}
+{#                                                        <input type="checkbox" name="coin_board"#}
+{#                                                               value={{ coin_board.id }}>#}
+{#                                                        {{ coin_board.name }}#}
+{#                                                    {% endif %}#}
+{#                                                </label>#}
+{#                                            {% endfor %}#}
+{#                                        </div>#}
+{#                                    </div>#}
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认修改" onclick="modify_board()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove" title="取消修改" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+    // 编辑快讯类别
+    function modify_board() {
+        // 拿值
+        var board_name = $("#board_name").val();
+        if (board_name == "") {
+            layer.msg("不可为空!", {time: 1000, icon: 2});
+            return false
+        }
+        layer.confirm('是否修改？', {
+            btn: ['确认', '取消']
+        }, function () {
+            $.ajax({
+                // 处理ajax
+                url: '{{ url_for('ften.modify_board')}}',
+                type: 'post',
+                data: {
+                    id:{{ data["id"] }},
+                    board_name: board_name
+                },
+                success: function (data) {
+                    if (data.status == 'ok') {
+                        layer.msg(data.msg, {time: 1000, icon: 1});
+                        window.location.href = "/concept_board_manage";
+                    }
+                    else {
+                        layer.msg(data.msg, {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            });
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            return false
+        });
+    }
+    </script>
+{% endblock %}
+

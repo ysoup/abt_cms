@@ -1,0 +1,290 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="">FootBar管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">FootBar列表</span>
+                            </li>
+                        </ul>
+                        <!-- Single button -->
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle blue dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/footbar_views?select_id=0" class="btn btn-circle ">所有FootBar </a>
+                                        </li>
+                                        <li><a href="/footbar_views?select_id=1" class="btn btn-circle ">使用中 </a>
+                                        </li>
+                                        <li><a href="/footbar_views?select_id=2" class="btn btn-circle ">未使用 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <button type="button" class="btn blue btn-circle" onclick='add_foot_bar()'
+                                        style="margin-left: 10px">新增FootBar
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="delete_choice_footbar()" class="btn blue btn-circle pull-right">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="portlet-body col-lg-12">
+                                <div class="table-scrollable">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>
+                                                <button onclick="all_choice()" type="button"
+                                                        class="btn btn-circle red btn-sm">全选
+                                                </button>
+                                            </th>
+                                            <th>FootBar ID</th>
+                                            <th>内容</th>
+                                            <th>添加时间</th>
+                                            <th>更新时间</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for row in data %}
+                                            <tr id="tr-{{ row.id }}">
+                                                <td><label>
+                                                    <input type="checkbox" name="choice_checkbox"
+                                                           value="{{ row.id }}">
+                                                </label></td>
+                                                <td>{{ row.id }}</td>
+                                                <td>{{ row.content|safe }}</td>
+                                                <td>{{ row.create_time }}</td>
+                                                <td>{{ row.update_time }}</td>
+                                                {% if row.is_delete == 0 %}
+                                                    <td>使用中</td>
+                                                {% else %}
+                                                    <td>已删除</td>
+                                                {% endif %}
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"
+                                                            onclick="modify_foot_bar({{ row.id }})"></button>
+                                                <br>
+                                                    {% if row.is_delete == 1 %}
+                                                        <button type="button" disabled="true"
+                                                                class="btn btn-default glyphicon glyphicon-trash"
+                                                                title="已删除"></button>
+                                                    {% else %}
+                                                        <button type="button"
+                                                                class="btn btn-success glyphicon glyphicon-trash"
+                                                                title="删除"
+                                                                onclick="delete_foot_bar({{ row.id }})"></button>
+                                                    {% endif %}
+                                                    <br>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if pagination %}
+                        {{ macro_pagination.pagination_widget(pagination,'new_flash.footbar_views') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+        var this_reload = window.localStorage.getItem("footBar_reload");
+        if (this_reload == "true") {
+            window.localStorage.setItem("footBar_reload", "false");
+            window.location.reload();
+        }
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+        var select_id = getUrlParms("select_id");
+
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            if (select_id) {
+                $("#hidden_val").val(select_id)
+            }
+
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('使用中 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('未使用 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('所有FootBar <span class="caret"></span>');
+            }
+{#            $(".form-horizontal").submit(function () {#}
+{#                search_new_flash_keyword();#}
+{#                return false;#}
+{#            })#}
+        });
+        // 反选
+        function all_choice() {
+            $("input[name='choice_checkbox']").each(function () {
+                if ($(this).prop("checked")) {
+                    $(this).attr("checked", false);
+                }
+                else {
+                    $(this).prop("checked", true);
+                }
+            })
+        }
+
+        // 批量删除付特巴
+        function delete_choice_footbar() {
+            var footbar_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                footbar_id_list.push($(this).val());
+            });
+            if (footbar_id_list == "") {
+                layer.msg("请最少选择一条FootBar，再进行该操作");
+                return false
+            }
+            layer.confirm('是否批量删除？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.delete_choice_footbar')}}',
+                    type: 'post',
+                    data: JSON.stringify(footbar_id_list),
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layser.msg("批量删除成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                        }
+                        else {
+                            layer.msg("批量删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
+        // 关键词搜索
+{#        function search_new_flash_keyword() {#}
+{#            var keyword = $("#keyword").val();#}
+{#            if (keyword) {#}
+{#                window.open("/new_search_result?keyword=" + keyword);#}
+{#                localStorage.setItem("keyword", keyword);#}
+                {#                window.open = #}
+{#            } else {#}
+{#                layer.msg("您好像并没输入任何东西", {time: 2000, icon: 5});#}
+{#                return false#}
+{#            }#}
+{#        }#}
+
+        // 展示
+{#        function show_foot_bar(id) {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.show_foot_bar')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        layer.msg("展示成功", {time: 2000, icon: 6});#}
+{#                        window.location.reload()#}
+{#                    }#}
+{#                    else {#}
+{#                        layer.msg("未成功展示", {time: 2000, icon: 5});#}
+{##}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        // 取消展示
+{#        function close_foot_bar(id) {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.close_foot_bar')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        layer.msg("操作成功", {time: 2000, icon: 1});#}
+{#                        window.location.reload()#}
+{#                    }#}
+{#                    else {#}
+{#                        layer.msg("操作失败，请重试！", {time: 2000, icon: 5});#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        // 删除foo_bar
+        function delete_foot_bar(id) {
+            layer.confirm("是否删除？", {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.delete_footbar')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("删除成功", {time: 2000, icon: 1});
+                            $("#tr-" + id).remove();
+                            window.location.reload();
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
+        function add_foot_bar() {
+            window.location.href = "/add_footbar"
+        }
+
+        function modify_foot_bar(id) {
+            window.location.href = "/modify_footbar?id=" + id;
+        }
+
+    </script>
+{% endblock %}
+

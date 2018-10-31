@@ -1,0 +1,291 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/rep_list">ReportList</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">编辑Report</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">编辑模板</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label radio-inline">TOP指数源
+                                            {#  <br /><span style="color: #f00;">(单选)</span>#}
+                                        </label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="top_name">
+                                                {% for row in rows %}
+                                                    {% if data.top_source_id == row.id %}
+                                                        <option value="{{ row['id'] }}"
+                                                                selected>{{ row.source_name }}</option>
+                                                    {% else %}
+                                                        <option value="{{ row['id'] }}">{{ row.source_name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-2 text-right">次级指数源<br/><span
+                                                style="color: #f00;">(限选三)</span></div>
+                                        <div class="col-md-10">
+                                            {% for row in rows %}
+                                                <label class="checkbox-inline"
+                                                       style="width: 150px; margin: 0 10px 10px 0;">
+                                                    {% if data.sec_source[0].id == row.id %}
+                                                        <input type="checkbox" checked name="second_source"
+                                                               value="{{ row.id }}">
+                                                        {{ row.source_name }}
+                                                    {% elif data.sec_source[1].id == row.id %}
+                                                        <input type="checkbox" checked name="second_source"
+                                                               value="{{ row.id }}">
+                                                        {{ row.source_name }}
+                                                    {% elif data.sec_source[2].id == row.id %}
+                                                        <input type="checkbox" checked name="second_source"
+                                                               value="{{ row.id }}">
+                                                        {{ row.source_name }}
+                                                    {% else %}
+                                                        <input type="checkbox" name="second_source"
+                                                               value="{{ row.id }}">
+                                                        {{ row.source_name }}
+                                                    {% endif %}
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-2 control-label radio-inline">类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="rep_type">
+                                                <option value=1>早报</option>
+                                                <option disabled="disabled" value=2>午报 （暂不可选）</option>
+                                                <option value=3 {% if data.type== 3 %}
+                                                        selected="selected"
+                                                {% endif %} >晚报
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">模板内容</label>
+                                        <div class="col-md-10">
+                                            <textarea name="editor1" id="editor1" class=”ckeditor” rows="100"
+                                                      value="{{ data.content }}">{{ data.content }}</textarea>
+                                            <script>
+                                                // 用CKEditor替换<textarea id="editor1">
+                                                // 使用默认配置
+                                                var editor1 = CKEDITOR.replace('editor1');
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-11 text-right">
+                                            <button type="button" class="btn green" onclick="modify_report()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green" onclick="stop_report()">
+                                                取消
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-offset-2 col-md-11 text-left">
+                                            {#                                            <button type="button" class="btn green" onclick="preview_report()">#}
+                                            {#                                                预览#}
+                                            {#                                            </button>#}
+                                            {#                                            <button type="button" class="btn green" onclick="download_report()">#}
+                                            {#                                                保存并下载到本地#}
+                                            {#                                            </button>#}
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+
+        function modify_report() {
+            var top_source = $("#top_name").val();
+            if (top_source == "") {
+                layer.msg("Top指数源不可为空！", {time: 2000, icon: 5});
+                return false
+            }
+
+            var sec_source = [];
+            $("input[name=second_source]:checked").each(function () {
+                sec_source.push($(this).val())
+            });
+            if (sec_source.length != 3) {
+                layer.msg("请选择三个次级指数！", {time: 2000, icon: 5});
+                return false
+            }
+            {#            console.log(array);#}
+            {#            console.log(array.length);#}
+
+            var rep_type = $("#rep_type").val();
+
+            var content = editor1.getData();
+            if (content == "") {
+                layer.msg("Report内容不可为空", {time: 2000, icon: 2});
+                return false
+            }
+
+
+            layer.confirm('是否修改？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('report.modify_rep')}}',
+                        type: 'post',
+                        data: {
+                            info_id: {{ data.information_id }},
+                            id: {{ data.id }},
+                            content_text: editor1.document.getBody().getText(),
+                            content: content,
+                            top_source: top_source,
+                            sec_source: JSON.stringify(sec_source),
+                            rep_type: rep_type
+                        },
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("修改成功！", {time: 1000, icon: 1});
+                                window.location.href = "/rep_list"
+                            }
+                            else {
+                                layer.msg(data.msg, {time: 1000, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+                });
+        }
+
+
+        function stop_report() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.location.href = "/rep_list";
+            }, function () {
+                layer.msg('~~~', {time: 1000, icon: 6});
+                return false;
+            });
+        }
+
+        function checked_3() {
+            var num = $("input[name=second_source]:checked").length;
+            if (num == 3 || num > 3) {
+                $("input[name=second_source]").not(":checked").attr("disabled", "disabled");
+            } else if (num < 3) {
+                $("input[name=second_source]").not(":checked").removeAttr("disabled");
+            }
+        }
+        // 限制只能选三个。
+        $(function () {
+            checked_3();
+            $(document).on("click", "input[name=second_source]", function () {
+                checked_3();
+            });
+            $(document).on("click", ".checkbox-inline", function () {
+                var $this = $(this);
+                var disabled = $(this).find("input").is(":disabled");
+                if (disabled) {
+                    layer.tips('已存在三个选项，请先取消再选择', $this, {tips: [3, '#f60']});
+                }
+            });
+        });
+
+
+        // 预览
+        {#        function add_report() {#}
+        {#            var top_source = $("#top_name").val();#}
+        {#            if(top_source == ""){#}
+        {#                layer.msg("Top指数源不可为空！", {time: 2000, icon: 5});#}
+        {#                return false#}
+        {#            }#}
+        {##}
+        {#            var sec_source = [];#}
+        {#            $("input[name=second_source]:checked").each(function(){sec_source.push($(this).val())});#}
+        {#            if (sec_source.length !=3){#}
+        {#                layer.msg("请选择三个次级指数！", {time: 2000, icon: 5});#}
+        {#                return false#}
+        {#            }#}
+        {#            console.log(array);#}
+        {#            console.log(array.length);#}
+        {##}
+        {#            var rep_type = $("#rep_type").val();#}
+        {##}
+        {#            var content = editor1.getData();#}
+        {#            if(content==""){#}
+        {#                layer.msg("Report内容不可为空", {time: 2000, icon: 2});#}
+        {#                return false#}
+        {#            }#}
+        {##}
+        {##}
+        {#            layer.confirm('是否添加？', {#}
+        {#                    btn: ['确认', '取消']#}
+        {#                },#}
+        {#                function () {#}
+        {#                    $.ajax({#}
+        {#                        url: '{{ url_for('report.add_rep')}}',#}
+        {#                        type: 'post',#}
+        {#                        data: {#}
+        {#                            content_text: editor1.document.getBody().getText(),#}
+        {#                            content: content,#}
+        {#                            top_source: top_source,#}
+        {#                            sec_source : JSON.stringify(sec_source),#}
+        {#                            rep_type : rep_type#}
+        {#                        },#}
+        {#                        success: function (data) {#}
+        {#                            if (data.success == 'ok') {#}
+        {#                                layer.msg("添加成功！", {time: 1000, icon: 1});#}
+        {#                                window.history.go(-1);#}
+        {#                            }#}
+        {#                            else {#}
+        {#                                layer.msg("添加失败！", {time: 1000, icon: 5});#}
+        {#                                return false#}
+        {#                            }#}
+        {#                        }#}
+        {#                    });#}
+        {#                },#}
+        {#                function () {#}
+        {#                    layer.msg("已取消", {time: 1000, icon: 2});#}
+        {#                    return false#}
+        {#                });#}
+        {#        }#}
+
+
+    </script>
+{% endblock %}
+

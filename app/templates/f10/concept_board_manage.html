@@ -1,0 +1,90 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="">F10管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">概念板块列表</span>
+                            </li>
+                        </ul>
+{#                        <div>#}
+{#                            <button type="button" class="btn btn-circle blue" onclick=''>概念版本管理</button>#}
+{#                        </div>#}
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>概念板块名称</th>
+                                        <th>对应币种</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for row in data %}
+                                        <tr>
+                                            <td>{{ row['id'] }}</td>
+                                            <td>{{ row['name'] }}</td>
+                                            <td>
+                                                {% for k,v in coin_dict.items() %}
+                                                    {% if k == row.id %}
+                                                        {% for datum in v %}
+                                                            {{ datum }}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-info glyphicon glyphicon-pencil"
+                                                        title="编辑"
+                                                        onclick="modify_board({{ row['id'] }})"></button>
+
+                                                <button type="button" class="btn btn-danger glyphicon glyphicon-trash"
+                                                title="功能暂未开通" disabled="disabled" onclick="delete_board({{ row['id'] }})"></button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+
+
+        function modify_board(id) {
+            window.location.href = "/f10/modify_board?id=" + id;
+        }
+
+
+    </script>
+{% endblock %}
+

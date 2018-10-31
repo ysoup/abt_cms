@@ -1,0 +1,271 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        .my_input {
+            width: 100%;
+            display: block;
+            line-height: 60px;
+            text-align: center;
+        }
+
+        .my_input input[type="checkbox"] {
+            display: none;
+        }
+
+        .my_input input[type="checkbox"] + label {
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            position: relative;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            margin: 0px 20px;
+            box-sizing: border-box;
+        }
+
+        .my_input input[type="checkbox"] + label:after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 20px;
+            height: 20px;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .my_input .inset_put:checked + label.pink {
+            background: #fb7575;
+        }
+
+        .my_input .inset_put:checked + label.pink:after {
+            background: #fff;
+        }
+
+        .my_input .inset_put:checked + label:after {
+            left: calc(100% - 18px);
+        }
+
+        .my_input .inset_put:checked + label.disabled {
+            background: #bbb;
+        }
+
+        .my_input .inset_put + label {
+            background: #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .my_input .inset_put + label:after {
+            background: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            top: 2px;
+            left: 2px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #config_info_table td,#config_info_table th { word-wrap: break-word;  word-break: break-all;}
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>每日发放Token信息
+                        <small>查询日期：{{ query_time }}</small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false" style="background: #fb7575;color: #fff;">全部 &nbsp;&nbsp;<span
+                                            class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/gather/config_list?select_id=0" class="btn btn-circle "> 全部 </a>
+                                        </li>
+                                        <li><a href="/gather/config_list?select_id=1" class="btn btn-circle "> 状态1 </a>
+                                        </li>
+                                        <li><a href="/gather/config_list?select_id=2" class="btn btn-circle "> 状态2 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="add_planet_config()" class="btn btn-circle pull-right"
+                                        style="background: #b07cc6;color: #fff;">添加
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="config_info_table">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th width="150">Token<br/>编号</th>
+                                        <th>TOKEN名称</th>
+                                        <th>发放数量</th>
+                                        <th>发放时间</th>
+                                        <th>创建时间</th>
+                                        <th>更新时间</th>
+                                        <th>是否生效<br />（0失效 1生效）</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for info in data %}
+                                        <tr>
+                                            <td>{{ info.sn }}</td>
+                                            <td>{{ info.token_no }}</td>
+                                            <td>{{ info.token_name }}</td>
+                                            <td>{{ info.token_num }}</td>
+                                            <td>{{ info.issue_time }}</td>
+                                            <td>{{ info.create_time }}</td>
+                                            <td>{{ info.update_time }}</td>
+                                            <td>
+                                                {% if info.is_userful == 1 %}
+                                                    <div class="row my_input">
+                                                        <input type="checkbox" checked id="inset_input-{{ info.sn }}"
+                                                               class="inset_put">
+                                                        <label for="inset_input-{{ info.sn }}" class="pink"
+                                                               data-id="{{ info.sn }}" data-flag="1"></label>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="row my_input">
+                                                        <input type="checkbox" id="inset_input-{{ info.sn }}"
+                                                               class="inset_put">
+                                                        <label for="inset_input-{{ info.sn }}" class="pink "
+                                                               data-id="{{ info.sn }}" data-flag="0"></label>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="/gather/modify_planet_config?sn={{ info.sn }}"
+                                                   class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+    // 状态操作相关
+    $(document).on("click", ".my_input label", function () {
+        if ($(this).hasClass("disabled")) {
+            layer.msg("不可编辑!!!", {time: 1500, icon: 1});
+            return false;
+        }
+
+        var $this = $(this);
+        var this_id = $this.data("id");
+        var this_flag = $this.data("flag");
+        var istatus = 0;
+        if (this_flag == 0){
+            istatus=1
+        }
+
+        layer.confirm('是否改变当前状态？（不会抹去数据）', {
+            btn: ['是', '否']
+        }, function () {
+            $.ajax({
+                url: "/gather/modify_config_status",
+                type: 'POST',
+                data: {
+                    sn: this_id,
+                    is_userful: istatus
+                },
+                success: function (data) {
+                    if (data.success == "ok") {
+                        if (this_flag == '1') {
+                            $('#inset_input-' + this_id).removeAttr("checked");
+                            $this.data("flag", "0");
+                            layer.msg("状态修改成功", {time: 1500, icon: 6})
+                        }
+                        else if (this_flag == '0') {
+                            $('#inset_input-' + this_id).attr("checked");
+                            $this.data("flag", "1");
+                            layer.msg("状态修改成功", {time: 1500, icon: 1})
+                        }
+                    }
+                    else {
+                        layer.msg(data.failed, {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            })
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            window.location.reload();
+            return false
+        })
+    });
+
+
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('状态1 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('状态2 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+        });
+
+        function add_planet_config() {
+            location.href = "{{ url_for('planet_token_manage.add_planet_config') }}"
+        }
+
+    </script>
+{% endblock %}

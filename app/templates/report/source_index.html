@@ -1,0 +1,110 @@
+{% extends "/index.html" %}
+{%import 'macro_pagination.html' as macro_pagination%}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+
+    <div class="page-content-wrapper">
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content">
+                    <!-- BEGIN PAGE HEAD-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="">Source管理</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active">Source列表</span>
+                        </li>
+                    </ul>
+                            <div>
+                                <button type="button" class="btn btn-circle blue" onclick='add_source()'>添加来源</button>
+                            </div>
+                                <div class="portlet-body">
+                                    <div class="table-scrollable">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>SourceName</th>
+                                                    <th>创建时间</th>
+                                                    <th>更新时间</th>
+{#                                                    <th>关联id</th>#}
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for row in data %}
+                                                <tr>
+                                                    <td>{{ row['id'] }}</td>
+                                                    <td>{{ row["source_name"] }}</td>
+                                                    <td>{{ row["create_time"] }}</td>
+                                                    <td>{{ row["update_time"] }}</td>
+{#                                                    <td>{{ row["report_id"] }}</td>#}
+                                                    <td>
+                                                        <button type="button" class="btn btn-success glyphicon glyphicon-trash" title="删除" onclick="delete_source(this,{{row['id']}})"></button>
+                                                        <button type="button" class="btn btn-danger glyphicon glyphicon-pencil" title="编辑" onclick="modify_source({{row['id']}})"></button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {%if pagination%}
+                                {{macro_pagination.pagination_widget(pagination,'report.source_list')}}
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <script type="text/JavaScript">
+
+        function delete_source(obj,id) {
+            layer.confirm('真删？', {
+                btn: ['真', '假']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('report.delete_source')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            $(obj).parents("tr").remove();
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+        function add_source() {
+            window.location.href="/add_source"
+        }
+
+        function modify_source(id) {
+            window.location.href="/modify_source?id="+id;
+        }
+
+    </script>
+{% endblock %}
+

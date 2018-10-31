@@ -1,0 +1,162 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #customer_info_table td, #customer_info_table th {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>客户资产页
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <div class="portlet-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> <b>客户ID：</b> </label>
+                                    <div class="col-md-4">
+                                        <p>{{ data.userid }}</p>
+                                    </div>
+                                    <label class="col-md-2 control-label"> <b>查询时间：</b> </label>
+                                    <div class="col-md-4">
+                                        <p>{{ data.time }}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> <b>客户姓名：</b> </label>
+                                    <div class="col-md-4">
+                                        <p>{{ data.username }}</p>
+                                    </div>
+                                    <label class="col-md-2 control-label"> <b>地址：</b> </label>
+                                    <div class="col-md-4">
+                                        <p>{{ data.address }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <h4>客户资产</h4>
+                            <div class="table-scrollable">
+
+                                <table class="table table-hover table-striped table-bordered" id="customer_info_table">
+                                    <thead>
+                                    <tr>
+                                        <th>币种</th>
+                                        <th>数量</th>
+                                        <th>可用</th>
+                                        <th>冻结</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for info in data.account %}
+                                        <tr>
+                                            <td>{{ info.symbol }}</td>
+                                            <td>{{ info.amount }}</td>
+                                            <td>{{ info.cash }}</td>
+                                            <td>{{ info.freeze }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <hr>
+                            <h4>客户星球资产</h4>
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="customer_info_table">
+                                    <thead>
+                                    <tr>
+                                        <th>星球</th>
+                                        <th>币种</th>
+                                        <th>数量</th>
+                                        <th>可用</th>
+                                        <th>冻结</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for info in data.planet %}
+                                        {% for foo in info.planet_account %}
+                                            <tr>
+                                            <td>{{ info.planet_name }}</td>
+                                                <td>{{ foo.symbol }}</td>
+                                                <td>{{ foo.amount }}</td>
+                                                <td>{{ foo.cash }}</td>
+                                                <td>{{ foo.freeze }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        var info_reload = window.localStorage.getItem("customer_reload");
+        if (info_reload == "true") {
+            window.localStorage.setItem("customer_reload", "false");
+            window.location.reload();
+        }
+
+        function delete_customer(customer_no) {
+            layer.confirm('是否删除？(仅改变状态，不会抹去数据)', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('customers.customer_info')}}',
+                    type: 'post',
+                    data: {
+                        customer_no: customer_no
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                            $("#show_info").text("本就是删除状态，还想咋个删法")
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+
+    </script>
+{% endblock %}

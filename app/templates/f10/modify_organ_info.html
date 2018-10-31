@@ -1,0 +1,136 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <i class="fa fa-circle"></i><a href="/f10/person_organ_manage">人物机构管理</a>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+
+                                <span class="caption-subject font-dark sbold uppercase">机构信息编辑</span>
+                                <i class="fa fa-slideshare" style="font-size:24px"></i>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>机构名称</b></label>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" id="organ_name"
+                                                   value="{{ organ_obj["name"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>机构简介</b></label>
+                                        <div class="col-md-10">
+                                            <textarea class="form-control" id="organ_intro" cols="30" rows="8">{{ organ_obj.intro }}</textarea>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>相关币种</b></label>
+                                        <div class="col-md-2">
+                                            {% for coin in organ_coin_list %}
+                                                {{ coin }}&nbsp;&nbsp;&nbsp;
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2"><b>相关人物</b></label>
+                                        <div class="col-md-2">
+                                            {% for person in organ_person_list %}
+                                                {{ person }}&nbsp;&nbsp;&nbsp;
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+
+                                    {#                                    <div class="form-group">#}
+                                    {#                                        <label class="col-md-2 control-label">相关币种</label>#}
+                                    {#                                        <div class="col-md-10">#}
+                                    {#                                            {% for coin_obj in coin_list %}#}
+                                    {#                                                <label class="checkbox-inline">#}
+                                    {#                                                    {% if coin_obj.id in p_coin_list %}#}
+                                    {#                                                        <input type="checkbox" name="coin"#}
+                                    {#                                                               value={{ coin_obj.id }} checked>#}
+                                    {#                                                        {{ coin_obj.code }}#}
+                                    {#                                                    {% else %}#}
+                                    {#                                                        <input type="checkbox" name="coin"#}
+                                    {#                                                               value={{ coin_obj.id }}>#}
+                                    {#                                                        {{ coin_obj.code }}#}
+                                    {#                                                    {% endif %}#}
+                                    {#                                                </label>#}
+                                    {#                                            {% endfor %}#}
+                                    {#                                        </div>#}
+                                    {#                                    </div>#}
+
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title="确认修改" onclick="modify_organ()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title="取消修改" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        // 编辑快讯类别
+
+        function modify_organ(){
+            var organ_name = $("#organ_name").val();
+            var organ_intro = $("#organ_intro").val();
+
+            if(organ_name == ""){
+                layer.msg("机构名称不可为空！", {time:1500, icon:2});
+                return false
+            }
+
+            layer.confirm("是否修改？",{
+                btn: ['确认', "取消"]
+            },function () {
+                $.ajax({
+                    url : '{{ url_for("ften.modify_organ_info") }}',
+                    type : 'post',
+                    data :{
+                        id: {{ organ_obj.id }},
+                        name : organ_name,
+                        intro : organ_intro
+                    },
+                    success: function (data) {
+                        if (data.status == "ok"){
+                            layer.msg(data.msg, {time: 1500, icon: 6});
+                            window.location.href = "{{ url_for('ften.person_organ_manage') }}"
+                        }
+                        else{
+                            layer.msg(data.msg, {time:1500, icon:5});
+                            return false
+                        }
+                    }
+                })
+            }, function () {
+                 layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+            })
+        }
+    </script>
+{% endblock %}
+

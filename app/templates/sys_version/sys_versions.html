@@ -1,0 +1,151 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #sys_version_table td, #sys_version_table th {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .layui-layer-tips {
+            word-break: break-all;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>版本信息
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false" style="background: #fb7575;color: #fff;">全部 &nbsp;&nbsp;<span
+                                            class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/sys_versions?select_id=0" class="btn btn-circle ">全部 </a>
+                                        </li>
+                                        <li><a href="/sys_versions?select_id=1" class="btn btn-circle ">状态1 </a>
+                                        </li>
+                                        <li><a href="/sys_versions?select_id=2" class="btn btn-circle ">状态2 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="create_sys_version()" class="btn btn-circle pull-right"
+                                        style="background: #b07cc6;color: #fff;">新增版本信息
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="sys_version_table">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>类型</th>
+                                        <th>版本号</th>
+                                        <th>下载链接</th>
+                                        <th>创建时间</th>
+                                        <th>更新时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for info in data %}
+                                        <tr>
+                                            <td><a href="/modify_sys_version?sn={{ info.sn }}">{{ info.sn }}</a></td>
+                                            <td>
+                                                {% if info.version_type == "2" %}
+                                                    Android
+                                                {% elif info.version_type == "3" %}
+                                                    IOS
+                                                {% else %}
+                                                    {{ info.version_type }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ info.version_no }}</td>
+                                            <td><a href="{{ info.download_link }}">{{ info.download_link }}</a></td>
+                                            <td>{{ info.create_time }}</td>
+                                            <td>{{ info.update_time }}</td>
+                                            <td>
+                                                <a style="margin-bottom: 3px"
+                                                   href="/modify_sys_version?sn={{ info.sn }}"
+                                                   class="btn btn-danger glyphicon glyphicon-pencil"
+                                                   title="编辑"></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        var sys_version_reload = window.localStorage.getItem("sys_version_reload");
+        if (sys_version_reload == "true") {
+            window.localStorage.setItem("sys_version_reload", "false");
+            window.location.reload();
+        }
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('状态1 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('状态2 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+        });
+
+        function create_sys_version() {
+            location.href = "{{ url_for('sys_version.create_sys_version') }}"
+        }
+
+
+    </script>
+{% endblock %}

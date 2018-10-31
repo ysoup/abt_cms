@@ -1,0 +1,210 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #notice_info_table td, #notice_info_table th {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .layui-layer-tips {
+            word-break: break-all;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>星球公告
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false" style="background: #fb7575;color: #fff;">全部 &nbsp;&nbsp;<span
+                                            class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/planet/notice_info?select_id=0" class="btn btn-circle "> 全部 </a>
+                                        </li>
+                                        <li><a href="/planet/notice_info?select_id=1" class="btn btn-circle ">
+                                            状态1 </a>
+                                        </li>
+                                        <li><a href="/planet/notice_info?select_id=2" class="btn btn-circle ">
+                                            状态2 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="create_notice()" class="btn btn-circle pull-right"
+                                        style="background: #b07cc6;color: #fff;">添加新公告
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="notice_info_table">
+                                    <thead>
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>公告类型</th>
+                                        <th>标题</th>
+                                        <th>摘要</th>
+                                        <th>内容</th>
+                                        <th>链接</th>
+                                        <th>是否展示</th>
+                                        <th width="100">创建时间</th>
+                                        <th width="100">更新时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for info in data %}
+                                        <tr>
+                                            <td>{{ info.sn }}</td>
+                                            <td>
+                                                {% if info.type == "1" %}
+                                                    官方公告
+                                                {% else %}
+                                                    {{ info.type }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary notice_title"
+                                                        title="{{ info.title }}">查看
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary notice_summary"
+                                                        title="{{ info.summary }}">查看
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary notice_content"
+                                                        title="{{ info.content }}">查看
+                                                </button>
+                                            </td>
+                                            <td>{{ info.url }}</td>
+                                            <td>
+                                                {% if info.show == "1" %}
+                                                    是
+                                                {% else %}
+                                                    否
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ info.create_time }}</td>
+                                            <td>{{ info.update_time }}</td>
+                                            <td>
+                                                {% if info.show == "0" %}
+                                                    <button type="button" disabled="true"
+                                                            class="btn btn-default glyphicon glyphicon-trash"
+                                                            title="已删除"></button>{% else %}
+                                                    <button class="btn btn-success glyphicon glyphicon-trash"
+                                                            title="删除"
+                                                            onclick="delete_notice('{{ info.sn }}')"></button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(".notice_title, .notice_summary, .notice_content").click(function () {
+            layer.tips($(this).attr('title'), $(this), {
+                tips: [1, '#0FA6D8'] //还可配置颜色
+            });
+        });
+        var info_reload = window.localStorage.getItem("planet_notice_reload");
+        if (info_reload == "true") {
+            window.localStorage.setItem("planet_notice_reload", "false");
+            window.location.reload();
+        }
+
+        function delete_notice(notice_no) {
+            layer.confirm('是否删除？(仅改变状态，不会抹去数据)', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.modify_notice_status')}}',
+                    type: 'post',
+                    data: {
+                        notice_no: notice_no
+                    },
+                    success: function (data) {
+                        if (data.status == 'ok') {
+                            layer.msg(data.msg, {time: 1000, icon: 1});
+                            $("#show_info").text("本就是删除状态，还想咋个删法")
+                            location.reload()
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('状态2 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('状态1 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+        });
+
+        function create_notice() {
+            location.href = "{{ url_for('planet.create_notice') }}"
+        }
+
+    </script>
+{% endblock %}

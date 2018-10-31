@@ -1,0 +1,501 @@
+{% extends "/index.html" %}
+{% import "macro_pagination.html" as macro_pagination %}
+{% block content %}
+    <style>
+        .form-control {
+            display: inline;
+            vertical-align: middle;
+        }
+
+        #flash_id_list a, #info_id_list a {
+            margin-right: 5px;
+        }
+
+        .tab-content .fade {
+            display: none;
+        }
+
+        .tab-content .active {
+            display: block;
+        }
+
+        #flash {
+            height: 800px;
+            overflow-y: scroll;
+        }
+
+        #info {
+            height: 800px;
+            overflow-y: scroll;
+        }
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <!--面包屑导航-->
+                        <ul class="page-breadcrumb breadcrumb" style="border-bottom: 1px solid;margin-bottom:20px;">
+                            <li>
+                                <a href="/calendar">日历管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <a href="/calendar">爱日历</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">添加事件</span>
+                            </li>
+                        </ul>
+                        <div class="row">
+                            <!--左边资讯快讯展示部分-->
+                            <div class="col-lg-6">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <ul class="nav nav-pills pull-left btn" type="button">
+                                            <li class="active">
+                                                <a href="#flash" data-toggle="tab">快讯</a>
+                                            </li>
+                                            <li><a href="#info" data-toggle="tab">资讯</a></li>
+                                        </ul>
+
+                                        {#                                        <div class="btn-group pull-right" style="margin-left: 10px">#}
+                                        {#                                            <form class="form-horizontal" role="form">#}
+                                        {#                                                #}
+                                        {#                                                <div class="input-group pull-right search_word">#}
+                                        {#                                                    <input type="text" class="form-control btn-circle"#}
+                                        {#                                                           style="text-align: center;width: 239px;padding-right: 80px;"#}
+                                        {#                                                           id="keyword" placeholder="请输入关键字">#}
+                                        {#                                                    <a class="btn glyphicon glyphicon-remove"#}
+                                        {#                                                       style="pointer-events:auto; position: absolute; left: 150px; z-index: 2;padding: 8px 12px;"></a>#}
+                                        {#                                                    <button type="button" class="btn blue btn-circle pull-right"#}
+                                        {#                                                            style="position: absolute; right: 0; z-index: 2;">搜索#}
+                                        {#                                                    </button>#}
+                                        {#                                                </div>#}
+                                        {#                                            </form>#}
+                                        {#                                        </div>#}
+
+                                    </div>
+                                </div>
+
+                                {#                            生成日历#}
+                                {#                                <div class="row">#}
+                                {#                                    <div class="col-lg-12">#}
+                                {#                                        <button id="create_cal" class="btn btn-default pull-right" type="button"#}
+                                {#                                                style="margin-right: 50px" onclick="create_calendar()">生成日历#}
+                                {#                                        </button>#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
+                                <!--展示快讯-->
+                                <div class="row">
+                                    <div class="portlet col-lg-12">
+                                        <div class="table-scrollable tab-content">
+                                            <div class="fade in active" id="flash">
+                                                <table class="table table-hover table-bordered tab-pane">
+                                                    <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>ID</th>
+                                                        <th>更新时间</th>
+                                                        <th>快讯标题</th>
+                                                    </tr>
+                                                    </thead>
+
+
+                                                    <tbody>
+                                                    {% for row in flash_data %}
+                                                        <tr id="tr-{{ row.id }}">
+                                                            <td><label><input type="checkbox" name="flash_checkbox"
+                                                                              value="{{ row.id }}"></label></td>
+                                                            <td>{{ row.id }}</td>
+                                                            <td>{{ row.update_time }}</td>
+                                                            <td>
+                                                                {% if row.title %}
+                                                                <b>{{ row.title|safe|truncate(length = 200, killwords = False, end = '...') }}</b>
+                                                            {% else %}
+                                                                {{ row.content|safe|truncate(length = 100, killwords = False, end = '...') }}
+                                                            {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div id="info" class="fade">
+                                                <table class="table table-bordered table-hover tab-pane">
+                                                    <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>ID</th>
+                                                        <th>更新时间</th>
+                                                        <th>资讯标题</th>
+                                                    </tr>
+                                                    </thead>
+
+
+                                                    <tbody style="width: 730px">
+                                                    {% for row in info_data %}
+                                                        <tr id="tr-{{ row.id }}">
+                                                            <td><label><input type="checkbox" name="info_checkbox"
+                                                                              value="{{ row.id }}"></label></td>
+                                                            <td>{{ row.id }}</td>
+                                                            <td>{{ row.update_time }}</td>
+                                                            <td>
+                                                            {% if row.title %}
+                                                                <b>{{ row.title|safe|truncate(length = 200, killwords = False, end = '...') }}</b>
+                                                            {% else %}
+                                                                {{ row.content|safe|truncate(length = 100, killwords = False, end = '...') }}
+                                                            {% endif %}
+
+                                                                <br>
+                                                                {% if row.source_url == "" or row.source_url == "''" %}
+
+                                                                {% else %}
+                                                                    <a href="{{ row.source_url }}" target="_blank">查看源链接 &nbsp;<span
+                                                                            class="fa fa-angellist"></span></a>
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--右边添加事件部分-->
+                            <div class="col-lg-6">
+                                <form class="form-horizontal" role="form" name="test">
+                                    <div class="form-body">
+{#                                        <div class="form-group">#}
+{#                                            <label class="col-md-2 control-label">所属主题</label>#}
+{#                                            <div class="col-md-10">#}
+{#                                                <select class="form-control input-small" id="sub">#}
+{#                                                    {% for sub in sub_list %}#}
+{#                                                        <option value="{{ sub.id }}">{{ sub.name }}</option>#}
+{#                                                    {% endfor %}#}
+{#                                                </select>#}
+{#                                                <a href="javascript:;" class="btn btn-default" data-toggle="modal"#}
+{#                                                   data-target="#myModal" data-id="">#}
+{#                                                    <i class="glyphicon glyphicon-plus-sign"></i></a>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                        <hr>#}
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2">时间TIME</label>
+                                            <div class="col-md-10">
+                                                <input type="date" class="form-control input-inline"
+                                                       placeholder="请输入快讯标题（可为空）" id="in_date">
+                                                <input type="time" class="form-control input-inline"
+                                                       placeholder="请输入快讯标题（可为空）" id="in_time">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2">相关快讯ID</label>
+                                            <div class="col-md-10" id="flash_id_list"></div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2">相关资讯ID</label>
+                                            <div class="col-md-10" id="info_id_list"></div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2">事件内容</label>
+                                            <div class="col-md-10">
+                                                <textarea id="event_content" class="form-control" rows="7"
+                                                          style=" height: 300px;"
+                                                          value=""></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">类型</label>
+                                            <div class="col-md-10">
+                                                <select class="form-control input-small" id="tag_type">
+                                                    <option value="1">地区</option>
+                                                    <option value="2">币种</option>
+                                                    <option value="3">交易所</option>
+                                                </select>
+
+                                                <select class="form-control input-small" id="tag_name"></select>
+
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">重要</label>
+                                            <div class="col-md-10">
+                                                <div class="mt-checkbox-list" id="c_importance">
+                                                    <label class="mt-checkbox-outline">
+                                                        <input type="radio" value="1" name="c_importance"> 1星
+                                                        <input type="radio" value="2" name="c_importance"> 2星
+                                                        <input type="radio" value="3" name="c_importance"> 满混
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">展示</label>
+                                            <div class="col-md-10">
+                                                <div class="mt-checkbox-list">
+                                                    <label class="mt-checkbox-outline">
+                                                        <input id="is_show" type="checkbox" name="is_show"/>
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">关键词</label>
+                                            <div class="col-md-10">
+                                                <input id="key_word" type="text" class="form-control"
+                                                       placeholder="请...事件关键词">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-actions">
+                                        <div class="row">
+                                            <div class="col-md-11 text-right">
+                                                <button type="button" class="btn green" onclick="add_event()">
+                                                    提交
+                                                </button>
+                                                <button type="button" class="btn green" onclick="stop_add_event()">
+                                                    取消
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模态框（Modal） -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                添加主题
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="portlet-body form">
+                                <form class="form-horizontal" role="form" name="test">
+                                    <div class="form-body">
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2">主题名称</label>
+                                            <div class="col-md-10">
+                                                <input type="text" id="sub_name" class="form-control" value=""
+                                                       placeholder="" name="sub_name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认新增" id="add_sub_btn"
+                                    onclick="add_sub()" data-dismiss=""></button>
+                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                    data-dismiss="modal" title="取消新增"></button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+
+            <script type="text/javascript">
+                // add subjects
+                function add_sub(){
+                    var sub_name = $("#sub_name").val();
+                    if(sub_name == ""){
+                        layer.msg("主题不可为空！", {time: 1000, icon: 2});
+                        return false;
+                    }
+                    $.ajax({
+                        url : "{{ url_for('calendar.add_sub') }}",
+                        type : 'post',
+                        data : {'sub_name':sub_name},
+                        success:function(data){
+                            if(data.success='ok'){
+                                layer.msg("添加成功！", {time: 2000, icon: 1});
+                                window.location.reload()
+                            }
+                        }
+                    })
+                }
+
+
+
+
+                // stop add_event
+                function stop_add_event() {
+                    layer.confirm('是否要放弃当前新添加的事件？', {
+                        btn: ['确认', '取消']
+                    }, function () {
+                        window.localStorage.setItem("cale_reload", "true");
+                        window.history.go(-1);
+                    }, function () {
+                        layer.msg('不放弃!', {time: 1000, icon: 6});
+                        return false;
+                    });
+                }
+
+                // add event
+                function add_event() {
+                    var c_date = $("#in_date").val();
+                    var c_time = $("#in_time").val();
+                    if (c_date == "") {
+                        layer.msg("日期不可为空！", {time: 1000, icon: 2});
+                        return false;
+                    }
+
+                    var tag_type = $("#tag_type").val();
+                    var tag_name = $("#tag_name").val();
+                    if (tag_type == "" || tag_name == "") {
+                        layer.msg("关联类型，类型名称都不可为空！", {time: 1000, icon: 2});
+                        return false;
+                    }
+
+                    var content = $("#event_content").val();
+                    if (content == "") {
+                        layer.msg("事件内容不可为空！", {time: 1000, icon: 2});
+                        return false;
+                    }
+                    var c_importance = $("#c_importance input[type='radio']:checked").val();
+                    if (c_importance == undefined) {
+                        layer.msg("请选择事件的重要性！", {time: 1000, icon: 2});
+                        return false;
+                    }
+
+                    var is_show = $("#is_show").is(":checked");
+                    var show = 0;
+                    if (is_show == true) {
+                        show = 1;
+                    }
+
+                    layer.confirm('是否保存新建事件？', {
+                        btn: ["确认", "取消"]
+                    }, function () {
+                        $.ajax({
+                            url: '{{ url_for("calendar.add_new_event") }}',
+                            type: 'post',
+                            data: {
+{#                                sub: $("#sub").val(),#}
+                                c_date: c_date,
+                                c_time: c_time,
+                                tag_type: tag_type,
+                                tag_name : tag_name,
+                                content: content,
+                                c_importance: c_importance,
+                                is_show: show,
+                                key_word: $("#key_word").val(),
+                                flash_id_list : JSON.stringify(flash_id_list),
+                                info_id_list : JSON.stringify(info_id_list)
+                            },
+                            success: function (data) {
+                                if (data.success == 'ok') {
+                                    layer.msg("事件添加成功！", {time: 2000, icon: 1});
+                                    window.localStorage.setItem("cale_reload", "true");
+                                    window.history.go(-1);
+                                } else {
+                                    layer.msg(data.failed, {time: 2000, icon: 5});
+                                }
+                            }
+                        });
+                    }, function () {
+                        layer.msg("已取消", {time: 1000, icon: 2});
+                        return false;
+                    });
+                }
+                //change tag_name
+                function tag_type(num) {
+                    $("#tag_name").empty();
+                    $.ajax({
+                        url: '{{ url_for("calendar.get_tag_type") }}',
+                        data: {"tag_type": num},
+                        success: function (data) {
+                            if (data.success == "ok") {
+                                var this_data = data.eng_list;
+                                $.each(this_data, function (i, n) {
+                                    if(i==0){
+                                        $("#tag_name").append('<option selected="selected" value="' + (i+1) + '">' + n + '</option>');
+                                    }else {
+                                        $("#tag_name").append('<option value="' + (i+1) + '">' + n + '</option>');
+                                    }
+                                })
+                            }
+                        }
+                    });
+                }
+
+                $(function () {
+                    flash_id_list = [];
+                    info_id_list = [];
+
+                    $(document).on("click", "input[name=flash_checkbox]", function () {
+                        flash_id_list = [];
+                        $("#flash_id_list").empty();
+                        var checked_input = $("input[name=flash_checkbox]:checked");
+                        checked_input.each(function () {
+                            this_val = $(this).val();
+                            flash_id_list.push(this_val);
+                            $("#flash_id_list").append('<a href="javascript:;" class="btn btn-default" data-id="' + this_val + '">' + this_val + ' <i class="icon-close"></i></a>')
+                        });
+                    });
+                    $(document).on("click", "#flash_id_list a", function () {
+                        var $this = $(this);
+                        var index = $this.index();
+                        $this.remove();
+                        $("input[name=flash_checkbox]:checked").eq(index).trigger("click");
+                    });
+                    $(document).on("click", "input[name=info_checkbox]", function () {
+                        info_id_list = [];
+                        $("#info_id_list").empty();
+                        var checked_input = $("input[name=info_checkbox]:checked");
+                        checked_input.each(function () {
+                            this_val = $(this).val();
+                            info_id_list.push(this_val);
+                            $("#info_id_list").append('<a href="javascript:;" class="btn btn-default" data-id="' + this_val + '">' + this_val + ' <i class="icon-close"></i></a>')
+                        });
+                    });
+                    $(document).on("click", "#info_id_list a", function () {
+                        var $this = $(this);
+                        var index = $this.index();
+                        $this.remove();
+                        $("input[name=info_checkbox]:checked").eq(index).trigger("click");
+                    });
+
+
+                    // init tag_name
+                    tag_type(1);
+                    // 根据填写的种类(国家与地区， 币种信息， 交易所信息)
+                    $('#tag_type').change(function () {
+                        var this_val = $("#tag_type").val();
+                        tag_type(this_val);
+                    });
+                });
+
+            </script>
+
+{% endblock %}

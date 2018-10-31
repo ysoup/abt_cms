@@ -1,0 +1,623 @@
+{% extends "/index.html" %}
+{% import "macro_pagination.html" as macro_pagination %}
+{% block content %}
+    <style type="text/css">
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        .today_btn {
+            display: inline-block;
+            text-align: center;
+            color: #666;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .date_ms span {
+            line-height: 34px;
+        }
+
+        #searchTime {
+            margin: 0 10px;
+        }
+
+        .dates_con {
+            margin-top: 8px;
+            border-spacing: 10px;
+            border-collapse: separate;
+        }
+
+        .dates_con tr td {
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            border-radius: 100%;
+            text-align: center;
+        }
+
+        .dates_con .today {
+            background: #bbb;
+            color: #fff;
+        }
+
+        .dates_con .on {
+            background: #028BE0;
+            color: #fff;
+            -webkit-animation: elastic 0.3s;
+            animation: elastic 0.3s;
+        }
+
+        @keyframes elastic {
+            0% {
+                transform: scale(0.5);
+            }
+            80% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @-webkit-keyframes elastic {
+            0% {
+                -webkit-transform: scale(0.5);
+            }
+            80% {
+                -webkit-transform: scale(1.2);
+            }
+            100% {
+                -webkit-transform: scale(1);
+            }
+        }
+
+        .dates_con tr td em {
+            display: block;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 24px;
+        }
+
+        .dates_con tr td span {
+            font-size: 12px;
+            line-height: 14px;
+            display: block;
+        }
+
+        .dates_btn {
+            float: left;
+            padding-top: 30px;
+            margin-right: 20px;
+        }
+
+        .dates_btn a {
+            font-size: 14px;
+            color: #666;
+            margin: 0 5px;
+        }
+
+        .dates_btn a:hover {
+            color: #F9B515;
+            text-decoration: none;
+        }
+
+        .dates_con {
+            float: left;
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .dates_con:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 20px;
+            display: inline-block;
+            width: 1px;
+            height: 20px;
+            background: #ddd;
+        }
+
+        .dates_con:after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 20px;
+            display: inline-block;
+            width: 1px;
+            height: 20px;
+            background: #ddd;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <!--面包屑导航-->
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="">日历管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">爱日历</span>
+                            </li>
+                        </ul>
+                        <!-- Single button -->
+                        <!--添加新事件-->
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle blue dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false">所有事件&nbsp;&nbsp;<span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/calendar?select_id=0" class="btn btn-circle ">全部事件</a></li>
+                                        <li><a href="/calendar?select_id=1" class="btn btn-circle ">已展示事件</a></li>
+                                        <li><a href="/calendar?select_id=2" class="btn btn-circle ">未展示事件</a></li>
+                                    </ul>
+                                </div>
+
+                                <!--搜索功能-->
+                                {#                                <div class="btn-group" style="margin-left: 10px">#}
+                                {#                                    <form class="form-horizontal" role="form">#}
+                                {#                                        <div class="input-group pull-right search_word">#}
+                                {#                                            <input type="text" class="form-control btn-circle"#}
+                                {#                                                   style="text-align: center;width: 220px;padding-right: 80px;"#}
+                                {#                                                   id="keyword" placeholder="请输入关键字">#}
+                                {#                                            <a class="btn glyphicon glyphicon-remove"#}
+                                {#                                               style="pointer-events:auto; position: absolute; left: 132px; z-index: 2;padding: 8px 12px;"></a>#}
+                                {#                                            <button type="button" class="btn blue btn-circle pull-right"#}
+                                {#                                                    style="position: absolute; right: 0; z-index: 2;"#}
+                                {#                                                    onclick="search_new_event_keyword()">搜索#}
+                                {#                                            </button>#}
+                                {#                                        </div>#}
+                                {#                                    </form>#}
+                                {#                                </div>#}
+
+                                <div class="btn-group date_ms">
+                                    <input type="text" name="searchTime" readonly placeholder="请选择日期"
+                                           class="form-control form_datetime btn-circle" id="searchTime"
+                                           style="height: 33px; width: 150px; float: left;"/>
+                                    <span id="first_day"></span>
+                                    <span>至</span>
+                                    <span id="last_day"></span>
+                                    <a href="javascript:;" class="today_btn btn blue btn-circle">回到今天</a>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 text-right">
+                                {#                                <button type="button" class="btn btn-circle black" title="请先确保事件主题已存在，如没有，请先添加主题" data-toggle="modal" data-target="#myModal">生成关联事件</button>#}
+                                <button type="button" class="btn btn-circle green" title="即为事件绑定主题"
+                                        onclick="add_event_relation_btn()">添加关联事件
+                                </button>
+                                <button type="button" class="btn btn-circle red" onclick='add_new_event()'>添加新事件
+                                </button>
+                            </div>
+                        </div>
+                        　　　　        <!-- 日历部分 -->
+                        <div class="row">
+                            <div class="col-lg-12 date_box">
+                                <div class="dates_btn">
+                                    <a href="javascript:;" id="lastM" class="lastM" title="上一月">&lt;&lt; 上月</a>
+                                    <a href="javascript:;" id="last-week" class="lastW" title="上一周">&lt; 上周</a>
+                                </div>
+                                <div class="dates_con">
+                                    <table id="monitor">
+                                        <tr>
+                                            <td data-date=""><em></em><span>周日</span></td>
+                                            <td data-date=""><em></em><span>周一</span></td>
+                                            <td data-date=""><em></em><span>周二</span></td>
+                                            <td data-date=""><em></em><span>周三</span></td>
+                                            <td data-date=""><em></em><span>周四</span></td>
+                                            <td data-date=""><em></em><span>周五</span></td>
+                                            <td data-date=""><em></em><span>周六</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="dates_btn">
+                                    <a href="javascript:;" id="next-week" class="nextW" title="下一周">下周 &gt;</a>
+                                    <a href="javascript:;" id="nextM" class="nextM" title="下一月">下月 &gt;&gt;</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!--展示事件部分-->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-scrollable">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>
+                                                <p>选</p>
+                                            </th>
+                                            <th>事件ID</th>
+                                            <th>时间</th>
+                                            <th>事件标签</th>
+                                            <th>事件内容</th>
+                                            <th>重要性</th>
+                                            <th>所属主题</th>
+                                            <th>相关快讯ID</th>
+                                            <th>相关资讯ID</th>
+                                            <th>关键词(后台)</th>
+                                            <th>STATE</th>
+                                            <th>更新时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for event in data %}
+                                            <tr>
+                                                <td><label>
+                                                    <input type="checkbox" name="choice_checkbox"
+                                                           value="{{ event['id'] }}">
+                                                </label></td>
+                                                <td>{{ event.id }}</td>
+                                                <td>
+                                                    {{ event.happened_date }}
+                                                    <br>
+                                                    {% if event.happened_time|safe  == '00:00:00' %}
+                                                        时间待定
+                                                    {% else %}
+                                                        {{ event.happened_time }}
+                                                    {% endif %}
+                                                </td>
+                                                <!--事件标签-->
+                                                {% if event.happened_tag_type == 1 %}
+                                                    <td>国家
+                                                        <br>{% for country_obj in country_list %}
+                                                            {% if country_obj.id == event.happened_tag_id %}
+                                                                {{ country_obj.chinese_name }}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </td>
+                                                {% elif event.happened_tag_type == 2 %}
+                                                    <td>币种
+                                                        <br>
+                                                        {% for coin_obj in coin_list %}
+                                                            {% if coin_obj.id == event.happened_tag_id %}
+                                                                {{ coin_obj.code }}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </td>
+                                                {% elif event.happened_tag_type == 3 %}
+                                                    <td>交易所
+                                                        <br>
+                                                        {% for exchange_obj in exchange_list %}
+                                                            {% if exchange_obj.id == event.happened_tag_id %}
+                                                                {{ exchange_obj.chinese_name }}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </td>
+                                                {% endif %}
+                                                <td>{{ event.content }}</td>
+                                                <td>
+                                                    {% if event.importance == '1' %}
+                                                        ✿
+                                                    {% elif event.importance == '2' %}
+                                                        ✿ ✿
+                                                    {% elif event.importance == '3' %}
+                                                        ✿ ✿ ✿
+                                                    {% else %}
+                                                        未选择
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ event.event_sub.name }}</td>
+                                                <td>
+                                                    {% for news in event.event_news %}
+                                                        {{ news.id }}
+                                                    {% endfor %}
+                                                <td> {% for info in event.event_info %}
+                                                    {{ info.id }}
+                                                {% endfor %}</td>
+                                                <td>{{ event.keywords }}</td>
+                                                <td>
+                                                    {% if event.is_show == 1 %}
+                                                        已展示
+                                                    {% else %}
+                                                        未展示
+                                                    {% endif %}</td>
+                                                <td>{{ event.update_time }}</td>
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-danger glyphicon glyphicon-pencil"
+                                                            onclick="modify_event({{ event.id }})" title="编辑"></button>
+                                                    {% if event.is_show == 1 %}
+                                                        <button type="button"
+                                                                class="btn btn-default glyphicon glyphicon-eye-close"
+                                                                title="点击取消展示"
+                                                                onclick="modify_event_state({{ event.id }}, 1)"></button>
+                                                    {% else %}
+                                                        <button type="button"
+                                                                class="btn btn-primary glyphicon glyphicon-eye-open"
+                                                                title="点击展示"
+                                                                onclick="modify_event_state({{ event.id }}, 0)"></button>
+                                                    {% endif %}
+                                                    {#                                                    <button type="button" class="btn btn-success" title="直接关联" data-toggle="modal"#}
+                                                    {#                                                   data-target="#myModal">直接关联</button>#}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+
+                </div>
+
+                <!-- 模态框（Modal） -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    添加关联事件
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">请先选择相关主题</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 text-right">主题名称</div>
+                                    <div class="col-md-9">
+                                        <select class="form-control input-small" id="category">
+                                            {% for row in sub_list %}
+                                                <option value="{{ row['id'] }}">{{ row['name'] }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">将以下事件关联到该主题下</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 text-right">所选事件ID</div>
+                                    <div class="col-md-9">
+                                        <input type="number" id="event_id" class="form-control input-small" value=""
+                                               placeholder="" name="event_id">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="关联"
+                                        id="add_sub_btn"
+                                        onclick="add_relation()" data-dismiss=""></button>
+                                <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                        data-dismiss="modal" title="取消"></button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+                </div>
+
+
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            //获取地址栏参数
+            function getUrlParms(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null)
+                    return unescape(r[2]);
+                return null;
+            }
+            var select_date = getUrlParms("select_date");
+            var select_id = getUrlParms("select_id");
+
+            $("#searchTime").val(select_date);
+            function initDatePlugin() {
+                $("#searchTime").datetimepicker({
+                    minView: "month", //  选择时间时，最小可以选择到那层；默认是‘hour’也可用0表示
+                    language: 'zh-CN', // 语言
+                    autoclose: true, //  true:选择时间后窗口自动关闭
+                    format: 'yyyy-mm-dd', // 文本框时间格式，设置为0,最后时间格式为2017-03-23 17:00:00
+                    todayHighlight: true, //高亮当日
+                    // clearBtn:true,   //清除按钮
+                    todayBtn: true
+
+                }).on("changeDate", function () {
+                    var searchTime = $("#searchTime").val();
+                    setDate(new Date(searchTime));
+                    go_date(searchTime);
+                });
+            }
+            var days_con = $("#monitor");
+            var first_day = $("#first_day");
+            var last_day = $("#last_day");
+            var currentFirstDate;
+            var now_date = new Date();
+            var now_year = now_date.getFullYear();
+            var now_month = now_date.getMonth() + 1;
+            var now_today = now_date.getDate();
+            var today_date = now_year + "-" + now_month + "-" + now_today;
+            var formatDate = function (date) {
+                var year = date.getFullYear() + '年';
+                var month = (date.getMonth() + 1) + '月';
+                var day = date.getDate();
+                var week = '(' + ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][date.getDay()] + ')';
+                return day;
+            };
+            var addDate = function (date, n) {
+                date.setDate(date.getDate() + n);
+                return date;
+            };
+            var setDate = function (date) {
+                var week = date.getDay();
+                date_on = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                date = addDate(date, week * -1);
+                $("#monitor td").removeClass("today on");
+                currentFirstDate = new Date(date);
+                for (var i = 0; i < 7; i++) {
+                    if (i == 0) {
+                        var this_date = addDate(date, 0);
+                    } else {
+                        var this_date = addDate(date, 1);
+                    }
+                    var this_year = this_date.getFullYear();
+                    var this_month = this_date.getMonth() + 1;
+                    var this_day = formatDate(this_date);
+                    $("#monitor td").eq(i).data("date", this_year + "-" + this_month + "-" + this_day);
+                    $("#monitor td").eq(i).find("em").html(this_day);
+                    if (date_on == this_year + "-" + this_month + "-" + this_day) {
+                        $("#monitor td").eq(i).addClass("on");
+                    }
+                    if ($("#monitor td").eq(i).data("date") == (now_year + "-" + now_month + "-" + now_today)) {
+                        $("#monitor td").eq(i).addClass("today");
+                    }
+                    ;
+                }
+                first_day.html($("#monitor td").eq(0).data("date"));
+                last_day.html($("#monitor td").eq(6).data("date"));
+            };
+            function go_date(data) {
+                window.location.href = "/calendar?select_date=" + data;
+            }
+            $(function () {
+                switch (select_id) {
+                    case "1":
+                        $("#toggle_menu").html('已展示事件 <span class="caret"></span>');
+                        break;
+                    case "2":
+                        $("#toggle_menu").html('未展示事件 <span class="caret"></span>');
+                        break;
+                    default:
+                        $("#toggle_menu").html('全部事件 <span class="caret"></span>');
+                }
+
+
+                //初始化日期插件
+                initDatePlugin();
+                //上一月
+                $("#lastM").click(function () {
+                    setDate(addDate(currentFirstDate, -30));
+                });
+                //上一周
+                $("#last-week").click(function () {
+                    setDate(addDate(currentFirstDate, -7));
+                });
+                //下一周
+                $("#next-week").click(function () {
+                    setDate(addDate(currentFirstDate, 7));
+                });
+                //下一月
+                $("#nextM").click(function () {
+                    setDate(addDate(currentFirstDate, 30));
+                });
+                //返回今天
+                $(".today_btn").click(function () {
+                    setDate(new Date());
+                    go_date(today_date);
+                });
+                if (select_date) {
+                    setDate(new Date(select_date));
+                } else {
+                    //初始化今天
+                    setDate(new Date());
+                }
+                //选择日期
+                $("#monitor td").click(function () {
+                    var this_date = $(this).data("date");
+                    $("#monitor td").removeClass("on");
+                    $(this).addClass("on");
+                    go_date(this_date);
+                });
+                //日历调用方法
+//			setDate(new Date("2019-8-30"));
+            });
+
+
+            var info_reload = window.localStorage.getItem("cale_reload");
+            if (info_reload == "true") {
+                window.localStorage.setItem("cale_reload", "false");
+                window.location.reload();
+            }
+
+            // 添加新事件
+            function add_new_event() {
+                window.location.href = "/calendar/add_new_event"
+            }
+
+            // 关键词搜索
+            function search_new_event_keyword() {
+                var keyword = $("#keyword").val();
+                if (keyword) {
+                    window.open("/calendar/event_search_result?keyword=" + keyword);
+                    localStorage.setItem("keyword", keyword);
+                } else {
+                    layer.msg("请输入查询相关", {time: 2000, icon: 5});
+                    return false
+                }
+            }
+
+            // 编辑事件
+            function modify_event(event_id) {
+                window.location.href = "/calendar/modify_event?event_id=" + event_id
+            }
+
+            // 添加关联事件
+            function add_event_relation_btn() {
+                window.open("{{ url_for('calendar.add_event_relation') }}")
+            }
+
+            // 取消事件展示
+            function modify_event_state(e_id, state) {
+                $.ajax({
+                    url: '{{ url_for("calendar.modify_event_state") }}',
+                    type: 'post',
+                    data: {
+                        id: e_id,
+                        state: state
+                    },
+                    success: function (data) {
+                        if (data.success == "ok") {
+                            layer.msg("操作成功", {time: 2000, icon: 1});
+                            window.location.reload()
+                        } else {
+                            layer.msg("操作失败，请重试", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                })
+            }
+
+
+            // add event_relation
+            {#            function add_relation(){#}
+            {#                var relation_id = $("#relation_id").val();#}
+            {#                if(relation_id == ""){#}
+            {#                    layer.msg("请输入相关事件ID！", {time: 1000, icon: 2});#}
+            {#                    return false;#}
+            {#                }#}
+            {#                $.ajax({#}
+            {#                    url : "{{ url_for('calendar.add_event_relation') }}",#}
+            {#                    type : 'post',#}
+            {#                    data : {'relation_id':relation_id},#}
+            {#                    success:function(data){#}
+            {#                        if(data.success='ok'){#}
+            {#                            layer.msg("添加成功！", {time: 2000, icon: 1});#}
+            {#                            window.location.reload()#}
+            {#                        }#}
+            {#                    }#}
+            {#                })#}
+            {#            }#}
+        </script>
+    </div>
+{% endblock %}

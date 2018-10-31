@@ -1,0 +1,442 @@
+{% extends "/index.html" %}
+{% block content %}
+    {#    <script src="{{url_for('static', filename='ckeditor/ckeditor.js')}}"></script>#}
+    <style>
+        #uploadfile_input{
+            opacity: 0;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">资讯内容编辑</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">资讯标题</label>
+                                        <div class="col-md-10">
+                                            <input id="title" class="form-control" name="title"
+                                                   value="{{ data[0]["title"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">标题图片</label>
+                                        <div class="col-md-10">
+                                            <span id="base_pic" class=""></span>
+                                            <img src="{{ data[0]["img"] }}" alt="" id="title_img" width="268"
+                                                 height="200">
+                                            <input type="file" id="uploadfile_input" value="{{ data[0]["img"] }}"
+                                                   accept="image/png,image/jpg,image/jpeg,image/JPG">
+                                            <label for="uploadfile_input" class='btn btn-danger'>选择图片</label>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">原文内容</label>
+                                        <div class="col-md-10">
+                                                    <textarea name="editor1" id="editor1" class=”ckeditor” rows="100"
+                                                              cols="200" value="{{ data[0]["content"] }}"
+                                                    >{{ data[0]["content"] }}</textarea>
+                                            <script>
+                                                // 用CKEditor替换<textarea id="editor1">
+                                                // 使用默认配置
+                                                var editor1 = CKEDITOR.replace('editor1');
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">FootBar</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="footbar">
+                                                {% for row in footbar_list %}
+                                                    {% if data[0]["foot_bar_id"] == row['id'] %}
+                                                        <option value="{{ row['id'] }}"
+                                                                selected>{{ row['id'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ row['id'] }}">{{ row['id'] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                
+                                
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">F10类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="content_type">
+                                                <option value=1 {% if data[0].content_type == 1 %}
+                                                        selected {% endif %}>原创</option>
+                                                <option value=2 {% if data[0].content_type == 2 %}
+                                                        selected {% endif %}>解盘(币莱解盘)</option>
+                                                <option value=3 {% if data[0].content_type == 3 %}
+                                                        selected {% endif %}>视频(币莱播报)</option>
+                                                <option value=4 {% if data[0].content_type == 4 %}
+                                                        selected {% endif %}>音频</option>
+                                                <option value=5 {% if data[0].content_type == 5 %}
+                                                        selected {% endif %}>PDF</option>
+                                                <option value=6 {% if data[0].content_type == 6 %}
+                                                        selected {% endif %} >早报</option>
+                                                <option value=7 {% if data[0].content_type == 7 %}
+                                                        selected {% endif %} >晚报</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">数据源链接</label>
+                                        <div class="col-md-10">
+                                            {% if  data[0].source_url == "" or  data[0].source_url == "''" %}
+                                                <input class="form-control" type="text" id="source_url"
+                                                       placeholder="暂无！点击即可手动添加">
+                                            {% else %}
+                                                <input class="form-control" type="text" id="source_url"
+                                                       value="{{ data[0].source_url }}">
+                                                <a href="{{ data[0].source_url }}" target="_blank"><span
+                                                        class="fa fa-angellist">点击直达</span></a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="category">
+                                                {% for row in rows %}
+                                                    {% if data[0]["category"] == row['id'] %}
+                                                        <option value="{{ row['id'] }}"
+                                                                selected>{{ row['catname'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ row['id'] }}">{{ row['catname'] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">来源</label>
+                                        <div class="col-md-10">
+                                            <input class="form-control input-small" type="text" id="source_name"
+                                                   value="{{ data[0].source_name }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">作者</label>
+                                        <div class="col-md-10">
+                                            <input class="form-control input-small" type="text" id="author"
+                                                   value="{{ data[0].author }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">标签</label>
+                                        <div class="col-md-10">
+                                            <input class="form-control" type="text" id="tag" value="{{ data[0].tag }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">备注</label>
+                                        <div class="col-md-10">
+                                            <textarea id="remarks" class="form-control" rows="3"
+                                                      value="{{ data[0].remarks }}">{{ data[0].remarks }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    {#                                        <div class="form-group">#}
+                                    {#                                                <label class="col-md-1 control-label">推送</label>#}
+                                    {#                                                <div class="col-md-10">#}
+                                    {#                                                    <div class="mt-checkbox-list">#}
+                                    {#                                                    <label class="radio mt-checkbox-outline" for="debugInfo">#}
+                                    {#                                                        {% if data[0]["is_push"] == 0 %}#}
+                                    {#                                                            <input id="is_push" type="radio" name="push" value="{{ data[0]["is_show"] }}" class="input-small"/>#}
+                                    {#                                                        {% else %}#}
+                                    {#                                                            <input id="is_push" type="radio" name="push" value="{{ data[0]["is_show"] }}" class="input-small" checked />#}
+                                    {#                                                        {% endif %}#}
+                                    {#                                                        <span></span>#}
+                                    {#                                                    </label>#}
+                                    {#                                                    </div>#}
+                                    {#                                                </div>#}
+                                    {#                                            </div>#}
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">展示</label>
+                                        <label class="col-md-11">
+                                            {% if data[0]["is_show"] == 0 %}
+                                                <input id="is_show" type="checkbox" name="push"
+                                                       value="{{ data[0]["is_show"] }}"/>
+                                            {% else %}
+                                                <input id="is_show" type="checkbox" name="push"
+                                                       value="{{ data[0]["is_show"] }}" checked/>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class=" col-md-11 text-right">
+                                            <button type="button" class="btn green"
+                                                    onclick="modify_information_content()">提交
+                                            </button>
+                                            <button type="button" class="btn green"
+                                                    onclick="stop_information_content()">取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        $(function () {
+            $("#title_img").click(function () {
+                $("#uploadfile_input").trigger("click");
+            });
+            $("#uploadfile_input").change(function () {
+
+                var file = $("#uploadfile_input").val();
+                if (!/.(jpg|jpeg|png|JPG)$/.test(file)) {
+                    layer.msg("图片类型必须是.jpeg,jpg,png中的一种", {time: 2000, icon: 2});
+                    return false;
+                } else {
+                    var image = $("#uploadfile_input")[0].files[0];
+                    {#                        filesize = image.size;#}
+                    {#                        console.log(filesize);#}
+                    {#                        if (filesize > 102400) {#}
+                    {#                            layer.msg('请选择100K大小以内的图片', {time: 2000, icon: 2});#}
+                    {#                            return false;#}
+                    {#                        }#}
+                }
+                layer.msg("图片通过", {time: 2000, icon: 6});
+
+                var img_src = $("#uploadfile_input").val();
+                var formData = new FormData();
+                formData.append("file", image);
+                formData.append('base_pic_url', $('#title_img').attr("src"));
+                formData.append('img_url', img_src);
+                $.ajax({
+                    url: "{{ url_for("new_flash.get_info_img_url") }}",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        $('#title_img').attr("src", data['base_pic_url']);
+                        $('#base_pic').attr("class", data['img_url']);
+                    }
+                })
+            });
+        });
+
+        function modify_information_content() {
+            if ($('#title').val() == "" || $("#title_img").attr("src") == "") {
+                layer.msg("图片和标题不可为空，请重新操作！", {time: 1000, icon: 2});
+                return false
+            }
+            var content = editor1.getData();
+            if (content == "") {
+                layer.msg("赖好写点内容哇", {time: 1000, icon: 2})
+            }
+            var formData = new FormData();
+            var is_show = $("#is_show").is(":checked");
+            var show = 0;
+            if (is_show == true) {
+                show = 1;
+            }
+            if ($("#uploadfile_input")[0].files[0]) {
+                formData.append("img", $("#uploadfile_input")[0].files[0]);
+            }
+            formData.append('title', $('#title').val());
+            formData.append('base_pic_url', $('#title_img').attr("src"));
+            formData.append('img_url', $('#base_pic').attr("class"));
+            formData.append('is_show', show);
+            formData.append('id', {{data[0]["id"]}});
+            formData.append('remarks', $('#remarks').val());
+            formData.append('content', editor1.getData());
+            formData.append('category', $("#category").val());
+            formData.append('tag', $("#tag").val());
+            formData.append('source_name', $("#source_name").val());
+            formData.append('source_url', $("#source_url").val());
+            formData.append('author', $("#author").val());
+            formData.append('footbar_id', $("#footbar").val());
+            formData.append('content_type', $("#content_type").val());
+
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.modify_information')}}',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("修改成功", {time: 1000, icon: 1});
+                            window.localStorage.setItem("info_reload", "true");
+                            window.history.go(-1);
+                        }
+                        else {
+                            layer.msg(data.failed, {time: 1000, icon: 5})
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+        {#        function modify_information_content() {#}
+        {#            if ($('#title').val() == "" || $("#title_img").attr("src") == "") {#}
+        {#                alert("图片和标题不可为空，请重新操作！");#}
+        {#                return false#}
+        {#            }#}
+        {#            var formData = new FormData();#}
+        {#            var is_show = $("#is_show").is(":checked");#}
+        {#            var show = 0;#}
+        {#            if (is_show == true) {#}
+        {#                show = 1;#}
+        {#                }#}
+        {#            if ($("#uploadfile_input")[0].files[0]) {#}
+        {#                formData.append("img", $("#uploadfile_input")[0].files[0]);#}
+        {#                }#}
+        {#            formData.append('title', $('#title').val());#}
+        {#            formData.append('base_pic_url', $('#title_img').attr("src"));#}
+        {#            formData.append('img_url', $('#base_pic').attr("class"));#}
+        {#            formData.append('is_show', show);#}
+        {#            formData.append('id', {{data[0]["id"]}});#}
+        {#            formData.append('remarks', $('#remarks').val());#}
+        {#            formData.append('content', editor1.getData());#}
+        {#            formData.append('category', $("#category").val());#}
+        {#            formData.append('tag', $("#tag").val());#}
+        {#            formData.append('source_name', $("#source_name").val());#}
+        {#            formData.append('author', $("#author").val());#}
+        {##}
+        {#            layer.confirm('是否修改？', {#}
+        {#                btn: ['确认', '取消']#}
+        {#            }, function () {#}
+        {#                $.ajax({#}
+        {#                    url: '{{ url_for('new_flash.modify_information')}}',#}
+        {#                    type: 'post',#}
+        {#                    contentType: false,#}
+        {#                    processData: false,#}
+        {#                    data: formData,#}
+        {#                    success: function (data) {#}
+        {#                        if (data.success == 'ok') {#}
+        {#                            alert("修改成功");#}
+        {#                            window.localStorage.setItem("info_reload", "true");#}
+        {#                            window.history.go(-1);#}
+        {#                        }#}
+        {#                        else {#}
+        {#                            alert(data.failed)#}
+        {#                        }#}
+        {#                    }#}
+        {#                });#}
+        {#            }, function () {#}
+        {#                layer.msg("已取消", {time: 1000, icon: 2});#}
+        {#                return false#}
+        {#            });#}
+        {#        }#}
+
+
+        function formatText() {
+            var content = editor1.getData();
+            //clearScript
+            content = content.replace(/\<\!\-\-(.*?)\-\-\>/gi, '');
+            content = content.replace(/<[\s]*(script)[^>]*>.*?<[\s]*\/[\s]*(script)[\s]*>/gi, '');
+            content = content.replace(/<[\s]*(style|title)[^>]*>.*?<[\s]*\/[\s]*(style|title)[\s]*>/gi, '');
+            content = content.replace(/<[\s]*(meta|link|base)[^>]*>/gi, '');
+            //clearAttr
+            content = content.replace(/(id|class|style|onclick|alt|title|width|height|_href|_src)\s*\=\'[^\>\']*?\'/gi, '');
+            content = content.replace(/(id|class|style|onclick|alt|title|width|height|_href|_src)\s*\=\"[^\>\"]*?\"/gi, '');
+            //content = content.replace(/(id|class|style|onclick|alt|title|width|height|_href|_src)\s*\=[^\>\s]+?/gi,'');
+
+            //clearLine
+            content = content.replace(/[\s]+/gi, ' ');
+            content = content.replace(/[\s]+>/gi, '>');
+            content = content.replace(/<([\/\s]*)(div)([^>]*)>/gi, '<$1p$3>');
+            content = content.replace(/(<([\/\s]*)([^>]*)>)(\s|&nbsp;|\　|\ )+/gi, '$1');
+            content = content.replace(/(\s*<[\s]*br[^>]*>\s*)+/gi, '<br/>');
+            content = content.replace(/(^\s*<[\s]*br[^>]*>|<[\s]*br[^>]*>\s*$)/gi, '');
+            content = content.replace(/(<[\/\s]*(p|hr|h1|h2|h3|h4|h5|h6)[^>]*>)\s*(<[\s]*br[^>]*>)/gi, '$1');
+            content = content.replace(/(<[\s]*br[^>]*>)\s*(<[\/\s]*(p|hr|h1|h2|h3|h4|h5|h6)[^>]*>)/gi, '$2');
+            contentre = content.replace(/<(!=iframe|embed|br|hr|tr|td)[^>]+>\s*<[\s]*\/[\s]*(!=iframe|embed|br|hr|tr|td)[^>]+>/gi, '');
+            while (contentre != content) {
+                content = contentre;
+                contentre = content.replace(/<(!=iframe|embed|br|hr|tr|td)[^>]+>\s*<[\s]*\/[\s]*(!=iframe|embed|br|hr|tr|td)[^>]+>/gi, '');
+            }
+            content = content.replace(/<([\/\s]*)(p)([^>]*)>(\s*<[^>]*(br)[^>]+>\s*)*<([\/\s]*)\/([\/\s]*)(p)([^>]*)>/gi, '');
+            content = content.replace(/(<[\s]*p[^>]*>[\s]*)*(<[\s]*(embed|img|iframe)[^>]*>)([\s]*<[\s]*\/[\s]*p[^>]*>)*/gi, '<div style="text-align: center;">$2</div>');
+            //clearA
+            content = content.replace(/<([\/\s]*)(a)([^>]*)>/gi, '');
+            //content = content.replace(/<([\/\s]*)(a)([^>]*)(!=href\=\"\/|href\=\'\/|href\=\/)([^>]*)>/gi,'');
+            editor1.insertHtml(content);
+        }
+
+
+        {#        function modify_information_content() {#}
+        {#            #}
+        {#            var is_show = $("#is_show").is(":checked");#}
+        {#            var show = 0;#}
+        {#            if (is_show == true) {#}
+        {#                show = 1;#}
+        {#            }#}
+        {#            $.ajax({#}
+        {#                url: '{{ url_for('new_flash.modify_information')}}',#}
+        {#                type: 'post',#}
+        {#                data: {#}
+        {#                    id:{{data[0]["id"]}},#}
+        {#                    title: $('#title').val(),#}
+        {#                    content: editor1.getData(),#}
+        {#                    category: $("#category").val(),#}
+        {#                    tag: $("#tag").val(),#}
+        {#                    is_show: show#}
+        {#                },#}
+        {#                success: function (data) {#}
+        {#                    if (data.success == 'ok') {#}
+        {#                        window.location.href = "/information_list";#}
+        {#                        alert("资讯修改成功");#}
+        {#                    }#}
+        {#                }#}
+        {#            })#}
+        {#        }#}
+
+        {#        function stop_information_content() {#}
+        {#            window.localStorage.setItem("info_reload", "true");#}
+        {#            window.history.go(-1);#}
+        {#        }#}
+
+
+        function stop_information_content() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.localStorage.setItem("info_reload", "true");
+                window.history.go(-1);
+            }, function () {
+                layer.msg('未放弃，真棒！', {time: 1000, icon: 6});
+                return false;
+            });
+        }
+
+    </script>
+{% endblock %}
+

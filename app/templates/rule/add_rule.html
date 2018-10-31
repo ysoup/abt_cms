@@ -1,0 +1,106 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+                <div class="page-content">
+                    <div class="row ">
+                        <div class="col-md-12 ">
+                            <div class="portlet light bordered">
+                                <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="/new_flash_rule">快讯规则列表</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active">快讯规则</span>
+                        </li>
+                    </ul>
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-settings font-dark"></i>
+                                        <span class="caption-subject font-dark sbold uppercase">新增快讯规则</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" role="form" name="test">
+{#                                        {{form.hidden_tag()}}#}
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">竞品关键词</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" id="origin_name" class="form-control" value="" placeholder="输！不能为空，不然不保存！"  name="origin_name">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">爱必投关键词</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" id="rule_name" name="rule_name" value="" placeholder="可以为空（不填即为空）">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-10">
+                                                    <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认新增" onclick="add_new_rule()"></button>
+                                                    <button type="button" class="btn green btn-lg glyphicon glyphicon-remove" title="取消新增" onclick="stop_add_rule()"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+   <script type="text/JavaScript">
+        function add_new_rule() {
+            var origin_name = $("#origin_name").val();
+            var rule_name = $("#rule_name").val();
+
+            if (origin_name == ""){
+                layer.msg("关键词不可为空", {time:1000, icon:2});
+                return false
+            }
+
+            layer.confirm("是否添加该规则？", {
+                btn : ['是','否']
+            }, function () {
+               $.ajax({
+                   url:"{{ url_for('new_flash.add_rule') }}",
+                   type: 'post',
+                   data : {
+                       origin_name : origin_name,
+                       rule_name : rule_name
+                   },
+                   success: function (data) {
+                       if (data.success == "ok"){
+                           layer.msg("添加成功！", {time:1000, icon:1});
+                           window.location.href = "/new_flash_rule"
+                       }
+                       else{
+                           layer.msg("添加失败！", {time:1000, icon:5});
+                           return false
+                       }
+                   }
+               });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+        function stop_add_rule() {
+          layer.confirm('是否放弃当前编辑内容？', {
+              btn: ['确认','取消']
+            }, function(){
+              window.location.href = "/new_flash_rule";
+            }, function(){
+              layer.msg('未放弃，真棒！', {time: 1000, icon: 6});
+              return false;
+            });
+        }
+
+    </script>
+{% endblock %}
+

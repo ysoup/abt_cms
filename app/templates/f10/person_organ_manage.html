@@ -1,0 +1,206 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+    </style>
+
+
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+
+                    <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/f10/person_organ_manage">人物机构管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">人物机构列表</span>
+                            </li>
+                        </ul>
+
+{#                    <div class="row" style="padding-top: 10px">#}
+{#                            <div class="col-md-12">#}
+
+                                <!-- 下拉菜单 -->
+{#                                <div class="btn-group">#}
+{#                                    <button type="button" class="btn btn-circle blue dropdown-toggle"#}
+{#                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"#}
+{#                                            aria-expanded="false">#}
+{#                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>#}
+{#                                    </button>#}
+{#                                    <ul class="dropdown-menu">#}
+{#                                        <li><a href="/new_flash_list?select_id=0" class="btn btn-circle ">所有快讯</a></li>#}
+{#                                        <li><a href="/new_flash_list?select_id=1" class="btn btn-circle ">已展示快讯</a></li>#}
+{#                                        <li><a href="/new_flash_list?select_id=2" class="btn btn-circle ">采编快讯</a></li>#}
+{#                                        <li><a href="/new_flash_list?select_id=3" class="btn btn-circle ">原创快讯</a></li>#}
+{#                                        <li><a href="/new_flash_list?select_id=4" class="btn btn-circle ">未展示快讯</a></li>#}
+{#                                    </ul>#}
+{#                                </div>#}
+
+{#                                <button type="button" class="btn btn-danger btn-circle pull-right" onclick='add_new_organ()'>新增机构</button>#}
+{#                                <button type="button" class="btn  btn-circle pull-right" style="margin-right: 5px;" onclick='add_new_person()'>新增人物</button>#}
+
+                                <!-- 搜索功能 -->
+{#                                <div class="btn-group" style="margin-left: 10px">#}
+{#                                    <form class="form-horizontal" role="form">#}
+{#                                        <div class="input-group pull-right search_word">#}
+{#                                            <input type="text" class="form-control btn-circle" style="text-align: center;width: 239px;padding-right: 80px;" id="keyword" placeholder="请输入关键字">#}
+{#                                            <a class="btn glyphicon glyphicon-remove" style="pointer-events:auto; position: absolute; left: 150px; z-index: 2;padding: 8px 12px;"></a>#}
+{#                                            <button type="button" class="btn blue btn-circle pull-right" style="position: absolute; right: 0; z-index: 2;" onclick="search_new_flash_keyword()">搜索</button>#}
+{#                                        </div>#}
+{#                                    </form>#}
+{#                                </div>#}
+
+{#                            </div>#}
+
+{#                            <div class="col-md-4">#}
+{#                                <button onclick="delete_choice_flash()" class="btn blue btn-circle pull-right">批量删除</button>#}
+{#                            </div>#}
+{#                        </div>#}
+
+
+                        <div class="portlet-body">
+                            <ul id="myTab" class="nav nav-tabs">
+                                <li class="active"><a href="#person" data-toggle="tab"><h5><b>人物管理</b></h5></a></li>
+                                <li><a href="#organ" data-toggle="tab"><h5><b>机构管理</b></h5></a></li>
+
+                                <button type="button" class="btn btn-danger btn-circle pull-right" onclick='add_new_organ()'>新增机构</button>
+                                <button type="button" class="btn btn-danger btn-circle pull-right" style="margin-right: 5px;" onclick='add_new_person()'>新增人物</button>
+
+                            </ul>
+
+                            <div id="myTabContent" class="tab-content">
+
+                                <div class="tab-pane active" id="person">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="table-scrollable">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>人物</th>
+                                                        <th>人物介绍</th>
+                                                        <th>关联币种</th>
+{#                                                        <th>关联机构</th>#}
+                                                        <th>操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    {% for person_info in person_list %}
+                                                        <tr>
+                                                            <td>{{ person_info.id }}</td>
+                                                            <td>{{ person_info.name }}</td>
+                                                            <td>{{ person_info.intro }}</td>
+                                                            <td>
+                                                                {% for id, name_list in coin_data.items() %}
+                                                                    {% if person_info.id == id %}
+                                                                        {% for name in name_list %}
+                                                                            {{ name }}
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </td>
+                                                            <td>
+                                                                <button type="button"
+                                                                        class="btn btn-info glyphicon glyphicon-pencil"
+                                                                        title="编辑" style="margin-bottom: 5px"
+                                                                        onclick="modify_person_info({{ person_info['id'] }})"></button>
+
+                                                                <button type="button"
+                                                                        class="btn btn-danger glyphicon glyphicon-trash" disabled="disabled"
+                                                                        title="功能暂未开通"
+                                                                        onclick="delete_person_info({{ person_info['id'] }})"></button>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="organ">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="table-scrollable">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Name</th>
+                                                        <th>机构介绍</th>
+                                                        <th>操作</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    {% for organ_info in organ_list %}
+                                                        <tr>
+                                                            <td>{{ organ_info.id }}</td>
+                                                            <td>{{ organ_info.name }}</td>
+                                                            <td>{{ organ_info.intro }}</td>
+                                                            <td>
+                                                                <button type="button"
+                                                                        class="btn btn-info glyphicon glyphicon-pencil"
+                                                                        title="编辑" style="margin-bottom: 5px"
+                                                                        onclick="modify_organ_info({{ organ_info['id'] }})"></button>
+
+                                                                <button type="button"
+                                                                        class="btn btn-danger glyphicon glyphicon-trash" disabled="disabled"
+                                                                        title="功能暂未开通"
+                                                                        onclick="delete_organ_info({{ organ_info['id'] }})"></button>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/JavaScript">
+
+        function modify_person_info(id) {
+            window.location.href = "/f10/modify_person_info?id=" + id;
+        }
+        function modify_organ_info(id) {
+            window.location.href = "/f10/modify_organ_info?id=" + id;
+        }
+
+        function delete_organ_info(id) {
+            layer.msg('删除机构功能暂未开放', {time:1500, icon:4})
+        }
+        function delete_person_info(id) {
+            layer.msg('删除人物功能暂未开放', {time:1500, icon:4})
+        }
+
+        function add_new_person(){
+            window.location.href = "{{ url_for('ften.add_person') }}"
+        }
+        function add_new_organ() {
+            window.location.href = "/f10/add_organ"
+        }
+
+    </script>
+{% endblock %}
+

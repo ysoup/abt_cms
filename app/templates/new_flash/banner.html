@@ -1,0 +1,424 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="javascript:;">Banner管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">Banner列表</span>
+                            </li>
+                        </ul>
+                        <!-- Single button -->
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle blue dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" id="toggle_menu" aria-expanded="false">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/banner_list?select_id=0" class="btn btn-circle ">全部Banner</a></li>
+                                        <li><a href="/banner_list?select_id=1" class="btn btn-circle ">已展示Banner</a></li>
+                                        <li><a href="/banner_list?select_id=2" class="btn btn-circle ">已下架Banner</a></li>
+                                    </ul>
+                                </div>
+                                <button type="button" class="btn blue btn-circle" onclick='add_banner()' style="margin-left: 10px">新增Banner
+                                </button>
+{#                                <button type="button" class="btn blue btn-circle" style="margin-left: 10px" onclick='$("#dialog_push_config").modal("show")'>自动推送时间段设置</button>#}
+{#                                <div class="btn-group" style="margin-left: 10px">#}
+{#                                    <form class="form-horizontal" role="form">#}
+{#                                        <div class="input-group input-medium date date-picker"  data-date-format="yyyy-mm-dd" data-date-viewmode="years">#}
+{#                                            <input type="text" class="form-control btn btn-circle-left" style="text-align: left" id="query_time" readonly>#}
+{#                                            <a class="btn glyphicon glyphicon-remove" style="pointer-events:auto; position: absolute; left: 105px; z-index: 2;"></a>#}
+{#                                            <span class="input-group-btn">#}
+{#                                                <button class="btn blue btn-circle-right" type="button" style="margin-right: 5px;">#}
+{#                                                    <i class="fa fa-calendar"></i>#}
+{#                                                </button>#}
+{#                                                <button type="button" class="btn blue btn-circle" onclick="info_by_date()">查询</button>#}
+{#                                            </span>#}
+{##}
+{#                                        </div>#}
+{#                                    </form>#}
+{#                                </div>#}
+
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="delete_choice_banner()" class="btn blue btn-circle pull-right">批量下架</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="portlet col-lg-12">
+                                <div class="table-scrollable">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+{#                                            <th><button onclick="all_choice()" type="button" class="btn btn-circle red btn-sm">全选</button></th>#}
+                                            <th><button onclick="invent()" type="button" class="btn btn-circle red btn-sm">全选</button></th>
+                                            <th>编号</th>
+                                            <th>图片</th>
+                                            <th>描述</th>
+                                            <th>URL</th>
+                                            <th>上架时间</th>
+                                            <th>是否上架</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for row in data %}
+                                            <tr>
+                                                <td><label>
+                                                    <input type="checkbox" name="choice_checkbox" value="{{ row.id }}">
+                                                </label></td>
+                                                <td>{{ row.id }}</td>
+                                                <td><img src="{{ row.banner_img }}" width="100px" height="100px"></td>
+                                                <td>{{ row.banner_desc }}</td>
+                                                {% if row.skip_url %}
+                                                    <td><a href="{{ row.skip_url }}">Click!</a></td>
+                                                {% else %}
+                                                    <td>URL为空</td>
+                                                {% endif %}
+
+                                                <td>
+                                                    {% if row.putaway_time %}
+                                                        {{ row.putaway_time }}
+                                                    {% else %}
+                                                        待上架
+                                                    {% endif %}
+                                                </td>
+
+                                                {% if row.is_show == 1 %}
+                                                    <td id="show_info">已上架</td>
+                                                {% else %}
+                                                    <td id="show_info">未上架</td>
+                                                {% endif %}
+{#                                                <td>{{ row["remarks"] }}</td>#}
+                                                <td>
+                                                    <button type="button" class="btn btn-success glyphicon glyphicon-trash" title="下架Banner" onclick="delete_banner({{ row['id'] }})"></button>
+                                                    <br><button type="button" class="btn btn-danger glyphicon glyphicon-pencil" title="编辑Banner" onclick="modify_banner({{ row['id'] }})"></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if pagination %}
+                        {{ macro_pagination.pagination_widget(pagination,'new_flash.banner_list') }}
+                    {% endif %}
+                </div>
+            </div>
+{#            <div id="dialog_push_config" class="modal fade" aria-hidden="true">#}
+{#                <div class="modal-dialog">#}
+{#                    <div class="modal-content">#}
+{#                        <div class="modal-header">#}
+{#                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>#}
+{#                            <h4 class="modal-title">自动推送时间段设置</h4>#}
+{#                        </div>#}
+{#                        <div class="modal-body">#}
+{#                            <form action="#" class="form-horizontal">#}
+{#                                <div class="form-group">#}
+{#                                    <label class="control-label col-md-4">开始时间</label>#}
+{#                                    <div class="col-md-5">#}
+{#                                        <div class="input-group">#}
+{#                                            <input id="begin_time" type="text" class="form-control timepicker timepicker-24" value="{{ modal_data["begin_time"] }}">#}
+{#                                            <span class="input-group-btn">#}
+{#                                                <button class="btn default" type="button">#}
+{#                                                    <i class="fa fa-clock-o"></i>#}
+{#                                                </button>#}
+{#                                            </span>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                                <div class="form-group">#}
+{#                                    <label class="control-label col-md-4">结束时间</label>#}
+{#                                    <div class="col-md-5">#}
+{#                                        <div class="input-group">#}
+{#                                            <input id="end_time" type="text" class="form-control timepicker timepicker-24" value="{{ modal_data["begin_time"] }}">#}
+{#                                            <span class="input-group-btn">#}
+{#                                                <button class="btn default" type="button">#}
+{#                                                    <i class="fa fa-clock-o"></i>#}
+{#                                                </button>#}
+{#                                            </span>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </form>#}
+{#                        </div>#}
+{#                        <div class="modal-footer">#}
+{#                            <button class="btn dark btn-outline" data-dismiss="modal" aria-hidden="true">关闭</button>#}
+{#                            <button class="btn blue btn-primary" data-dismiss="modal" onclick="add_auto_push()">保存</button>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+        </div>
+    </div>
+
+    <script type="text/JavaScript">
+        //获取地址栏参数，name:参数名称
+         function getUrlParms(name){
+           var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+           var r = window.location.search.substr(1).match(reg);
+           if(r!=null)
+           return unescape(r[2]);
+           return null;
+           }
+        var select_id = getUrlParms("select_id");
+
+
+        $(function(){
+{#            var query_time = getUrlParms("query_time");#}
+{#            if (query_time){#}
+{#                $('#query_time').val(query_time)#}
+{#            }#}
+{#            $(".date-picker .glyphicon-remove").click(function () {#}
+{#                $("#query_time").val("");#}
+{#            });#}
+            switch (select_id){
+                case "1":
+                    $("#toggle_menu").html('已展示Banner <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('已下架Banner <span class="caret"></span>');
+                    break;
+                default:
+                $("#toggle_menu").html('全部Banner <span class="caret"></span>');
+            }
+        });
+
+        // 反选
+        function invent() {
+            $("input[name='choice_checkbox']").each(function () {
+                if ($(this).prop("checked")) {
+                    $(this).attr("checked",false);
+                }
+                else {
+                    $(this).prop("checked",true);
+                }
+            })
+        }
+
+        // 全选
+{#        function all_choice() {#}
+{#            $("input[name='choice_checkbox']").each(function () {#}
+{#                $(this).attr("checked", true)#}
+{#            })#}
+{#        }#}
+
+        // 批量下架
+        function delete_choice_banner() {
+            var banner_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                banner_id_list.push($(this).val());
+            });
+            if(banner_id_list == ""){
+                layer.msg("你好像一个都没选", {time: 1000, icon: 2});
+                return false
+            }
+            layer.confirm('真下架？', {
+                btn: ['真', '假']
+            }, function () {
+                $.ajax({
+                    // 处理ajax
+                    url: '{{ url_for('new_flash.delete_choice_banner')}}',
+                    type: 'post',
+                    data: JSON.stringify(banner_id_list),
+
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("下架成功！", {time: 1000, icon: 1});
+                            window.location.href = "{{ url_for('new_flash.banner_list') }}";
+                        }
+                        else {
+                            layer.msg("下架失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+        // 批量下架
+{#        function delete_choice_banner() {#}
+{#            var banner_id_list = [];#}
+{#            $("input[name='choice_checkbox']:checked").each(function () {#}
+{#                banner_id_list.push($(this).val());#}
+{#            });#}
+{#            if(banner_id_list == ""){#}
+{#                layer.msg("你好像一个都没选", {time: 1000, icon: 2});#}
+{#                return false#}
+{#            }#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.delete_choice_banner')}}',#}
+{#                type: 'post',#}
+{#                data: JSON.stringify(banner_id_list),#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        alert("下架成功");#}
+{#                        window.location.href = "{{ url_for('new_flash.banner_list') }}"#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        // 选择日期
+{#        function info_by_date() {#}
+{#            let query_time = $("#query_time").val();#}
+{#            if (query_time){window.location.href = "/information_list?query_time=" + query_time}#}
+{#            else {window.location.href="/information_list"}#}
+{##}
+{#        }#}
+
+        // 添加自动推送
+{#        function add_auto_push() {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.add_auto_push_time')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    begin_time: $("#begin_time").val(),#}
+{#                    end_time: $("#end_time").val()#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        $("#dialog_push_config").modal('hide');#}
+{#                        alert("添加成功");#}
+{#                        window.location.reload();#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        // 推送功能
+{#        function push_new_flash(id) {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.push_new_flash')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        alert("推送成功")#}
+{#                    }#}
+{#                    else {#}
+{#                        alert("推送不成功")#}
+                        {#window.navigate({{ url_for("new_flash.new_flash_list") }});#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+
+        // 展示功能
+{#        function show_banner(id) {#}
+{#            console.log($('#show_banner').text());#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('')}}',    // show_banner功能#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        alert("展示成功")#}
+{#                    }#}
+{#                    else {#}
+{#                        if($('#show_banner').text() == "展示"){#}
+{#                            alert('该条Banner已展示，请重新操作')#}
+{#                        }#}
+{#                        else{alert("展示不成功")}#}
+                        {#window.navigate({{ url_for("new_flash.new_flash_list") }});#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        // 下架banner(单条)
+        function delete_banner(id) {
+            layer.confirm('真下架？', {
+                btn: ['真', '假']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.delete_banner')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("下架成功！", {time: 1000, icon: 1});
+                            $("#show_info").text("未上架")
+                        }
+                        else {
+                            layer.msg("下架失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+        // 下架banner(单条)
+{#        function delete_banner(id) {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.delete_banner')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        layer.msg("下架成功", {time:1000, icon:1});#}
+{#                        $("#show_info").text("未上架")#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        // 添加banner
+        function add_banner() {
+            window.location.href = "/add_banner"
+        }
+
+        // 编辑banner
+        function modify_banner(id) {
+            window.location.href = "/modify_banner?id=" + id;
+            {#$.ajax({#}
+            {#    url: '{{ url_for('new_flash.modify_new_flash')}}',#}
+            {#    type: 'get',#}
+            {#    data: {#}
+            {#        id: id#}
+            {#    },#}
+            {#    success: function (data) {#}
+            {#        if (data.success == 'ok') {#}
+            {##}
+            {#        }#}
+            {#    }#}
+            {#{)#}
+        }
+    </script>
+{% endblock %}

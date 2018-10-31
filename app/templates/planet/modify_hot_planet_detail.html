@@ -1,0 +1,101 @@
+{% extends "/index.html" %}
+<style>
+</style>
+{% block content %}
+    <div class="page-content-wrapper">
+                <div class="page-content">
+                    <div class="row ">
+                        <div class="col-md-12 ">
+                            <div class="portlet light bordered">
+                                <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="/planet/hot_planets">推荐星球信息</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active"></span>
+                        </li>
+                    </ul>
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-settings font-dark"></i>
+                                        <span class="caption-subject font-dark sbold uppercase">推荐星球信息编辑</span>
+                                    </div>
+                                </div>
+                                <div class="portlet-body form">
+                                    <form class="form-horizontal" role="form" name="test">
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">星球编号</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" id="planet_no" style="text-align: center" class="form-control" value="{{ data.planet_no }}" placeholder=""  name="planet_no" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">Note</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" style="text-align: center" id="hot_note" class="form-control" value="{{ data.note }}" placeholder=""  name="hot_note">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">权重 <br /><small>不填，默认为0</small>  </label>
+                                                <div class="col-md-6">
+                                                    <input type="number" style="text-align: center" id="hot_weight" class="form-control" value="{{ data.weight }}" placeholder=""  name="hot_weight">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row">
+                                                <div class="col-md-offset-3 col-md-10">
+                                                    <button type="button" class="btn red btn-lg glyphicon glyphicon-ok" title="确认修改" onclick="modify_hot_planet()"></button>
+                                                    <button type="button" class="btn green btn-lg glyphicon glyphicon-remove" title="取消修改" onclick="window.history.go(-1)"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+   <script type="text/JavaScript">
+
+    function modify_hot_planet() {
+        // 拿值
+        var note = $("#hot_note").val();
+        var weight = $("#hot_weight").val();
+
+        layer.confirm('是否修改？', {
+            btn: ['确认', '取消']
+        }, function () {
+            $.ajax({
+                // 处理ajax
+                url: '{{ url_for('planet.modify_hot_planet')}}',
+                type: 'post',
+                data: {
+                    planet_no : '{{ data.planet_no }}',
+                    note : note,
+                    weight : weight
+                },
+                success: function (data) {
+                    if (data.status == 'success') {
+                        layer.msg(data.msg, {time: 1500, icon: 1});
+                        window.localStorage.setItem("hot_planet_reload", "true");
+                        window.history.go(-1);
+                    }
+                    else {
+                        layer.msg(data.msg, {time: 1000, icon: 5});
+                        return false
+                    }
+                }
+            });
+        }, function () {
+            layer.msg("已取消", {time: 1000, icon: 2});
+            return false
+        });
+    }
+
+    </script>
+{% endblock %}
+

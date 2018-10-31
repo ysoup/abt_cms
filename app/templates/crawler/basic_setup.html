@@ -1,0 +1,51 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">基本设置</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">名称</label>
+                            <input type="text" class="form-control" style="width:1200px" value="{{ data[0].spider_ch_name }}">
+                        </div>
+                        <div class="form-group">
+                            <div>标签</div>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">不用的</label>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">准备用的</label>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">AiBiLink-牛币学堂</label>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">AiBiLink-首页新闻</label>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">AiBiLink-论坛帖子</label>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">新增</label>
+                            <label for=""><input name="type" type="checkbox" style="vertical-align: bottom">备份</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="">开启cookie<input type="checkbox" style="vertical-align: bottom"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}
+<script>
+        $(function () {
+        setTimeout(function () {
+            $('textarea').removeClass("input-circle");
+            $('input').removeClass("input-circle");
+        },500)
+    })
+</script>
+

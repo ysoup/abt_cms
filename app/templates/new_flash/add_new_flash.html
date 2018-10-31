@@ -1,0 +1,249 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/new_flash_list">快讯列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">新增快讯</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">快讯内容新增</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">快讯标题</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="请输入快讯标题（可为空）" id="in_title">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">快讯内容</label>
+                                        <div class="col-md-10">
+                                            <textarea name="editor1" id="editor1" class=”ckeditor” rows="100" cols="200"
+                                                      value=""></textarea>
+                                            <script>
+                                                // 用CKEditor替换<textarea id="editor1">
+                                                // 使用默认配置
+                                                var editor1 = CKEDITOR.replace('editor1');
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="category">
+                                                {% for row in rows %}
+                                                    <option value="{{ row['id'] }}">{{ row['catname'] }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">重要</label>
+                                        <div class="col-md-11">
+                                            <div class="mt-checkbox-list">
+                                                <label class="mt-checkbox-outline">
+                                                    <input id="highlight_color" type="checkbox"/>
+                                                    <span style="color: red;">&nbsp;&nbsp;&nbsp;(选择后，该条快讯会被标红显示)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">推送&展示</label>
+                                        <div class="col-md-10">
+                                            <div class="mt-checkbox-list">
+                                                <label class="mt-checkbox-outline">
+                                                    <input id="is_push" type="checkbox" name="push"/>
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">仅展示</label>
+                                        <div class="col-md-10">
+                                            <div class="mt-checkbox-list">
+                                                <label class="mt-checkbox-outline">
+                                                    <input id="is_show" type="checkbox" name="push"/>
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">备注</label>
+                                        <div class="col-md-10">
+                                            <textarea id="remarks" class="form-control" rows="3" value=""></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-11 text-right">
+                                            <button type="button" class="btn green" onclick="add_new_flash_content()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green" onclick="stop_new_flash_content()">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function add_new_flash_content() {
+            var is_push = $("#is_push").is(":checked");
+            var push = 0;
+            if (is_push == true) {
+                push = 1;
+            }
+            var is_show = $("#is_show").is(":checked");
+            var show = 0;
+            if (is_show == true) {
+                show = 1;
+            }
+            var is_highlight_color = $("#highlight_color").is(":checked");
+            var highlight_color = 0;
+            if (is_highlight_color == true){
+                highlight_color = 1
+            }
+
+            var content = editor1.getData();
+            var category = $("#category").val();
+            var remarks = $('#remarks').val();
+            if (content == "") {
+                layer.msg("快讯内容都不填，你想干啥？", {time: 1000, icon: 2});
+                return false
+            }
+            var title = $('#in_title').val();
+
+            layer.confirm('是否添加？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('new_flash.add_new_flash')}}',
+                        type: 'post',
+                        data: {
+                            content_text: editor1.document.getBody().getText(),
+                            content: content,
+                            category: category,
+                            is_push: push,
+                            is_show: show,
+                            highlight_color :highlight_color,
+                            remarks: remarks,
+                            title : title
+                        },
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("添加成功！", {time: 1000, icon: 1});
+                                window.localStorage.setItem("reload", "true");
+                                window.history.go(-1);
+                            }
+                            else {
+                                layer.msg("添加失败！", {time: 1000, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+                });
+        }
+
+
+        {#        function add_new_flash_content() {#}
+        {#            var is_push = $("#is_push").is(":checked");#}
+        {#            var push = 0;#}
+        {#            if (is_push == true) {#}
+        {#                push = 1;#}
+        {#            }#}
+        {#            var is_show = $("#is_show").is(":checked");#}
+        {#            var show = 0;#}
+        {#            if (is_show == true) {#}
+        {#                show = 1;#}
+        {#            }#}
+        {##}
+        {#            var content = editor1.getData();#}
+        {#            var category = $("#category").val();#}
+        {#            var remarks = $('#remarks').val();#}
+        {#            if (content == "") {#}
+        {#                layer.msg("快讯内容都不填，你想干啥？", {time: 1000, icon: 2});#}
+        {#                return false#}
+        {#            }#}
+        {##}
+        {#            $.ajax({#}
+        {#                url: '{{ url_for('new_flash.add_new_flash')}}',#}
+        {#                type: 'post',#}
+        {#                data: {#}
+        {#                    content: editor1.document.getBody().getText(),#}
+        {#                    content: content,#}
+        {#                    category: category,#}
+        {#                    is_push: push,#}
+        {#                    is_show: show,#}
+        {#                    remarks: remarks},#}
+        {##}
+        {#                success: function (data) {#}
+        {#                    if (data.success == 'ok') {#}
+        {#                        alert("添加成功");#}
+        {#                        window.location.href = "/new_flash_list"#}
+        {#                        window.history.go(-1);#}
+        {#                    }#}
+        {#                }#}
+        {#            })#}
+        {#        }#}
+
+
+        function stop_new_flash_content() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.location.href = "/new_flash_list";
+            }, function () {
+                layer.msg('未放弃，真棒！', {time: 1000, icon: 6});
+                return false;
+            });
+        }
+
+
+        $(function () {
+            $("input[name=push]").click(function () {
+                var this_checked = $(this).prop("checked");
+                if (this_checked) {
+                    $("input[name=push]").prop("checked", false);
+                    $(this).prop("checked", true);
+                } else {
+                    $(this).prop("checked", false);
+                }
+            });
+        })
+    </script>
+{% endblock %}
+

@@ -1,0 +1,294 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        #planet_info_table td, #planet_info_table th {
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .layui-layer-tips {
+            word-break: break-all;
+        }
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>星球展示页
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-8">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-circle dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" id="toggle_menu"
+                                            aria-expanded="false" style="background: #fb7575;color: #fff;">全部 &nbsp;&nbsp;<span
+                                            class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/planet/planet_info?select_id=0" class="btn btn-circle ">全部 </a>
+                                        </li>
+                                        <li><a href="/planet/planet_info?select_id=1" class="btn btn-circle ">状态1 </a>
+                                        </li>
+                                        <li><a href="/planet/planet_info?select_id=2" class="btn btn-circle ">状态2 </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button onclick="add_planet_detail()" class="btn btn-circle pull-right"
+                                        style="background: #b07cc6;color: #fff;">添加星球
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="planet_info_table">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>星球<br/>编号</th>
+                                        <th>名称</th>
+                                        <th>简称</th>
+                                        <th>类型</th>
+                                        <th>区块链<br/>地址</th>
+                                        <th>拥有者</th>
+                                        <th>简介</th>
+                                        <th>星球主币</th>
+                                        <th>居民数</th>
+                                        <th>资产数</th>
+                                        <th>发行<br/>星球币</th>
+                                        <th>挖矿</th>
+                                        <th>状态</th>
+                                        <th>图标</th>
+                                        <th>星球模板</th>
+                                        <th>星球等级</th>
+                                        <th>星球背景</th>
+                                        <th width="100">发现时间</th>
+                                        <th>备注</th>
+                                        <th>推荐</th>
+                                        {#                                        <th>创建时间</th>#}
+                                        {#                                        <th>更新时间</th>#}
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for info in data %}
+                                        <tr>
+                                            <td>
+                                                <a href="/planet/planet_detail?planet_no={{ info.planet_no }}">{{ info.sn }}</a>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary plt_no"
+                                                        title="{{ info.planet_no }}">查看
+                                                </button>
+                                            </td>
+
+
+                                            {#                                            <td><a href="/planet/planet_detail?planet_no={{ info.planet_no }}"#}
+                                            {#                                                   class="planet_no">{{ info.planet_no }}</a></td>#}
+                                            <td>{{ info.planet_name }}</td>
+                                            <td>{{ info.short_name }}</td>
+                                            <td>
+                                                {% if info.type == '1' %}
+                                                    普通
+                                                {% else %}
+                                                    母星
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary pl_address"
+                                                        title="{{ info.planet_address }}">查看
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary pl_owner"
+                                                        title="{{ info.planet_owner }}">查看
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary pl_remark"
+                                                        title="{{ info.remark }}">查看
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary pl_main_asset"
+                                                        title="{{ info.main_asset }}">查看
+                                                </button>
+                                            </td>
+                                            <td>{{ info.resident_number }}</td>
+                                            <td>{{ info.asset_number }}</td>
+                                            <td>{% if info.is_issued == "1" %}
+                                                √ {% else %}X{% endif %} </td>
+                                            <td>{% if info.is_mined == "1" %}
+                                                √{% else %}X{% endif %} </td>
+                                            <td> {% if info.status == "1" %}
+                                                √{% else %}X{% endif %} </td>
+                                            <td><img src="{{ info.image_no }}" alt="" width="30px" height="30px"></td>
+                                            {# <td>{{ info.planet_template }}</td>#}
+                                            {# <td>{{ info.planet_grade }}</td>#}
+                                            {# <td>{{ info.planet_background }}</td>#}
+                                            <td>X</td>
+                                            <td>X</td>
+                                            <td>X</td>
+                                            <td>{{ info.discovery_time }}</td>
+                                            <td>
+                                                <button class="btn btn-group btn-primary pl_note"
+                                                        title="{{ info.note }}">查看
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:;" type="button"
+                                                   data-planet-id="{{ info.planet_no }}"
+                                                   class="hot_planet btn yellow btn-circle fa fa-fire"></a>
+                                            </td>
+                                            {#                                            <td>{{ info.create_time }}</td>#}
+                                            {#                                            <td>{{ info.update_time }}</td>#}
+                                            <td>
+                                                <a href="/planet/planet_detail?planet_no={{ info.planet_no }}"
+                                                   class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"></a><br>
+                                                {% if info.is_delete == 1 %}
+                                                    <button type="button" disabled="true"
+                                                            class="btn btn-default glyphicon glyphicon-trash"
+                                                            title="已删除"></button>
+                                                {% else %}
+                                                    <button class="btn btn-success glyphicon glyphicon-trash"
+                                                            title="删除"
+                                                            onclick="delete_planet_info('{{ info.planet_no }}')"></button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation" class="text-center">
+                        <ul class="pagination">{{ html|safe }}</ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(document).on("click", ".hot_planet", function () {
+            var $this = $(this);
+            var this_planet_no = $this.data("planet-id");
+
+            layer.confirm('是否设置为推荐星球？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.set_hot_planet')}}',
+                    type: 'post',
+                    data: {
+                        planet_no: this_planet_no
+                    },
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        });
+
+
+        $(".plt_no, .pl_address, .pl_owner, .pl_remark, .pl_note, .pl_main_asset").click(function () {
+            layer.tips($(this).attr('title'), $(this), {
+                tips: [1, '#0FA6D8'] //还可配置颜色
+            });
+        });
+
+        var planet_reload = window.localStorage.getItem("planet_reload");
+        if (planet_reload == "true") {
+            window.localStorage.setItem("planet_reload", "false");
+            window.location.reload();
+        }
+
+
+        function delete_planet_info(planet_no) {
+            layer.confirm('是否删除？(仅改变状态，不会抹去数据)', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('planet.planet_info')}}',
+                    type: 'post',
+                    data: {
+                        planet_no: planet_no
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                            $("#show_info").text("本就是删除状态，还想咋个删法");
+                            location.reload();
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+        //获取地址栏参数，name:参数名称
+        function getUrlParms(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null)
+                return unescape(r[2]);
+            return null;
+        }
+
+        $(function () {
+            var select_id = getUrlParms("select_id");
+            switch (select_id) {
+                case "1":
+                    $("#toggle_menu").html('状态1 <span class="caret"></span>');
+                    break;
+                case "2":
+                    $("#toggle_menu").html('状态2 <span class="caret"></span>');
+                    break;
+                default:
+                    $("#toggle_menu").html('全部 <span class="caret"></span>');
+            }
+        });
+
+        function add_planet_detail() {
+            location.href = "{{ url_for('planet.add_planet_detail') }}"
+        }
+
+
+    </script>
+{% endblock %}

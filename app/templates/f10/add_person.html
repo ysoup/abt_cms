@@ -1,0 +1,250 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/f10/person_organ_manage">人物机构管理</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">添加人物</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-user-follow font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">新增人物信息</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1"><b>人物名称</b></label>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control input-circle" id="person_name" value="">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label"><b>人物简介</b></label>
+                                        <div class="col-md-8">
+                                            <textarea id="person_intro" class="form-control input-circle" rows="8"></textarea>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <style>
+                                        .coin_organ_data .col-md-11 { position: relative;}
+                                        .coin_organ_data .coin_list,.coin_organ_data .organ_list { margin-bottom: 10px;}
+                                        .coin_organ_data select { display: inline-block; width: 150px; vertical-align: middle;}
+                                        .coin_organ_data input { text-align: center; display: inline-block; width: 150px; vertical-align: middle;}
+                                        .coin_organ_data a { position: absolute;left:330px; bottom: 10px;}
+                                    </style>
+                                    <div class="form-group coin_organ_data">
+                                        <div class="row">
+                                            <label class="col-md-1 control-label"><b>关联币种 <br>（选填）</b></label>
+                                            <div class="col-md-11">
+                                                <div class="coin_list">
+                                                    <select class="form-control choice_coin"
+                                                            style="">
+                                                        <option value="0">---</option>
+                                                        {% for coin in coin_list %}
+                                                            <option value="{{ coin.id }}">{{ coin.code }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input placeholder="币种与人物关系" type="text" class="form-control">
+                                                </div>
+
+                                                <a href="javascript:;" class="btn btn-danger add_coin_btn" ><i class="glyphicon glyphicon-plus-sign"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                           <label class="col-md-1 control-label"><b>关联机构 <br>（选填）</b></label>
+                                            <div class="col-md-11">
+                                                <div class="organ_list">
+                                                    <select class="form-control choice_organ">
+                                                    <option value="0">---</option>
+                                                        {% for organ in organ_list %}
+                                                            <option value="{{ organ.id }}">{{ organ.name }}</option>}
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input placeholder="机构与人物关系" type="text" class="form-control">
+                                                </div>
+                                                <a href="javascript:;" class="btn btn-danger add_organ_btn" ><i class="glyphicon glyphicon-plus-sign"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-offset-10">
+                                            <button type="button" class="btn red btn-lg glyphicon glyphicon-ok"
+                                                    title="确认修改" onclick="add_person()"></button>
+                                            <button type="button" class="btn green btn-lg glyphicon glyphicon-remove"
+                                                    title="取消修改" onclick="window.history.go(-1)"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+        $(function () {
+            $(".add_coin_btn").click(function () {
+                var coin_list = $(".coin_list:eq(0)").clone();
+                coin_list.find("input").val("");
+                $(this).before(coin_list);
+            });
+            $(".add_organ_btn").click(function () {
+                var organ_list = $(".organ_list:eq(0)").clone();
+                organ_list.find("input").val("");
+                $(this).before(organ_list);
+            });
+        });
+
+        // 获取
+{#        function data_obj() {#}
+{#            var data_dict = {};#}
+{#            var coin_data=[];#}
+{#            var organ_data = [];#}
+{#            $(".coin_list").each(function () {#}
+{#                var this_key = $(this).find("select").val();#}
+{#                var this_val = $(this).find("input").val();#}
+{#                var this_data = {};#}
+{#                this_data[this_key] = this_val;#}
+{#                coin_data.push(this_data);#}
+{#            });#}
+{#            $(".organ_list").each(function () {#}
+{#                var this_key = $(this).find("select").val();#}
+{#                var this_val = $(this).find("input").val();#}
+{#                var this_data = {};#}
+{#                this_data[this_key] = this_val;#}
+{#                organ_data.push(this_data);#}
+{#            });#}
+{##}
+{#            console.log(coin_data);#}
+{#            console.log(organ_data);#}
+{#            data_dict['coin'] = coin_data;#}
+{#            data_dict['organ'] = organ_data;#}
+{#            console.log(data_dict);#}
+{#            return data_dict#}
+{#        }#}
+{##}
+{##}
+{#        // 编辑快讯类别#}
+{#            function add_person() {#}
+{#                var data_dict = data_obj();#}
+{#                // 拿值#}
+{#                var person_name = $("#person_name").val();#}
+{#                if (person_name == "") {#}
+{#                    layer.msg("姓名不可为空!", {time: 1500, icon: 2});#}
+{#                    return false#}
+{#                }#}
+{#                var person_intro = $("#person_intro").val();#}
+{##}
+{#                layer.confirm('是否修改？', {#}
+{#                    btn: ['确认', '取消']#}
+{#                }, function () {#}
+{#                    $.ajax({#}
+{#                        url: '{{ url_for("ften.add_person") }}',#}
+{#                        type: 'post',#}
+{#                        data: {#}
+{#                            person_name : person_name,#}
+{#                            person_intro : person_intro,#}
+{#                            data_dict : JSON.stringify(data_dict)#}
+{#                        },#}
+{#                        success: function (data) {#}
+{#                            if (data.status == 'ok') {#}
+{#                                layer.msg(data.msg, {time: 1500, icon: 1});#}
+{#                                window.location.href = "/f10/person_organ_manage";#}
+{#                            }#}
+{#                            else {#}
+{#                                layer.msg(data.msg, {time: 1500, icon: 5});#}
+{#                                return false#}
+{#                            }#}
+{#                        }#}
+{#                    });#}
+{#                }, function () {#}
+{#                    layer.msg("已取消", {time: 1500, icon: 2});#}
+{#                    return false#}
+{#                });#}
+{#            }#}
+
+    var data_dict = {};
+
+    function data_obj() {
+            var this_coin_data = {};
+            var this_organ_data = {};
+            $(".coin_list").each(function () {
+                var this_key = $(this).find("select").val();
+                var this_val = $(this).find("input").val();
+                if(this_key != "0"){
+                    this_coin_data[this_key] = this_val;
+                }
+            });
+            $(".organ_list").each(function () {
+                var this_key = $(this).find("select").val();
+                var this_val = $(this).find("input").val();
+                if (this_key != "0"){
+                    this_organ_data[this_key] = this_val;
+                }
+            });
+
+            data_dict['coin'] = this_coin_data;
+            data_dict['organ'] = this_organ_data;
+            console.log(data_dict);
+            return data_dict
+        }
+
+        // 编辑快讯类别
+        function add_person() {
+            var data_d = data_obj();
+            // 拿值
+            var person_name = $("#person_name").val();
+            if (person_name == "") {
+                layer.msg("姓名不可为空!", {time: 1500, icon: 2});
+                return false
+            }
+            var person_intro = $("#person_intro").val();
+
+            layer.confirm('是否修改？', {
+                btn: ['确认', '取消']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for("ften.add_person") }}',
+                    type: 'post',
+                    data: {
+                        person_name : person_name,
+                        person_intro : person_intro,
+                        data_dict : JSON.stringify(data_d)
+                    },
+                    success: function (data) {
+                        if (data.status == 'ok') {
+                            layer.msg(data.msg, {time: 1500, icon: 1});
+                            window.location.href = "/f10/person_organ_manage";
+                        }
+                        else {
+                            layer.msg(data.msg, {time: 1500, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1500, icon: 2});
+                return false
+            });
+        }
+
+
+    </script>
+{% endblock %}
+

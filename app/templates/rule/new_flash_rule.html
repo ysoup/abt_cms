@@ -1,0 +1,126 @@
+{% extends "/index.html" %}
+{%import 'macro_pagination.html' as macro_pagination%}
+{% block content %}
+    <style>
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+    </style>
+
+    <div class="page-content-wrapper">
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content">
+                    <!-- BEGIN PAGE HEAD-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            <ul class="page-breadcrumb breadcrumb">
+                        <li>
+                            <a href="">快讯规则管理</a>
+                            <i class="fa fa-circle"></i>
+                        </li>
+                        <li>
+                            <span class="active">快讯规则列表</span>
+                        </li>
+                    </ul>
+                            <div>
+                                <button type="button" class="btn btn-circle blue" onclick='add_new_rule()'>添加规则</button>
+                            </div>
+                                <div class="portlet-body">
+                                    <div class="table-scrollable">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>规则ID</th>
+                                                    <th>竞品关键词</th>
+                                                    <th>爱必投关键词</th>
+                                                    <th>创建时间</th>
+                                                    <th>更改时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for row in data %}
+                                                <tr>
+                                                    <td>{{ row['id'] }}</td>
+                                                    <td>{{ row["origin_name"] }}</td>
+                                                    <td>{{ row["rule_name"] }}</td>
+                                                    <td>{{ row["create_name"] }}</td>
+                                                    <td>{{ row["update_time"] }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-success glyphicon glyphicon-trash" title="删除" onclick="delete_rule(this,{{row['id']}})"></button>
+                                                        <button type="button" class="btn btn-danger glyphicon glyphicon-pencil" title="编辑" onclick="modify_rule({{row['id']}})"></button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {%if pagination%}
+                                {{macro_pagination.pagination_widget(pagination,'new_flash.new_flash_rule')}}
+                            {%endif%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <script type="text/JavaScript">
+
+        function delete_rule(obj,id) {
+            layer.confirm('真删？', {
+                btn: ['真', '假']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.delete_rule')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            $(obj).parents("tr").remove();
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+{#        function delete_rule(obj,id) {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('new_flash.delete_rule')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        $(obj).parents("tr").remove();#}
+{#                        alert("删除成功");#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+
+        function add_new_rule() {
+            window.location.href="/add_rule"
+        }
+
+        function modify_rule(id) {
+            window.location.href="/modify_rule?id="+id;
+        }
+
+    </script>
+{% endblock %}
+

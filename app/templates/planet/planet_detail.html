@@ -1,0 +1,102 @@
+{% extends "index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <style>
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        {#        #planet_detail_table td,#planet_detail_table th { word-wrap: break-word;  word-break: break-all;}#}
+
+    </style>
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <!-- BEGIN PAGE HEAD-->
+            <div class="page-head">
+                <!-- BEGIN PAGE TITLE -->
+                <div class="page-title">
+                    <h1>星球详情页
+                        <small></small>
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- BEGIN SAMPLE TABLE PORTLET-->
+                    <div class="portlet light bordered">
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-hover table-striped table-bordered" id="planet_detail_table">
+                                    <thead>
+                                    <tr>
+                                        <th>星球编号</th>
+                                        <th>名称</th>
+                                        <th>简称</th>
+                                        <th width="150">区块链地址</th>
+                                        <th>拥有者</th>
+                                        <th width="150">星球主币</th>
+                                        <th>是否发行<br/>星球币</th>
+                                        <th>挖矿</th>
+                                        <th>居民数</th>
+                                        <th>资产数</th>
+                                        <th>状态</th>
+                                        <th>简介</th>
+                                        <th>图标</th>
+                                        <th>星球模板</th>
+                                        <th>星球等级</th>
+                                        <th>星球背景</th>
+                                        <th width="100">发现时间</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    <tr>
+                                        <td>{{ data.list[0].no }}</td>
+                                        <td>{{ data.list[0].name }}</td>
+                                        <td>{{ data.list[0].shortname }}</td>
+                                        <td>{{ data.list[0].address }}</td>
+                                        <td>{{ data.list[0].owner.name }}</td>
+                                        <td>{{ data.list[0].maintoken.name }}</td>
+                                        <td>{{ data.list[0].isissued }}</td>
+                                        <td>{{ data.list[0].ismined }}</td>
+{#                                        <td>{{ data.list[0].residentnumber }}</td>#}
+                                        <td>{{ data.number }}</td>
+                                        <td>{{ data.list[0].assetnumber }}</td>
+                                        <td>{{ data.list[0].status }}</td>
+                                        <td>{{ data.list[0].remark }}</td>
+                                        <td>{{ data.list[0].image }}</td>
+                                        <td>{{ data.list[0].template }}</td>
+                                        <td>{{ data.list[0].grade }}</td>
+                                        <td>{{ data.list[0].background }}</td>
+                                        <td>{{ data.list[0].discoverytime }}</td>
+                                        <td>{{ data.list[0].note }}</td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        //获取地址栏参数，name:参数名称
+        {#    function getUrlParms(name) {#}
+        {#        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");#}
+        {#        var r = window.location.search.substr(1).match(reg);#}
+        {#        if (r != null)#}
+        {#            return unescape(r[2]);#}
+        {#        return null;#}
+        {#    }#}
+
+
+    </script>
+{% endblock %}

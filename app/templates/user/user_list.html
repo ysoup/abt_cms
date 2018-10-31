@@ -1,0 +1,133 @@
+{% extends "index.html" %}
+{%import 'macro_pagination.html' as macro_pagination%}
+{% block content %}
+    <div class="page-content-wrapper">
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content">
+                    <!-- BEGIN PAGE HEAD-->
+                    <div class="page-head">
+                        <!-- BEGIN PAGE TITLE -->
+                        <div class="page-title">
+                            <h1>用户展示页
+                                <small>User</small>
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            {% if current_user.id in [1,2,3] %}
+                            <div class="">
+                                <button type="button" class="btn btn-circle-right btn-danger" onclick='add_user()'>添加新用户</button>
+                                <!--<button type="button" class="btn btn-circle-left" onclick='$("#dialog_push_config").modal("show")'>自动推送时间段设置</button>-->
+                            </div>
+                            {% endif %}
+                                <div class="portlet-body">
+                                    <div class="table-scrollable">
+                                        <table class="table table-hover table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>用户ID</th>
+                                                    <th>Email</th>
+                                                    <th>上次登录时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for row in data %}
+                                                <tr>
+                                                    <td>{{ row['id'] }}</td>
+                                                    <td>{{ row["email"] }}</td>
+                                                    <td>{{ row["last_seen"] }}</td>
+                                                <td>
+                                                    {% if current_user.id in [1,2,3] %}
+                                                        <button type="button" class="btn btn-danger btn-circle glyphicon glyphicon-remove" title="删除用户" onclick="delete_user(this,{{row['id']}})"></button>
+{#                                                        <button type="button" class="btn btn-default" onclick="modify_new_information({{row['id']}})">编辑</button>#}
+                                                    {% else %}
+                                                        <button class="btn glyphicon glyphicon-piggy-bank"></button>
+                                                    {% endif %}
+                                                </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {%if pagination%}
+                                {{macro_pagination.pagination_widget(pagination,'user_auh.user_list')}}
+                            {%endif%}
+                        </div>
+                    </div>
+                    <div class="modal fade" id="dialog_push_config" >
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="width: 500px">
+                                <form id="form">
+                                    <div class="modal-body">
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" id="btnOK" onclick="add_school()">保存</button>
+                                            <button type="button" class="btn btn-default"
+                                                    data-dismiss="modal">取消</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- /.modal-content -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <script type="text/JavaScript">
+{#        function delete_user(obj,id) {#}
+{#            $.ajax({#}
+{#                url: '{{ url_for('user_auh.del_user')}}',#}
+{#                type: 'post',#}
+{#                data: {#}
+{#                    id: id#}
+{#                },#}
+{#                success: function (data) {#}
+{#                    if (data.success == 'ok') {#}
+{#                        $(obj).parents("tr").remove();#}
+{#                        alert("删除成功");#}
+{#                    }#}
+{#                }#}
+{#            })#}
+{#        }#}
+{#        #}
+        function delete_user(obj,id) {
+            layer.confirm('真删？', {
+                btn: ['真', '假']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('user_auh.del_user')}}',
+                    type: 'post',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            $(obj).parents("tr").remove();
+                            layer.msg("删除成功！", {time: 1000, icon: 1});
+                        }
+                        else {
+                            layer.msg("删除失败！", {time: 1000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 1000, icon: 2});
+                return false
+            });
+        }
+
+
+
+
+
+        function add_user() {
+            window.location.href="/add_user"
+        }
+    </script>
+{% endblock %}
