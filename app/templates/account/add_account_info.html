@@ -1,0 +1,122 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/monitor_list">账户信息列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">新增账户信息</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">账户信息新增</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">账户名称</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="请输入账户名称（不可为空）" id="account_name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">账户密码</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="请输入账户密码（不可为空）" id="account_password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">账户等级</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入账户等级（不可为空）" id="account_rank">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">已文章数量</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入已文章数量（不可为空）" id="account_article_num">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-11 text-right">
+                                            <button type="button" class="btn green" onclick="add_monitor_info()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green" onclick="stop_new_flash_content()">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function add_monitor_info() {
+            var account_name = $("#account_name").val();
+            var account_password = $("#account_password").val();
+            var account_rank = $("#account_rank").val();
+            var account_article_num = $('#account_article_num').val();
+            layer.confirm('是否添加？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('new_flash.add_account_info')}}',
+                        type: 'post',
+                        data: {
+                            account_name: account_name,
+                            account_password: account_password,
+                            account_rank: account_rank,
+                            account_article_num: account_article_num,
+                        },
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("添加成功！", {time: 1000, icon: 1});
+                                window.localStorage.setItem("reload", "true");
+                                window.history.go(-1);
+                            }
+                            else {
+                                layer.msg("添加失败！", {time: 1000, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+                });
+        }
+
+        function stop_new_flash_content() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.location.href = "/monitor_list";
+            }, function () {
+                layer.msg('未放弃，真棒！', {time: 1000, icon: 6});
+                return false;
+            });
+        }
+    </script>
+{% endblock %}
+
