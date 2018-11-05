@@ -10,11 +10,11 @@
                     <div class="portlet light bordered">
                         <ul class="page-breadcrumb breadcrumb">
                             <li>
-                                <a href="">文章管理</a>
+                                <a href="">文章上传管理</a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
-                                <span class="active">文章列表</span>
+                                <span class="active">文章上传设置列表</span>
                             </li>
                         </ul>
                         <!-- Single button -->
@@ -22,14 +22,14 @@
                             <div class="col-md-8">
 
                                 <button type="button" class="btn blue btn-circle" onclick='add_monitor_info()'
-                                        style="margin-left: 10px">新增文章信息
+                                        style="margin-left: 10px">新增文章上传设置
                                 </button>
                             </div>
-                            <div class="col-md-4">
-                                <button class="btn blue btn-circle pull-right" data-toggle="modal" data-target="#myModal">
-								文章导入
-							</button>
-                            </div>
+{#                            <div class="col-md-4">#}
+{#                                <button class="btn blue btn-circle pull-right" data-toggle="modal" data-target="#myModal">#}
+{#								文章导入#}
+{#							</button>#}
+{#                            </div>#}
                         </div>
                         <div class="row">
                             <div class="portlet-body col-lg-12">
@@ -38,9 +38,11 @@
                                         <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>文章标题</th>
+                                            <th>账户名称</th>
                                             <th>文章类型</th>
-                                            <th>文章状态</th>
+                                            <th>上传类型</th>
+                                            <th>上传状态</th>
+                                            <th>发送时间</th>
                                             <th>创建日期</th>
                                             <th>操作</th>
                                         </tr>
@@ -49,7 +51,7 @@
                                         {% for row in data %}
                                             <tr id="tr-{{ row['id'] }}">
                                                 <td>{{ row["id"] }}</td>
-                                                <td>{{ row["article_title"]}}</td>
+                                                <td>{{ row["account_name"]}}</td>
                                                 {% if row["article_type"] == 1 %}
                                                     <td id="show_info">原创</td>
                                                 {% elif row["article_type"] == 2 %}
@@ -66,14 +68,18 @@
                                                     <td id="show_info">解盘6</td>
                                                 {% endif %}
 
-                                                {% if row["is_send"] == 0 %}
-                                                    <td id="show_info">不可发送</td>
-                                                {% elif row["is_send"] == 1 %}
-                                                    <td id="show_info">可发送</td>
-                                                {% elif row["account_type"] == 2 %}
-                                                    <td id="show_info">已发送</td>
+                                                {% if row["send_type"] == 0 %}
+                                                    <td id="show_info">手动</td>
+                                                {% elif row["send_type"] == 1 %}
+                                                    <td id="show_info">自动</td>
                                                 {% endif %}
 
+                                                {% if row["send_status"] == 0 %}
+                                                    <td id="show_info">未发送</td>
+                                                {% elif row["send_status"] == 1 %}
+                                                    <td id="show_info">已发送</td>
+                                                {% endif %}
+                                                <td>{{ row["send_time"] }}</td>
                                                 <td>{{ row["create_time"] }}</td>
                                                 <td>
                                                     <button type="button"
@@ -216,11 +222,11 @@
             };
 
         function add_monitor_info() {
-            window.location.href = "/add_article_info"
+            window.location.href = "/add_article_upload_set"
         }
 
         function modify_monitor_data(id) {
-            window.location.href = "/modify_article_info?id=" + id;
+            window.location.href = "/modify_article_upload_set?id=" + id;
         }
 
     </script>

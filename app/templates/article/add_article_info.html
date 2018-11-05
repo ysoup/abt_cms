@@ -1,0 +1,243 @@
+{% extends "/index.html" %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <div class="page-content">
+            <div class="row ">
+                <div class="col-md-12 ">
+                    <div class="portlet light bordered">
+                        <ul class="page-breadcrumb breadcrumb">
+                            <li>
+                                <a href="/article_list">文章信息列表</a>
+                                <i class="fa fa-circle"></i>
+                            </li>
+                            <li>
+                                <span class="active">新增文章信息</span>
+                            </li>
+                        </ul>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-settings font-dark"></i>
+                                <span class="caption-subject font-dark sbold uppercase">文章信息新增</span>
+                            </div>
+                        </div>
+                        <div class="portlet-body form">
+                            <form class="form-horizontal" role="form" name="test">
+                                {#                                        {{form.hidden_tag()}}#}
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">文章标题</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="请输入文章标题（不可为空）" id="article_title">
+                                        </div>
+                                    </div>
+
+{#                                    <div class="form-group">#}
+{#                                        <label class="control-label col-md-1">标题图片</label>#}
+{#                                        <div class="col-md-10">#}
+{#                                            <span id="base_pic" class=""></span>#}
+{#                                            <img src="" alt="" id="title_img" width="268" height="200">#}
+{#                                            <input type="file" id="uploadfile_input" value=""#}
+{#                                                   accept="image/png,image/jpg,image/jpeg,image/JPG">#}
+{#                                            <label for="uploadfile_input" class='btn btn-danger'>选择图片</label>#}
+                                            {#                                            <span style="color: red;">提示：标题图片大小不超过100KB</span>#}
+{#                                        </div>#}
+{#                                    </div>#}
+                                    <br>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">文章内容</label>
+                                        <div class="col-md-10">
+                                            <textarea name="editor1" id="editor1" class=”ckeditor” rows="100" cols="200"
+                                                      value=""></textarea>
+                                            <script>
+                                                // 用CKEditor替换<textarea id="editor1">
+                                                // 使用默认配置
+                                                var editor1 = CKEDITOR.replace('editor1');
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">文章类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="article_type">
+                                                <option value=1>原创</option>
+                                                <option value=2>解盘(币莱解盘)</option>
+                                                <option value=3>视频(币莱播报)</option>
+                                                <option value=4>音频</option>
+                                                <option value=5>PDF</option>
+                                                <option value=6>早报</option>
+                                                <option value=7>晚报</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <div class="row">
+                                        <div class="col-md-11 text-right">
+                                            <button type="button" class="btn green" onclick="add_information_content()">
+                                                提交
+                                            </button>
+                                            <button type="button" class="btn green" onclick="stop_new_flash_content()">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+
+        function add_information_content() {
+
+            if ($('#article_title').val() == "" || $("#title_img").attr("src") == "") {
+                layer.msg("图片和标题不可为空，请重新操作！", {time: 1000, icon: 2});
+                return false
+            }
+
+            var content = editor1.getData();
+            if (content == "") {
+                layer.msg("快讯内容都不填，你想干啥？", {time: 1000, icon: 2});
+                return false
+            }
+            var article_type = $('#article_type').val()
+            var formData = new FormData();
+            {#formData.append("img", $("#uploadfile_input")[0].files[0]);#}
+            formData.append('article_title', $('#article_title').val());
+            {#formData.append('base_pic_url', $('#title_img').attr("src"));#}
+            {#formData.append('img_url', $('#base_pic').attr("class"));#}
+            formData.append('article_type', article_type);
+            formData.append('article_content', editor1.getData());
+
+            layer.confirm('是否添加？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('new_flash.add_article_info')}}',
+                        type: 'post',
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("添加成功！", {time: 1000, icon: 1});
+                                window.location.href = "/article_list";
+                            }
+                            else {
+                                layer.msg(data.msg, {time: 1000, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+                });
+        }
+
+        $(function () {
+                $("#title_img").click(function () {
+                    $("#uploadfile_input").trigger("click");
+                });
+                $("#uploadfile_input").change(function () {
+
+                    var file = $("#uploadfile_input").val();
+                    if (!/.(gif|jpg|jpeg|png|JPG)$/.test(file)) {
+                        layer.msg("图片类型必须是.jpeg,jpg,png中的一种", {time: 2000, icon: 2});
+                        return false;
+                    } else {
+
+                        var image = $("#uploadfile_input")[0].files[0];
+                        {#                    filesize = image.size;#}
+                        {#                    console.log(filesize);#}
+                        {#                    if (filesize > 102400) {#}
+                        {#                        layer.msg('图片大小不能100k的图片', {time: 2000, icon: 2});#}
+                        {#                        return false;#}
+                        {#                    }#}
+                    }
+                    layer.msg("图片通过", {time: 2000, icon: 6});
+
+                    var img_src = $("#uploadfile_input").val();
+                    var formData = new FormData();
+                    formData.append("file", image);
+                    formData.append('base_pic_url', $('#title_img').attr("src"));
+                    formData.append('img_url', img_src);
+                    $.ajax({
+                        url: "{{ url_for("new_flash.get_info_img_url") }}",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            $('#title_img').attr("src", data['base_pic_url']);
+                            $('#base_pic').attr("class", data['img_url']);
+                        }
+                    })
+                });
+            });
+
+        function add_monitor_info() {
+            var account_name = $("#account_name").val();
+            var account_password = $("#account_password").val();
+            var account_rank = $("#account_rank").val();
+            var account_article_num = $('#account_article_num').val();
+            var account_type = $('#account_type').val();
+            var total_read_num = $('#total_read_num').val();
+            var total_play_num = $('#total_play_num').val();
+            var total_subscribe_num = $('#total_subscribe_num').val();
+            var account_index = $('#account_index').val();
+            layer.confirm('是否添加？', {
+                    btn: ['确认', '取消']
+                },
+                function () {
+                    $.ajax({
+                        url: '{{ url_for('new_flash.add_account_info')}}',
+                        type: 'post',
+                        data: {
+                            account_name: account_name,
+                            account_password: account_password,
+                            account_rank: account_rank,
+                            account_article_num: account_article_num,
+                            account_type: account_type,
+                            total_read_num: total_read_num,
+                            total_play_num: total_play_num,
+                            total_subscribe_num: total_subscribe_num,
+                            account_index: account_index,
+                        },
+                        success: function (data) {
+                            if (data.success == 'ok') {
+                                layer.msg("添加成功！", {time: 1000, icon: 1});
+                                window.localStorage.setItem("reload", "true");
+                                window.history.go(-1);
+                            }
+                            else {
+                                layer.msg("添加失败！", {time: 1000, icon: 5});
+                                return false
+                            }
+                        }
+                    });
+                },
+                function () {
+                    layer.msg("已取消", {time: 1000, icon: 2});
+                    return false
+                });
+        }
+
+        function stop_new_flash_content() {
+            layer.confirm('是否放弃当前编辑内容？', {
+                btn: ['确认', '取消'] //按钮
+            }, function () {
+                window.location.href = "/monitor_list";
+            }, function () {
+                layer.msg('未放弃，真棒！', {time: 1000, icon: 6});
+                return false;
+            });
+        }
+    </script>
+{% endblock %}
+

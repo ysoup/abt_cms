@@ -2,7 +2,7 @@
 from flask_login import login_required
 from flask import request, render_template, jsonify, make_response,flash, abort, url_for, redirect, session, Flask, g, current_app
 from . import new_flash
-from app.models import AccountManage, ArticleManage
+from app.models import AccountManage, ArticleManage, ArticleUploadManage
 from cms_server import db, redis_store
 import time, copy
 from common import push_service
@@ -37,7 +37,7 @@ p[style-name='Hyperlink']=>a.link
 """
 guidUrl = "https://my.phrplus.com/REST/guid"
 
-imgPath = "/home/ywd/PycharmProjects/abt_cms/imgs"
+imgPath = "/data/imgs"
 
 
 # 账户列表页
@@ -208,6 +208,7 @@ def article_list():
 def article_file_upload():
     try:
         file_dict = request.files["file_data"]
+        account_type = request.form["account_type"]
         filename = secure_filename(file_dict.filename)
         file_dict.save(os.path.join("./", filename))
 
@@ -228,11 +229,13 @@ def article_file_upload():
         article["Content"] = ''.join(contentArr)
 
         # 数据库持久化
-        info = AccountManage(
-            account_name=info[0],
-            account_password=info[1],
-            account_rank=info[2],
-            account_article_num=info[3])
+        info = ArticleManage(
+            article_title=article["Title"],
+            article_cover="",
+            article_content=article["Content"],
+            article_type=account_type,
+            is_send=0
+        )
         db.session.add(info)
         db.session.commit()
         return jsonify({"success": "ok"})
@@ -283,3 +286,139 @@ def parseFile(f):
 
 def convert_image(image):
     return {"src": ""}
+
+
+# 新增文章信息
+@new_flash.route('/add_article_info', methods=['GET', "POST"])
+def add_article_info():
+    if request.method == "GET":
+        return render_template('article/add_article_info.html')
+    elif request.method == "POST":
+        try:
+            article_content = request.form.get("article_content")
+            article_title = request.form.get("article_title")
+            article_type = request.form.get("article_type")
+
+            info = ArticleManage(
+                article_content=article_content,
+                article_title=article_title,
+                article_type=article_type,
+                is_send=0
+            )
+            db.session.add(info)
+            db.session.commit()
+            return jsonify({'success': 'ok'})
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify({'failed': 'ok'})
+
+
+# 编辑文章信息
+@new_flash.route("/modify_article_info", methods=['GET', 'POST'])
+def modify_article_info():
+    if request.method == "GET":
+        id = request.args.get('id', type=int)
+        info = ArticleManage.query.filter_by(id=id).first()
+        dic = {}
+        if info:
+            dic["id"] = id
+            dic["article_title"] = info.article_title
+            dic["article_content"] = info.article_content
+            dic["article_type"] = info.article_type
+        return render_template('article/modify_article_manage.html', data=dic)
+    elif request.method == "POST":
+        try:
+            id = request.form.get('id')
+            article_title = request.form.get('article_title')
+            article_content = request.form.get('article_content')
+            article_type = request.form.get('article_type')
+            info = ArticleManage.query.filter_by(id=id).first()
+            if info:
+                info.article_title = article_title
+                info.article_content = article_content
+                info.article_type = article_type
+                db.session.add(info)
+                db.session.commit()
+            return jsonify({"success": "ok"})
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify({'failed': '修改失败'})
+
+
+# 文章上传设置列表
+@new_flash.route('/article_upload_set', methods=['GET'])
+@login_required                                                                                                 
+def article_upload_set():
+    try:
+        page = request.args.get('page', 1, type=int)
+        pagination = ArticleUploadManage.query.order_by(ArticleUploadManage.create_time.desc()).paginate(page,
+                                                                                                         per_page=10,
+                                                                                                         error_out=False)
+        data = pagination.items
+        return render_template('article/article_set_list.html', data=data, pagination=pagination)
+    except Exception as e:
+        current_app.logger.error(e)
+        return render_template("404.html")
+
+
+# 新增文章上传设置
+@new_flash.route('/add_article_upload_set', methods=['GET', "POST"])
+def add_article_upload_set():
+    if request.method == "GET":
+        info = AccountManage.query.order_by(AccountManage.create_time.desc())
+        account_ls = []
+        for x in info:
+            dic = {}
+            dic["id"] = x.id
+            dic["account_name"] = x.account_name
+            account_ls.append(dic)
+        return render_template('article/add_article_upload_set.html', data=account_ls)
+    elif request.method == "POST":
+        try:
+            account_name = request.form.get("account_name")
+            article_type = request.form.get("article_type")
+            send_type = request.form.get("send_type")
+
+            info = ArticleUploadManage(
+                account_name=account_name,
+                article_type=article_type,
+                send_type=send_type
+            )
+            db.session.add(info)
+            db.session.commit()
+            return jsonify({'success': 'ok'})
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify({'failed': 'ok'})
+
+
+# 编辑文章信息
+@new_flash.route("/modify_article_upload_set", methods=['GET', 'POST'])
+def modify_article_upload_set():
+    if request.method == "GET":
+        id = request.args.get('id', type=int)
+        info = ArticleManage.query.filter_by(id=id).first()
+        dic = {}
+        if info:
+            dic["id"] = id
+            dic["article_title"] = info.article_title
+            dic["article_content"] = info.article_content
+            dic["article_type"] = info.article_type
+        return render_template('article/modify_article_upload_set.html', data=dic)
+    elif request.method == "POST":
+        try:
+            id = request.form.get('id')
+            article_title = request.form.get('article_title')
+            article_content = request.form.get('article_content')
+            article_type = request.form.get('article_type')
+            info = ArticleManage.query.filter_by(id=id).first()
+            if info:
+                info.article_title = article_title
+                info.article_content = article_content
+                info.article_type = article_type
+                db.session.add(info)
+                db.session.commit()
+            return jsonify({"success": "ok"})
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify({'failed': '修改失败'})
