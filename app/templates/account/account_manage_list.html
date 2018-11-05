@@ -40,7 +40,12 @@
                                             <th>ID</th>
                                             <th>账户名称</th>
                                             <th>账户等级</th>
+                                            <th>账户类型</th>
                                             <th>已文章数量</th>
+                                            <th>总阅读量</th>
+                                            <th>总播放量</th>
+                                            <th>总订阅数</th>
+                                            <th>帐号指数</th>
                                             <th>创建日期</th>
                                             <th>操作</th>
                                         </tr>
@@ -51,7 +56,27 @@
                                                 <td>{{ row["id"] }}</td>
                                                 <td>{{ row["account_name"]}}</td>
                                                 <td>{{ row["account_rank"] }}</td>
+                                                {% if row["account_type"] == 1 %}
+                                                    <td id="show_info">原创</td>
+                                                {% elif row["account_type"] == 2 %}
+                                                    <td id="show_info">解盘</td>
+                                                {% elif row["account_type"] == 3 %}
+                                                    <td id="show_info">解盘1</td>
+                                                {% elif row["account_type"] == 4%}
+                                                    <td id="show_info">解盘3</td>
+                                                {% elif row["account_type"] == 5%}
+                                                    <td id="show_info">解盘4</td>
+                                                {% elif row["account_type"] == 6%}
+                                                    <td id="show_info">解盘5</td>
+                                                {% elif row["account_type"] == 7%}
+                                                    <td id="show_info">解盘6</td>
+
+                                                {% endif %}
                                                 <td>{{ row["account_article_num"] }}</td>
+                                                <td>{{ row["total_read_num"] }}</td>
+                                                <td>{{ row["total_play_num"] }}</td>
+                                                <td>{{ row["total_subscribe_num"] }}</td>
+                                                <td>{{ row["account_index"] }}</td>
                                                 <td>{{ row["create_time"] }}</td>
                                                 <td>
                                                     <br>

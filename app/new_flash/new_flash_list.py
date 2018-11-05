@@ -41,13 +41,23 @@ def add_account_info():
             account_name = request.form.get("account_name")
             account_password = request.form.get("account_password")
             account_rank = request.form.get("account_rank")
+            account_type = request.form.get("account_type")
+            total_read_num = request.form.get("total_read_num")
+            total_play_num = request.form.get("total_play_num")
+            total_subscribe_num = request.form.get("total_subscribe_num")
+            account_index = request.form.get("account_index")
             account_article_num = request.form.get("account_article_num")
 
             info = AccountManage(
                 account_name=account_name,
                 account_password=account_password,
                 account_rank=account_rank,
-                account_article_num=account_article_num
+                account_article_num=account_article_num,
+                account_type=account_type,
+                total_read_num=total_read_num,
+                total_play_num=total_play_num,
+                total_subscribe_num=total_subscribe_num,
+                account_index=account_index
             )
             db.session.add(info)
             db.session.commit()
@@ -69,6 +79,11 @@ def modify_account_info():
             dic["account_name"] = info.account_name
             dic["account_password"] = info.account_password
             dic["account_rank"] = info.account_rank
+            dic["account_type"] = info.account_type
+            dic["total_read_num"] = info.total_read_num
+            dic["total_play_num"] = info.total_play_num
+            dic["total_subscribe_num"] = info.total_subscribe_num
+            dic["account_index"] = info.account_index
             dic["account_article_num"] = info.account_article_num
         return render_template('account/modify_account_manage.html', data=dic)
     elif request.method == "POST":
@@ -78,12 +93,22 @@ def modify_account_info():
             account_password = request.form.get('account_password')
             account_rank = request.form.get('account_rank')
             account_article_num = request.form.get('account_article_num')
+            account_type = request.form.get('account_type')
+            total_read_num = request.form.get('total_read_num')
+            total_play_num = request.form.get('total_play_num')
+            total_subscribe_num = request.form.get('total_subscribe_num')
+            account_index = request.form.get('account_index')
             info = AccountManage.query.filter_by(id=id).first()
             if info:
                 info.account_name = account_name
                 info.account_password = account_password
                 info.account_rank = account_rank
                 info.account_article_num = account_article_num
+                info.account_type = account_type
+                info.total_read_num = total_read_num
+                info.total_play_num = total_play_num
+                info.total_subscribe_num = total_subscribe_num
+                info.account_index = account_index
                 db.session.add(info)
                 db.session.commit()
             return jsonify({"success": "ok"})

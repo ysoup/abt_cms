@@ -43,9 +43,47 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="control-label col-md-1">账户类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="account_type">
+                                                <option value=1>原创</option>
+                                                <option value=2>解盘(币莱解盘)</option>
+                                                <option value=3>视频(币莱播报)</option>
+                                                <option value=4>音频</option>
+                                                <option value=5>PDF</option>
+                                                <option value=6>早报</option>
+                                                <option value=7>晚报</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                     <div class="form-group">
                                         <label class="control-label col-md-1">已文章数量</label>
                                         <div class="col-md-10">
                                             <input type="number" class="form-control" placeholder="请输入已文章数量（不可为空）" id="account_article_num">
+                                        </div>
+                                    </div>
+                                     <div class="form-group">
+                                        <label class="control-label col-md-1">总阅读量</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入总阅读量（不可为空）" id="total_read_num">
+                                        </div>
+                                    </div>
+                                     <div class="form-group">
+                                        <label class="control-label col-md-1">总播放量</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入总播放量（不可为空）" id="total_play_num">
+                                        </div>
+                                    </div>
+                                     <div class="form-group">
+                                        <label class="control-label col-md-1">总订阅数</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入总订阅数（不可为空）" id="total_subscribe_num">
+                                        </div>
+                                    </div>
+                                     <div class="form-group">
+                                        <label class="control-label col-md-1">账户指数</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入账户指数（不可为空）" id="account_index">
                                         </div>
                                     </div>
                                 </div>
@@ -75,6 +113,11 @@
             var account_password = $("#account_password").val();
             var account_rank = $("#account_rank").val();
             var account_article_num = $('#account_article_num').val();
+            var account_type = $('#account_type').val();
+            var total_read_num = $('#total_read_num').val();
+            var total_play_num = $('#total_play_num').val();
+            var total_subscribe_num = $('#total_subscribe_num').val();
+            var account_index = $('#account_index').val();
             layer.confirm('是否添加？', {
                     btn: ['确认', '取消']
                 },
@@ -87,6 +130,11 @@
                             account_password: account_password,
                             account_rank: account_rank,
                             account_article_num: account_article_num,
+                            account_type: account_type,
+                            total_read_num: total_read_num,
+                            total_play_num: total_play_num,
+                            total_subscribe_num: total_subscribe_num,
+                            account_index: account_index,
                         },
                         success: function (data) {
                             if (data.success == 'ok') {

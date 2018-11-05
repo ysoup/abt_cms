@@ -45,10 +45,59 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="col-md-1 control-label">账户类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="account_type">
+                                                <option value=1 {% if data["account_type"] == 1 %}
+                                                        selected {% endif %}>原创</option>
+                                                <option value=2 {% if data["account_type"] == 2 %}
+                                                        selected {% endif %}>解盘(币莱解盘)</option>
+                                                <option value=3 {% if data["account_type"] == 3 %}
+                                                        selected {% endif %}>视频(币莱播报)</option>
+                                                <option value=4 {% if data["account_type"] == 4 %}
+                                                        selected {% endif %}>音频</option>
+                                                <option value=5 {% if data["account_type"] == 5 %}
+                                                        selected {% endif %}>PDF</option>
+                                                <option value=6 {% if data["account_type"] == 6 %}
+                                                        selected {% endif %} >早报</option>
+                                                <option value=7 {% if data["account_type"] == 7 %}
+                                                        selected {% endif %} >晚报</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="col-md-1 control-label">已文章数量</label>
                                             <div class="col-md-10">
                                             <input class="form-control" type="number" id="account_article_num"
                                                    value="{{ data["account_article_num"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">总阅读数量</label>
+                                            <div class="col-md-10">
+                                            <input class="form-control" type="number" id="total_read_num"
+                                                   value="{{ data["total_read_num"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">总播放量</label>
+                                            <div class="col-md-10">
+                                            <input class="form-control" type="number" id="total_play_num"
+                                                   value="{{ data["total_play_num"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">总订阅量</label>
+                                            <div class="col-md-10">
+                                            <input class="form-control" type="number" id="total_subscribe_num"
+                                                   value="{{ data["total_subscribe_num"] }}">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-1 control-label">账户指数</label>
+                                            <div class="col-md-10">
+                                            <input class="form-control" type="number" id="account_index"
+                                                   value="{{ data["account_index"] }}">
                                         </div>
                                     </div>
                                 </div>
@@ -80,6 +129,11 @@
             formData.append('account_password', $('#account_password').val());
             formData.append('account_rank', $("#account_rank").val());
             formData.append('account_article_num', $("#account_article_num").val());
+            formData.append('account_type', $("#account_type").val());
+            formData.append('total_read_num', $("#total_read_num").val());
+            formData.append('total_play_num', $("#total_play_num").val());
+            formData.append('total_subscribe_num', $("#total_subscribe_num").val());
+            formData.append('account_index', $("#account_index").val());
 
             layer.confirm('是否修改？', {
                 btn: ['确认', '取消']
