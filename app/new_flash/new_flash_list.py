@@ -2,7 +2,7 @@
 from flask_login import login_required
 from flask import request, render_template, jsonify, make_response,flash, abort, url_for, redirect, session, Flask, g, current_app
 from . import new_flash
-from app.models import AccountManage
+from app.models import AccountManage, ArticleManage
 from cms_server import db, redis_store
 import time, copy
 from common import push_service
@@ -14,9 +14,33 @@ from ..utils.filter_char import filter_char
 from ..utils.sphinxapi3_query_keyword import query_keyword
 from ..utils.Pagination import Pagination
 from werkzeug.utils import secure_filename
+import docx
+import mammoth
+import mammoth.transforms
+import os
+from docx import Document
+import zipfile
+import requests
+
+styleMap = """
+
+p[style-name='Title'] => h1.hide
+
+p[style-name='Subhead 1'] => h3
+
+p[style-name='List Bullet'] => ul.first > li:fresh
+
+p[style-name='List Bullet 2'] => ul.second > li:fresh
+
+p[style-name='Hyperlink']=>a.link
+
+"""
+guidUrl = "https://my.phrplus.com/REST/guid"
+
+imgPath = "/home/ywd/PycharmProjects/abt_cms/imgs"
 
 
-# 快讯列表页
+# 账户列表页
 @new_flash.route('/account_manage_list', methods=['GET'])
 @login_required
 def account_manage_list():
@@ -161,3 +185,101 @@ def account_count_list():
     except Exception as e:
         current_app.logger.error(e)
         return render_template("404.html")
+
+
+# 文章列表
+@new_flash.route('/article_list', methods=['GET'])
+@login_required
+def article_list():
+    try:
+        page = request.args.get('page', 1, type=int)
+        pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=10,
+                                                                                             error_out=False)
+        data = pagination.items
+        return render_template('article/article_list.html', data=data, pagination=pagination)
+    except Exception as e:
+        current_app.logger.error(e)
+        return render_template("404.html")
+
+
+# 文章上传
+@new_flash.route('/article_file_upload', methods=['POST'])
+@login_required
+def article_file_upload():
+    try:
+        file_dict = request.files["file_data"]
+        filename = secure_filename(file_dict.filename)
+        file_dict.save(os.path.join("./", filename))
+
+        imgNameArr = extractImage(filename)
+
+        article = parseFile(filename)
+
+        fileName = os.path.basename(filename)
+
+        contentArr = article["Content"].split("<img")
+
+        for idx, section in enumerate(contentArr):
+
+            for info in imgNameArr:
+                if idx is info["index"]:
+                    contentArr[idx] = section + "<img alt='" + info["fileName"] + "' data-fileName='" + info[
+                        "fileName"] + "'"
+        article["Content"] = ''.join(contentArr)
+
+        # 数据库持久化
+        info = AccountManage(
+            account_name=info[0],
+            account_password=info[1],
+            account_rank=info[2],
+            account_article_num=info[3])
+        db.session.add(info)
+        db.session.commit()
+        return jsonify({"success": "ok"})
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify({"success": "failed"})
+
+
+def extractImage(f):
+    ziped = zipfile.ZipFile(f)
+    allFiles = ziped.namelist()
+    imgs = filter(lambda x: x.startswith('word/media/'), allFiles)
+    imgNameArr = []
+    for img in imgs:
+        res = requests.post(guidUrl)
+        if res.status_code is 200:
+            guid = res.text
+            data = ziped.read(img, bytes(imgPath, encoding="utf-8"))
+            idxStr = os.path.basename(img).split(".")[0][-1:]
+            imgDict = {}
+            imgDict["index"] = int(idxStr)-1
+            imgDict["fileName"] = guid+".jpg"
+            imgNameArr.append(imgDict)
+            targetPath = os.path.join(imgPath, guid+".jpg")
+            target = open(targetPath, "wb")
+            target.write(data)
+            target.close()
+    ziped.close()
+
+    return imgNameArr
+
+
+def parseFile(f):
+    document = Document(f)
+    article = {"Title": document.paragraphs[0].text, "Content":""}
+    with open(f, "rb") as docFile:
+        html = mammoth.convert_to_html(docFile, style_map=styleMap,
+                                       convert_image=mammoth.images.img_element(convert_image))
+    if not article["Title"]:
+        for para in document.paragraphs:
+            if para.style.name == 'Title':
+                if para.text:
+                    article["Title"] = para.text
+
+    article["Content"] = html.value
+    return article
+
+
+def convert_image(image):
+    return {"src": ""}

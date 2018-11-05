@@ -498,3 +498,16 @@ class AccountManage(db.Model):
     account_index = db.Column(db.Integer)
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+
+
+class ArticleManage(db.Model):
+    """文章管理"""
+    __tablename__ = "article_manage"
+    id = db.Column(db.Integer, primary_key=True)
+    article_title = db.Column(db.String(225), default="")
+    article_cover = db.Column(db.String(225), default="")
+    article_content = db.Column(db.String(20000), default="")
+    article_type = db.Column(db.Integer)
+    is_send = db.Column(db.Integer)
+    create_time = db.Column(db.DateTime, default=datetime.datetime.now)
+    update_time = db.Column(db.DateTime, onupdate=datetime.datetime.now)
