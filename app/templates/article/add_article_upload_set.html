@@ -60,7 +60,9 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="control-label col-md-1">发送类型</label>
-                                        <input type="text" value="2017-07-31 17:58" id="datetimepicker"  class="form_datetime" data-date-format="yyyy-mm-dd hh:ii">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="datepicker"
+                                                                       class="form_datetime"
+                                                                       data-date-format="yyyy-mm-dd hh:ii">
                                     </div>
                                 </div>
                                 <div class="form-actions">
@@ -83,14 +85,18 @@
         </div>
     </div>
     <script type="text/JavaScript">
-
+        $('#datepicker').datetimepicker(
+            'setDate', new Date()
+        );
         function add_information_content() {
             var article_type = $('#article_type').val()
             var formData = new FormData();
             formData.append('account_name', $('#account_name').val());
             formData.append('article_type', article_type);
             formData.append('send_type', $('#send_type').val());
+            console.log($('#datepicker').val())
 
+            $('#datepicker').val().Format("yyyy-MM-dd hh:mm:ss.S")
             layer.confirm('是否添加？', {
                     btn: ['确认', '取消']
                 },
