@@ -41,11 +41,13 @@
                                             <th>账户名称</th>
                                             <th>账户等级</th>
                                             <th>账户类型</th>
-                                            <th>已文章数量</th>
+                                            <th>账户平台</th>
+                                            <th>账户分类</th>
                                             <th>总阅读量</th>
                                             <th>总播放量</th>
                                             <th>总订阅数</th>
                                             <th>帐号指数</th>
+                                            <th>信用分</th>
                                             <th>创建日期</th>
                                             <th>操作</th>
                                         </tr>
@@ -56,26 +58,31 @@
                                                 <td>{{ row["id"] }}</td>
                                                 <td>{{ row["account_name"]}}</td>
                                                 <td>{{ row["account_rank"] }}</td>
-                                                {% if row["account_type"] == 1 %}
-                                                    <td id="show_info">原创</td>
+                                                {% if row["account_type"] == 0 %}
+                                                    <td id="show_info">3级图文原创</td>
+                                                {% elif row["account_type"] == 1 %}
+                                                    <td id="show_info">2级图文原创</td>
                                                 {% elif row["account_type"] == 2 %}
-                                                    <td id="show_info">解盘</td>
-                                                {% elif row["account_type"] == 3 %}
-                                                    <td id="show_info">解盘1</td>
-                                                {% elif row["account_type"] == 4%}
-                                                    <td id="show_info">解盘3</td>
-                                                {% elif row["account_type"] == 5%}
-                                                    <td id="show_info">解盘4</td>
-                                                {% elif row["account_type"] == 6%}
-                                                    <td id="show_info">解盘5</td>
-                                                {% elif row["account_type"] == 7%}
-                                                    <td id="show_info">解盘6</td>
+                                                    <td id="show_info">3级非图文原创</td>
+                                                {% elif row["account_type"] == 3%}
+                                                    <td id="show_info">2级非图文原创</td>
                                                 {% endif %}
-                                                <td>{{ row["account_article_num"] }}</td>
+                                                {% for x in platform_ls %}
+                                                    {% if row["platform_type"] == x["id"] %}
+                                                        <td>{{ x["platform_name"] }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% for x in category_ls %}
+                                                    {% if row["category_type"] == x["id"] %}
+                                                        <td>{{ x["category_name"] }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
+{#                                                <td>{{ row["account_article_num"] }}</td>#}
                                                 <td>{{ row["total_read_num"] }}</td>
                                                 <td>{{ row["total_play_num"] }}</td>
                                                 <td>{{ row["total_subscribe_num"] }}</td>
                                                 <td>{{ row["account_index"] }}</td>
+                                                <td>{{ row["credit_score"] }}</td>
                                                 <td>{{ row["create_time"] }}</td>
                                                 <td>
                                                     <button type="button"
@@ -103,12 +110,44 @@
 										</div>
 										<div class="modal-body"><!-- 在这里添加一些文本 -->
 
-											<form id="importFile" name="importFile" class="form-horizontal" method="post"
+											<form id="importFile" name="importFile" class="form-inline" method="post"
 												enctype="multipart/form-data">
 												<div>
 													<label class="control-label">请选择要导入的excel文件：</label>
 {#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
                                                     <input id="excelFile" type="file" class="file" data-show-preview="True">
+												</div>
+                                                <div class="input-group">
+													<label class="control-label">账户类型</label>
+{#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
+                                                    <div class="input-group">
+                                                        <select class="form-control" id="account_type">
+                                                        <option value=0>3级图文原创</option>
+                                                        <option value=1>2级图文原创</option>
+                                                        <option value=2>3级非图文原创</option>
+                                                        <option value=3>2级非图文原创</option>
+                                                        </select>
+                                                    </div>
+												</div>
+                                                <div class="input-group">
+													<label class="control-label">账户所属平台</label>
+{#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
+                                                    <div class="input-group">
+                                                        <select class="form-control" id="platform_type">
+                                                        {% for x in platform_ls %}
+                                                            <option value={{ x["id"] }}>{{ x["platform_name"] }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    </div>
+												</div>
+                                                <div>
+													<label class="control-label">账户分类</label>
+{#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
+                                                    <select class="form-control input-small" id="category_type">
+                                                        {% for x in category_ls %}
+                                                            <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
+                                                        {% endfor %}
+                                                    </select>
 												</div>
 											</form>
 
@@ -152,8 +191,10 @@
 										'zip':'<i class="glyphicon glyphcion-file"></i>',
 									},
 									uploadExtraData:function(){
-										var extraValue = "test";
-										return {"excelType": extraValue};
+										var account_type = $("#account_type").val();
+										var platform_type = $("#platform_type").val();
+										var category_type = $("#category_type").val();
+										return {"account_type": account_type, "platform_type": platform_type, "category_type": category_type};
 									}
 								});
 							}

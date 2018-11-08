@@ -7,7 +7,7 @@
                     <div class="portlet light bordered">
                         <ul class="page-breadcrumb breadcrumb">
                             <li>
-                                <a href="/monitor_list">账户信息列表</a>
+                                <a href="/account_manage_list">账户信息列表</a>
                                 <i class="fa fa-circle"></i>
                             </li>
                             <li>
@@ -31,6 +31,12 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="control-label col-md-1">账户昵称</label>
+                                        <div class="col-md-10">
+                                            <input type="text" class="form-control" placeholder="请输入账户昵称（不可为空）" id="nick_name">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="control-label col-md-1">账户密码</label>
                                         <div class="col-md-10">
                                             <input type="text" class="form-control" placeholder="请输入账户密码（不可为空）" id="account_password">
@@ -42,26 +48,12 @@
                                             <input type="number" class="form-control" placeholder="请输入账户等级（不可为空）" id="account_rank">
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-1">账户类型</label>
-                                        <div class="col-md-10">
-                                            <select class="form-control input-small" id="account_type">
-                                                <option value=1>原创</option>
-                                                <option value=2>解盘(币莱解盘)</option>
-                                                <option value=3>视频(币莱播报)</option>
-                                                <option value=4>音频</option>
-                                                <option value=5>PDF</option>
-                                                <option value=6>早报</option>
-                                                <option value=7>晚报</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                     <div class="form-group">
-                                        <label class="control-label col-md-1">已文章数量</label>
-                                        <div class="col-md-10">
-                                            <input type="number" class="form-control" placeholder="请输入已文章数量（不可为空）" id="account_article_num">
-                                        </div>
-                                    </div>
+{#                                     <div class="form-group">#}
+{#                                        <label class="control-label col-md-1">已文章数量</label>#}
+{#                                        <div class="col-md-10">#}
+{#                                            <input type="number" class="form-control" placeholder="请输入已文章数量（不可为空）" id="account_article_num">#}
+{#                                        </div>#}
+{#                                    </div>#}
                                      <div class="form-group">
                                         <label class="control-label col-md-1">总阅读量</label>
                                         <div class="col-md-10">
@@ -84,6 +76,43 @@
                                         <label class="control-label col-md-1">账户指数</label>
                                         <div class="col-md-10">
                                             <input type="number" class="form-control" placeholder="请输入账户指数（不可为空）" id="account_index">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">信用分</label>
+                                        <div class="col-md-10">
+                                            <input type="number" class="form-control" placeholder="请输入信用分（不可为空）" id="credit_score">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">账户类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="account_type">
+                                                <option value=0>3级图文原创</option>
+                                                <option value=1>2级图文原创</option>
+                                                <option value=2>3级非图文原创</option>
+                                                <option value=3>2级非图文原创</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">账户所属平台</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="platform_type">
+                                                {% for x in platform_ls %}
+                                                    <option value={{ x["id"] }}>{{ x["platform_name"] }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-1">账户分类</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="category_type">
+                                                {% for x in category_ls %}
+                                                    <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -112,12 +141,16 @@
             var account_name = $("#account_name").val();
             var account_password = $("#account_password").val();
             var account_rank = $("#account_rank").val();
-            var account_article_num = $('#account_article_num').val();
+            {#var account_article_num = $('#account_article_num').val();#}
             var account_type = $('#account_type').val();
             var total_read_num = $('#total_read_num').val();
             var total_play_num = $('#total_play_num').val();
             var total_subscribe_num = $('#total_subscribe_num').val();
             var account_index = $('#account_index').val();
+            var nick_name = $('#nick_name').val();
+            var credit_score = $('#credit_score').val();
+            var platform_type = $('#platform_type').val();
+            var category_type = $('#category_type').val();
             layer.confirm('是否添加？', {
                     btn: ['确认', '取消']
                 },
@@ -129,12 +162,16 @@
                             account_name: account_name,
                             account_password: account_password,
                             account_rank: account_rank,
-                            account_article_num: account_article_num,
+                            {#account_article_num: account_article_num,#}
                             account_type: account_type,
                             total_read_num: total_read_num,
                             total_play_num: total_play_num,
                             total_subscribe_num: total_subscribe_num,
                             account_index: account_index,
+                            nick_name: nick_name,
+                            credit_score: credit_score,
+                            platform_type: platform_type,
+                            category_type: category_type
                         },
                         success: function (data) {
                             if (data.success == 'ok') {

@@ -496,6 +496,10 @@ class AccountManage(db.Model):
     total_play_num = db.Column(db.Integer)
     total_subscribe_num = db.Column(db.Integer)
     account_index = db.Column(db.Integer)
+    nick_name = db.Column(db.String(64), default="")
+    platform_type = db.Column(db.Integer)
+    category_type = db.Column(db.Integer)
+    credit_score = db.Column(db.Integer)
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
@@ -527,3 +531,27 @@ class ArticleUploadManage(db.Model):
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime,
                             default=datetime.datetime.now)
+
+
+# 平台
+class InformationPlatform(db.Model):
+    """平台"""
+    __tablename__ = "information_platform"
+    id = db.Column(db.Integer, primary_key=True)
+    platform_name = db.Column(db.String(64), default="")
+    create_time = db.Column(db.DateTime, default=datetime.datetime.now)
+    update_time = db.Column(db.DateTime,
+                            default=datetime.datetime.now)
+
+
+# 分类
+class NewInformationCategory(db.Model):
+    """分类"""
+    __tablename__ = "information_category"
+    id = db.Column(db.Integer, primary_key=True)
+    category_name = db.Column(db.String(64), default="")
+    create_time = db.Column(db.DateTime, default=datetime.datetime.now)
+    update_time = db.Column(db.DateTime,
+                            default=datetime.datetime.now)
+
+
