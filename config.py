@@ -15,7 +15,7 @@ class config:
 
 class DevelopmentConfig(config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@127.0.0.1:3306/user'
+    SQLALCHEMY_DATABASE_URI = ''
     SQLALCHEMY_BINDS = {
         'permission_manage': 'mysql+pymysql://root:Percona5.7.17@192.168.2.86:3306/permission_manage',
         "spiders_visualization": "mysql+pymysql://root:Percona5.7.17@192.168.2.86:3306/spiders_visualization"}

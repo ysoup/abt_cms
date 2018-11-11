@@ -70,7 +70,7 @@
                                                     <td id="show_info">不可发送</td>
                                                 {% elif row["is_send"] == 1 %}
                                                     <td id="show_info">可发送</td>
-                                                {% elif row["account_type"] == 2 %}
+                                                {% elif row["is_send"] == 2 %}
                                                     <td id="show_info">已发送</td>
                                                 {% endif %}
 
@@ -109,17 +109,25 @@
                                                     <input id="excelFile" type="file" class="file" data-show-preview="True">
 												</div>
                                                 <br>
-                                                <div>
-													<label class="control-label">文章类型</label>
+                                            <div class="input-group">
+													<label class="control-label">账户类型</label>
 {#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
-                                                    <select class="form-control input-small" id="account_type">
-                                                        <option value=1>原创</option>
-                                                        <option value=2>解盘(币莱解盘)</option>
-                                                        <option value=3>视频(币莱播报)</option>
-                                                        <option value=4>音频</option>
-                                                        <option value=5>PDF</option>
-                                                        <option value=6>早报</option>
-                                                        <option value=7>晚报</option>
+                                                    <div class="input-group">
+                                                        <select class="form-control" id="account_type">
+                                                        <option value=0>3级图文原创</option>
+                                                        <option value=1>2级图文原创</option>
+                                                        <option value=2>3级非图文原创</option>
+                                                        <option value=3>2级非图文原创</option>
+                                                        </select>
+                                                    </div>
+												</div>
+                                                <div>
+													<label class="control-label">账户分类</label>
+{#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
+                                                    <select class="form-control input-small" id="category_type">
+                                                        {% for x in category_ls %}
+                                                            <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
+                                                        {% endfor %}
                                                     </select>
 												</div>
 											</form>
@@ -165,7 +173,8 @@
 									},
 									uploadExtraData:function(){
 										var account_type = $("#account_type").val();
-										return {"account_type": account_type};
+										var category_type = $("#category_type").val();
+										return {"account_type": account_type,"category_type":category_type};
 									}
 								});
 							}

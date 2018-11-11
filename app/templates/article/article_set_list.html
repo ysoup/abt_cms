@@ -44,7 +44,7 @@
                                             <th>上传状态</th>
                                             <th>发送时间</th>
                                             <th>创建日期</th>
-                                            <th>操作</th>
+{#                                            <th>操作</th>#}
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -81,11 +81,11 @@
                                                 {% endif %}
                                                 <td>{{ row["send_time"] }}</td>
                                                 <td>{{ row["create_time"] }}</td>
-                                                <td>
-                                                    <button type="button"
-                                                            class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"
-                                                            onclick="modify_monitor_data({{ row['id'] }})"></button>
-                                                </td>
+{#                                                <td>#}
+{#                                                    <button type="button"#}
+{#                                                            class="btn btn-danger glyphicon glyphicon-pencil" title="编辑"#}
+{#                                                            onclick="modify_monitor_data({{ row['id'] }})"></button>#}
+{#                                                </td>#}
                                             </tr>
                                         {% endfor %}
                                         </tbody>

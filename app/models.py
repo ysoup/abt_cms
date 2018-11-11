@@ -512,6 +512,7 @@ class ArticleManage(db.Model):
     article_cover = db.Column(db.String(225), default="")
     article_content = db.Column(db.String(20000), default="")
     article_type = db.Column(db.Integer)
+    category_type = db.Column(db.Integer)
     is_send = db.Column(db.Integer, default=0)
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime,
@@ -525,6 +526,8 @@ class ArticleUploadManage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     account_name = db.Column(db.String(64), default="")
     article_type = db.Column(db.Integer, default=0)
+    category_type = db.Column(db.Integer, default=1)
+    platform_type = db.Column(db.Integer, default=1)
     send_type = db.Column(db.Integer, default=0)
     send_status = db.Column(db.Integer, default=0)
     send_time = db.Column(db.String(32), default="")

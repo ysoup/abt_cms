@@ -2,7 +2,7 @@
 from flask_login import login_required
 from flask import request, render_template, jsonify, make_response,flash, abort, url_for, redirect, session, Flask, g, current_app
 from . import new_flash
-from app.models import AccountManage, ArticleManage, ArticleUploadManage, InformationPlatform, NewInformationCategory
+#from app.models import AccountManage, ArticleManage, ArticleUploadManage, InformationPlatform, NewInformationCategory
 from cms_server import db, redis_store
 import time, copy
 from common import push_service
@@ -301,7 +301,18 @@ def article_list():
         pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=10,
                                                                                              error_out=False)
         data = pagination.items
-        return render_template('article/article_list.html', data=data, pagination=pagination)
+
+        # 账户分类
+        platform_category = NewInformationCategory.query
+        category_ls = []
+        if platform_category:
+            for x in platform_category:
+                dic = {}
+                dic["id"] = x.id
+                dic["category_name"] = x.category_name
+                category_ls.append(dic)
+        return render_template('article/article_list.html', data=data, category_ls=category_ls,
+                               pagination=pagination)
     except Exception as e:
         current_app.logger.error(e)
         return render_template("404.html")
@@ -314,6 +325,7 @@ def article_file_upload():
     try:
         file_dict = request.files["file_data"]
         account_type = request.form["account_type"]
+        category_type = request.form["category_type"]
         filename = secure_filename(file_dict.filename)
         file_dict.save(os.path.join("./", filename))
 
@@ -339,6 +351,7 @@ def article_file_upload():
             article_cover="",
             article_content=article["Content"],
             article_type=account_type,
+            category_type=category_type,
             is_send=0
         )
         db.session.add(info)
@@ -460,6 +473,15 @@ def article_upload_set():
                                                                                                          per_page=10,
                                                                                                          error_out=False)
         data = pagination.items
+
+        # 账户类型
+        types_ls = [
+            {0: "3级图文原创"},
+            {1: "2级图文原创"},
+            {2: "3级非图文原创"},
+            {3: "2级非图文原创"}
+        ]
+
         return render_template('article/article_set_list.html', data=data, pagination=pagination)
     except Exception as e:
         current_app.logger.error(e)
@@ -477,16 +499,47 @@ def add_article_upload_set():
             dic["id"] = x.id
             dic["account_name"] = x.account_name
             account_ls.append(dic)
-        return render_template('article/add_article_upload_set.html', data=account_ls)
+        # 账户类型
+        types_ls = [
+            {0: "3级图文原创"},
+            {1: "2级图文原创"},
+            {2: "3级非图文原创"},
+            {3: "2级非图文原创"}
+        ]
+        # 账户平台
+        platform_rows = InformationPlatform.query
+        platform_ls = []
+        if platform_rows:
+            for x in platform_rows:
+                dic = {}
+                dic["id"] = x.id
+                dic["platform_name"] = x.platform_name
+                platform_ls.append(dic)
+
+        # 账户分类
+        platform_category = NewInformationCategory.query
+        category_ls = []
+        if platform_category:
+            for x in platform_category:
+                dic = {}
+                dic["id"] = x.id
+                dic["category_name"] = x.category_name
+                category_ls.append(dic)
+        return render_template('article/add_article_upload_set.html', platform_ls=platform_ls,
+                               data=account_ls, category_ls=category_ls)
     elif request.method == "POST":
         try:
             account_name = request.form.get("account_name")
             article_type = request.form.get("article_type")
             send_type = request.form.get("send_type")
+            category_type = request.form.get("category_type")
+            platform_name = request.form.get("platform_name")
 
             info = ArticleUploadManage(
                 account_name=account_name,
                 article_type=article_type,
+                category_type=category_type,
+                platform_type=platform_name,
                 send_type=send_type
             )
             db.session.add(info)
