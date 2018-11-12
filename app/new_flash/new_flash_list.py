@@ -44,7 +44,7 @@ imgPath = "/data/imgs"
 @new_flash.route('/redirect_uri', methods=['GET'])
 def redirect_uri():
     try:
-        return jsonify({'success': 'ok'})
+        return render_template('account/redirect_uri.html')
     except Exception as e:
         current_app.logger.error(e)
         return render_template("404.html")
