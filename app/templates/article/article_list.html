@@ -50,20 +50,14 @@
                                             <tr id="tr-{{ row['id'] }}">
                                                 <td>{{ row["id"] }}</td>
                                                 <td>{{ row["article_title"]}}</td>
-                                                {% if row["article_type"] == 1 %}
-                                                    <td id="show_info">原创</td>
+                                                {% if row["article_type"] == 0 %}
+                                                    <td id="show_info">3级图文原创</td>
+                                                {% elif row["article_type"] == 1 %}
+                                                    <td id="show_info">2级图文原创</td>
                                                 {% elif row["article_type"] == 2 %}
-                                                    <td id="show_info">解盘</td>
-                                                {% elif row["article_type"] == 3 %}
-                                                    <td id="show_info">解盘1</td>
-                                                {% elif row["article_type"] == 4%}
-                                                    <td id="show_info">解盘3</td>
-                                                {% elif row["article_type"] == 5%}
-                                                    <td id="show_info">解盘4</td>
-                                                {% elif row["article_type"] == 6%}
-                                                    <td id="show_info">解盘5</td>
-                                                {% elif row["article_type"] == 7%}
-                                                    <td id="show_info">解盘6</td>
+                                                    <td id="show_info">3级非图文原创</td>
+                                                {% elif row["article_type"] == 3%}
+                                                    <td id="show_info">2级非图文原创</td>
                                                 {% endif %}
 
                                                 {% if row["is_send"] == 0 %}
@@ -106,7 +100,7 @@
 												<div>
 													<label class="control-label">请选择要导入的文件：</label>
 {#													<input id="excelFile" name="excelFile" class="file-loading" type="file" multiple accept=".xls,.xlsx">#}
-                                                    <input id="excelFile" type="file" class="file" data-show-preview="True">
+                                                    <input id="excelFile" type="file" class="file" data-show-preview="True" multiple>
 												</div>
                                                 <br>
                                             <div class="input-group">
@@ -159,7 +153,7 @@
 									showUpload:true,//是否显示上传按钮
 									browseClass:"btn btn-primary",//按钮样式
 									allowedFileExtensions: ["xls", "xlsx", "doc"], //接收的文件后缀
-									maxFileCount: 10,//最大上传文件数限制
+									maxFileCount: 1000,//最大上传文件数限制
 									previewFileIcon:'<i class="glyphicon glyphcion-file"></i>',
 									showPreview: true, //是否显示预览
  									allowPreviewTypes:null,//是否显示预览

@@ -2,7 +2,7 @@
 from flask_login import login_required
 from flask import request, render_template, jsonify, make_response,flash, abort, url_for, redirect, session, Flask, g, current_app
 from . import new_flash
-#from app.models import AccountManage, ArticleManage, ArticleUploadManage, InformationPlatform, NewInformationCategory
+from app.models import AccountManage, ArticleManage, ArticleUploadManage, InformationPlatform, NewInformationCategory
 from cms_server import db, redis_store
 import time, copy
 from common import push_service
@@ -38,6 +38,16 @@ p[style-name='Hyperlink']=>a.link
 guidUrl = "https://my.phrplus.com/REST/guid"
 
 imgPath = "/data/imgs"
+
+
+# 获取回调
+@new_flash.route('/redirect_uri', methods=['GET'])
+def redirect_uri():
+    try:
+        return jsonify({'success': 'ok'})
+    except Exception as e:
+        current_app.logger.error(e)
+        return render_template("404.html")
 
 
 # 账户列表页
@@ -352,7 +362,7 @@ def article_file_upload():
             article_content=article["Content"],
             article_type=account_type,
             category_type=category_type,
-            is_send=0
+            is_send=1
         )
         db.session.add(info)
         db.session.commit()
