@@ -21,6 +21,7 @@ import os
 from docx import Document
 import zipfile
 import requests
+import filetype
 
 styleMap = """
 
@@ -334,15 +335,14 @@ def article_list():
 def article_file_upload():
     try:
         file_dict = request.files["file_data"]
-        time.sleep(1)
         account_type = request.form["account_type"]
         category_type = request.form["category_type"]
         filename = secure_filename(file_dict.filename)
         file_dict.save(os.path.join("./", filename))
-
-        imgNameArr = extractImage(filename)
-
+        kind = filetype.guess(filename)
+        print(kind.extension)
         article = parseFile(filename)
+        imgNameArr = extractImage(filename)
 
         fileName = os.path.basename(filename)
 
@@ -374,6 +374,7 @@ def article_file_upload():
 
 
 def extractImage(f):
+    kind = filetype.guess(filename)
     ziped = zipfile.ZipFile(f)
     allFiles = ziped.namelist()
     imgs = filter(lambda x: x.startswith('word/media/'), allFiles)
