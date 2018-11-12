@@ -334,6 +334,7 @@ def article_list():
 def article_file_upload():
     try:
         file_dict = request.files["file_data"]
+        time.sleep(1)
         account_type = request.form["account_type"]
         category_type = request.form["category_type"]
         filename = secure_filename(file_dict.filename)
