@@ -455,7 +455,17 @@ def modify_article_info():
             dic["article_title"] = info.article_title
             dic["article_content"] = info.article_content
             dic["article_type"] = info.article_type
-        return render_template('article/modify_article_manage.html', data=dic)
+            dic["category_type"] = info.category_type
+
+        platform_category = NewInformationCategory.query
+        category_ls = []
+        if platform_category:
+            for x in platform_category:
+                dic = {}
+                dic["id"] = x.id
+                dic["category_name"] = x.category_name
+                category_ls.append(dic)
+        return render_template('article/modify_article_manage.html', data=dic, category_ls=category_ls)
     elif request.method == "POST":
         try:
             id = request.form.get('id')

@@ -3,7 +3,7 @@
 from selenium import webdriver
 
 CLIENT_ID = "0cc1a088bfb71ae1e02176c11a8af98b"
-executable_path = "/home/yangweidong/.pyenv/versions/3.5.2/bin/geckodriver"
+executable_path = "/home/ywd/.pyenv/versions/3.5.2/bin/geckodriver"
 
 
 def get_task():
@@ -37,7 +37,7 @@ def get_task():
 
 if __name__ == '__main__':
     browser = webdriver.Firefox(executable_path=executable_path)
-    url = "https://auth.om.qq.com/omoauth2/authorize?response_type=code&client_id=0cc1a088bfb71ae1e02176c11a8af98b&redirect_uri=http://houdun.net.cn&state=STATE"
+    url = "https://auth.om.qq.com/omoauth2/authorize?response_type=code&client_id=78274d6bfded051a82975cb4f4a36b58&redirect_uri=https://www.aibilink.com/&state=STATE"
     browser.get(url)
     browser.find_element_by_css_selector("[class='account-input']").send_keys("tfzij856@yeah.net")
     browser.find_element_by_css_selector("[class='password-input']").send_keys("sb123456")
