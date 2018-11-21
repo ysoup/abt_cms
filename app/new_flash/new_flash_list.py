@@ -309,7 +309,7 @@ def account_count_list():
 def article_list():
     try:
         page = request.args.get('page', 1, type=int)
-        pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=10,
+        pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
                                                                                              error_out=False)
         data = pagination.items
 
@@ -322,6 +322,7 @@ def article_list():
                 dic["id"] = x.id
                 dic["category_name"] = x.category_name
                 category_ls.append(dic)
+
         return render_template('article/article_list.html', data=data, category_ls=category_ls,
                                pagination=pagination)
     except Exception as e:
@@ -461,10 +462,10 @@ def modify_article_info():
         category_ls = []
         if platform_category:
             for x in platform_category:
-                dic = {}
-                dic["id"] = x.id
-                dic["category_name"] = x.category_name
-                category_ls.append(dic)
+                dics = {}
+                dics["id"] = x.id
+                dics["category_name"] = x.category_name
+                category_ls.append(dics)
         return render_template('article/modify_article_manage.html', data=dic, category_ls=category_ls)
     elif request.method == "POST":
         try:
@@ -602,3 +603,45 @@ def modify_article_upload_set():
         except Exception as e:
             current_app.logger.error(e)
             return jsonify({'failed': '修改失败'})
+
+
+# 编辑文章信息
+@new_flash.route("/set_category", methods=['POST'])
+def set_category():
+    try:
+        info_id_list = request.form.get('info_id_list')
+        article_title = request.form.get('article_title')
+        article_content = request.form.get('article_content')
+        article_type = request.form.get('article_type')
+        info = ArticleManage.query.filter_by(id=id).first()
+        if info:
+            info.article_title = article_title
+            info.article_content = article_content
+            info.article_type = article_type
+            db.session.add(info)
+            db.session.commit()
+        return jsonify({"success": "ok"})
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify({'failed': '修改失败'})
+
+
+# 编辑文章信息
+@new_flash.route("/set_type", methods=['POST'])
+def set_type():
+    try:
+        info_id_list = request.form.get('info_id_list')
+        article_title = request.form.get('article_title')
+        article_content = request.form.get('article_content')
+        article_type = request.form.get('article_type')
+        info = ArticleManage.query.filter_by(id=id).first()
+        if info:
+            info.article_title = article_title
+            info.article_content = article_content
+            info.article_type = article_type
+            db.session.add(info)
+            db.session.commit()
+        return jsonify({"success": "ok"})
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify({'failed': '修改失败'})

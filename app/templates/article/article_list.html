@@ -19,17 +19,29 @@
                         </ul>
                         <!-- Single button -->
                         <div class="row" style="padding-top: 10px">
+
                             <div class="col-md-8">
 
                                 <button type="button" class="btn blue btn-circle" onclick='add_monitor_info()'
                                         style="margin-left: 10px">新增文章信息
                                 </button>
                             </div>
-                            <div class="col-md-4">
-                                <button class="btn blue btn-circle pull-right" data-toggle="modal" data-target="#myModal">
-								文章导入
-							</button>
+                            <div class="col-md-2">
+
+                                <button type="button" class="btn blue btn-circle" onclick='set_category()'
+                                        style="margin-left: 10px">批量设置分类
+                                </button>
                             </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn blue btn-circle" onclick='set_type()'
+                                        style="margin-left: 10px">批量设置类型
+                                </button>
+                            </div>
+{#                            <div class="col-md-4">#}
+{#                                <button class="btn blue btn-circle pull-right" data-toggle="modal" data-target="#myModal">#}
+{#								文章导入#}
+{#							</button>#}
+{#                            </div>#}
                         </div>
                         <div class="row">
                             <div class="portlet-body col-lg-12">
@@ -37,8 +49,14 @@
                                     <table class="table table-hover">
                                         <thead>
                                         <tr>
+                                            <th>
+                                                <button onclick="invent()" type="button"
+                                                        class="btn btn-circle red btn-sm">全选
+                                                </button>
+                                            </th>
                                             <th>ID</th>
                                             <th>文章标题</th>
+                                            <th>文章分类</th>
                                             <th>文章类型</th>
                                             <th>文章状态</th>
                                             <th>创建日期</th>
@@ -48,8 +66,18 @@
                                         <tbody>
                                         {% for row in data %}
                                             <tr id="tr-{{ row['id'] }}">
+                                                <td><label>
+                                                    <input type="checkbox" name="choice_checkbox" value="{{ row.id }}">
+                                                </label></td>
                                                 <td>{{ row["id"] }}</td>
                                                 <td>{{ row["article_title"]}}</td>
+                                                {% for x in category_ls %}
+                                                    {% if x["id"] == row["category_type"] %}
+                                                        <td id="show_info">{{ x["category_name"] }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
+
+
                                                 {% if row["article_type"] == 0 %}
                                                     <td id="show_info">3级图文原创</td>
                                                 {% elif row["article_type"] == 1 %}
@@ -142,6 +170,88 @@
         </div>
     </div>
     <script type="text/JavaScript">
+        function invent() {
+                $("input[name='choice_checkbox']").each(function () {
+                    if ($(this).prop("checked")) {
+                        $(this).attr("checked", false);
+                    }
+                    else {
+                        $(this).prop("checked", true);
+                    }
+                })
+            }
+
+
+        // 批量删除
+        function set_category() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一篇文章，再进行该操作");
+                return false
+            }
+            alert(info_id_list);
+            layer.confirm('是否批量设置分类？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.set_category')}}',
+                    type: 'post',
+                    data: JSON.stringify(info_id_list),
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layser.msg("批量删除成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                        }
+                        else {
+                            layer.msg("批量删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
+        // 批量删除
+        function set_type() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一条资讯，再进行该操作");
+                return false
+            }
+            layer.confirm('是否批量删除？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.set_type')}}',
+                    type: 'post',
+                    data: JSON.stringify(info_id_list),
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layser.msg("批量删除成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                        }
+                        else {
+                            layer.msg("批量删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
+
         {##initUpload("excelFile","excelC.zcUserC.excelInput.do");#}
 							function initUpload(ctrlName,uploadUrl){
 								var control = $("#"+ctrlName);
