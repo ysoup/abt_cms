@@ -423,18 +423,29 @@ def convert_image(image):
 @new_flash.route('/add_article_info', methods=['GET', "POST"])
 def add_article_info():
     if request.method == "GET":
-        return render_template('article/add_article_info.html')
+        # 账户分类
+        platform_category = NewInformationCategory.query
+        category_ls = []
+        if platform_category:
+            for x in platform_category:
+                dic = {}
+                dic["id"] = x.id
+                dic["category_name"] = x.category_name
+                category_ls.append(dic)
+        return render_template('article/add_article_info.html', category_ls=category_ls)
     elif request.method == "POST":
         try:
             article_content = request.form.get("article_content")
             article_title = request.form.get("article_title")
             article_type = request.form.get("article_type")
+            category_type = request.form.get("category_type")
 
             info = ArticleManage(
                 article_content=article_content,
                 article_title=article_title,
                 article_type=article_type,
-                is_send=0
+                is_send=0,
+                category_type=category_type
             )
             db.session.add(info)
             db.session.commit()
@@ -472,12 +483,14 @@ def modify_article_info():
             id = request.form.get('id')
             article_title = request.form.get('article_title')
             article_content = request.form.get('article_content')
+            category_type = request.form.get('category_type')
             article_type = request.form.get('article_type')
             info = ArticleManage.query.filter_by(id=id).first()
             if info:
                 info.article_title = article_title
                 info.article_content = article_content
                 info.article_type = article_type
+                info.category_type = category_type
                 db.session.add(info)
                 db.session.commit()
             return jsonify({"success": "ok"})
@@ -609,17 +622,13 @@ def modify_article_upload_set():
 @new_flash.route("/set_category", methods=['POST'])
 def set_category():
     try:
+        category_type = request.form.get('category_type')
         info_id_list = request.form.get('info_id_list')
-        article_title = request.form.get('article_title')
-        article_content = request.form.get('article_content')
-        article_type = request.form.get('article_type')
-        info = ArticleManage.query.filter_by(id=id).first()
-        if info:
-            info.article_title = article_title
-            info.article_content = article_content
-            info.article_type = article_type
-            db.session.add(info)
-            db.session.commit()
+        id_list = info_id_list.split(",")
+        for x in id_list:
+            info = ArticleManage.query.filter_by(id=int(x)).first()
+            info.category_type = category_type
+        db.session.commit()
         return jsonify({"success": "ok"})
     except Exception as e:
         current_app.logger.error(e)

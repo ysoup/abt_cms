@@ -53,11 +53,25 @@
                                             </script>
                                         </div>
                                     </div>
-                                
+                                <div class="form-group">
+                                        <label class="col-md-1 control-label">文章类型</label>
+                                        <div class="col-md-10">
+                                            <select class="form-control input-small" id="article_type">
+                                                <option value=0 {% if data["article_type"] == 0 %}
+                                                        selected {% endif %}>3级图文原创</option>
+                                                <option value=1 {% if data["article_type"] == 1 %}
+                                                        selected {% endif %}>2级图文原创</option>
+                                                <option value=2 {% if data["article_type"] == 2 %}
+                                                        selected {% endif %}>3级非图文原创</option>
+                                                <option value=3 {% if data["article_type"] == 3 %}
+                                                        selected {% endif %}>2级非图文原创</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label class="col-md-1 control-label">文章分类</label>
                                         <div class="col-md-10">
-                                            <select class="form-control input-small" id="article_type">
+                                            <select class="form-control input-small" id="category_type">
                                                 {% for row in category_ls %}
                                                     <option value=1 {% if data["category_type"] == row["id"] %}
                                                         selected {% endif %}>{{ row["category_name"] }}</option>
@@ -65,22 +79,6 @@
                                             </select>
                                         </div>
                                     </div>
-
-                                    {#                                        <div class="form-group">#}
-                                    {#                                                <label class="col-md-1 control-label">推送</label>#}
-                                    {#                                                <div class="col-md-10">#}
-                                    {#                                                    <div class="mt-checkbox-list">#}
-                                    {#                                                    <label class="radio mt-checkbox-outline" for="debugInfo">#}
-                                    {#                                                        {% if data[0]["is_push"] == 0 %}#}
-                                    {#                                                            <input id="is_push" type="radio" name="push" value="{{ data[0]["is_show"] }}" class="input-small"/>#}
-                                    {#                                                        {% else %}#}
-                                    {#                                                            <input id="is_push" type="radio" name="push" value="{{ data[0]["is_show"] }}" class="input-small" checked />#}
-                                    {#                                                        {% endif %}#}
-                                    {#                                                        <span></span>#}
-                                    {#                                                    </label>#}
-                                    {#                                                    </div>#}
-                                    {#                                                </div>#}
-                                    {#                                            </div>#}
                                 </div>
                                 <div class="form-actions">
                                     <div class="row">
@@ -152,6 +150,7 @@
             formData.append('id', {{data["id"]}});
             formData.append('article_content', editor1.getData());
             formData.append('article_type', $("#article_type").val());
+            formData.append('category_type', $("#category_type").val());
 
             layer.confirm('是否修改？', {
                 btn: ['确认', '取消']
