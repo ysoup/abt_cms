@@ -21,7 +21,7 @@
                         <div class="row" style="padding-top: 10px">
                             <div class="col-md-8">
 
-                                <button type="button" class="btn blue btn-circle" onclick='add_monitor_info()'
+                                <button type="button" class="btn blue btn-circle"
                                         style="margin-left: 10px">新增文章上传设置
                                 </button>
                             </div>
@@ -38,11 +38,13 @@
                                         <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>账户名称</th>
+{#                                            <th>账户名称</th>#}
                                             <th>文章类型</th>
+                                            <th>文章分类</th>
+                                            <th>上传平台</th>
                                             <th>上传类型</th>
                                             <th>上传状态</th>
-                                            <th>发送时间</th>
+{#                                            <th>发送时间</th>#}
                                             <th>创建日期</th>
 {#                                            <th>操作</th>#}
                                         </tr>
@@ -51,22 +53,27 @@
                                         {% for row in data %}
                                             <tr id="tr-{{ row['id'] }}">
                                                 <td>{{ row["id"] }}</td>
-                                                <td>{{ row["account_name"]}}</td>
-                                                {% if row["article_type"] == 1 %}
-                                                    <td id="show_info">原创</td>
+{#                                                <td>{{ row["account_name"]}}</td>#}
+                                                {% if row["article_type"] == 0 %}
+                                                    <td id="show_info">3级图文原创</td>
+                                                {% elif row["article_type"] == 1 %}
+                                                    <td id="show_info">2级图文原创</td>
                                                 {% elif row["article_type"] == 2 %}
-                                                    <td id="show_info">解盘</td>
-                                                {% elif row["article_type"] == 3 %}
-                                                    <td id="show_info">解盘1</td>
-                                                {% elif row["article_type"] == 4%}
-                                                    <td id="show_info">解盘3</td>
-                                                {% elif row["article_type"] == 5%}
-                                                    <td id="show_info">解盘4</td>
-                                                {% elif row["article_type"] == 6%}
-                                                    <td id="show_info">解盘5</td>
-                                                {% elif row["article_type"] == 7%}
-                                                    <td id="show_info">解盘6</td>
+                                                    <td id="show_info">3级非图文原创</td>
+                                                {% elif row["article_type"] == 3%}
+                                                    <td id="show_info">2级非图文原创</td>
                                                 {% endif %}
+
+                                                {% for x in category_ls %}
+                                                    {% if x["id"] == row["category_type"] %}
+                                                        <td id="show_info">{{ x["category_name"] }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% for x in platform_ls %}
+                                                    {% if x["id"] == row["platform_type"] %}
+                                                        <td id="show_info">{{ x["platform_name"] }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
 
                                                 {% if row["send_type"] == 0 %}
                                                     <td id="show_info">手动</td>
@@ -79,7 +86,7 @@
                                                 {% elif row["send_status"] == 1 %}
                                                     <td id="show_info">已发送</td>
                                                 {% endif %}
-                                                <td>{{ row["send_time"] }}</td>
+{#                                                <td>{{ row["send_time"] }}</td>#}
                                                 <td>{{ row["create_time"] }}</td>
 {#                                                <td>#}
 {#                                                    <button type="button"#}

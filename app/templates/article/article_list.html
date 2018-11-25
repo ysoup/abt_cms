@@ -32,17 +32,32 @@
                                         style="margin-left: 10px" data-toggle="modal" data-target="#myModal">批量设置分类
                                 </button>
                             </div>
-{#                            <div class="col-md-2">#}
-{#                                <button type="button" class="btn blue btn-circle" onclick='set_type()'#}
-{#                                        style="margin-left: 10px">批量设置类型#}
-{#                                </button>#}
-{#                            </div>#}
-{#                            <div class="col-md-4">#}
-{#                                <button class="btn blue btn-circle pull-right" data-toggle="modal" data-target="#myModal">#}
-{#								文章导入#}
-{#							</button>#}
-{#                            </div>#}
+                             <div class="col-md-2">
+
+                                <button type="button" class="btn blue btn-circle"
+                                        style="margin-left: 10px" data-toggle="modal" data-target="#upload_article">批量上传文章
+                                </button>
+                            </div>
+
                         </div>
+
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-md-4">
+                             <div class="col-md-4">
+                                <select class="form-control input-small" id="category_type">
+                                            {% for x in category_ls %}
+                                                <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
+                                            {% endfor %}
+                                </select>
+                             </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn blue btn-circle"
+                                            style="margin-left: 10px" onclick="search()">搜索
+                                </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="portlet-body col-lg-12">
                                 <div class="table-scrollable">
@@ -139,6 +154,67 @@
                         </div>
                     </div>
                 </div>
+
+
+                <div class="modal fade" id="upload_article" tabindex="-1" role="basic" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                <h4 class="modal-title">文章批量上传平台</h4>
+                            </div>
+
+                            <form class="form-horizontal" role="form" name="test">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">账户类型</label>
+                                        <div class="col-md-4">
+                                            <select class="form-control input-small" id="account_type">
+                                                <option value=0>3级图文原创</option>
+                                                <option value=1>2级图文原创</option>
+                                                <option value=2>3级非图文原创</option>
+                                                <option value=3>2级非图文原创</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-2">分类</label>
+                                        <div class="col-md-4">
+                                            <select class="form-control input-small" id="category_type">
+                                                {% for x in category_ls %}
+                                                    <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                            <label class="control-label col-md-2">发送平台</label>
+                                            <div class="col-md-4">
+                                                <select class="form-control input-small" id="platform_type">
+                                                {% for x in platform_ls %}
+                                                    <option value={{ x["id"] }}>{{ x["platform_name"] }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            </div>
+                                    </div>
+{#                                    <div class="form-group">#}
+{#                                        <label class="control-label col-md-2">发送类型</label>#}
+{#                                        <div class="col-md-4">#}
+{#                                            <select class="form-control" id="send_type">#}
+{#                                                <option value=0>手动发送</option>#}
+{#                                                <option value=1>定时发送</option>#}
+{#                                            </select>#}
+{#                                        </div>#}
+{#                                    </div>#}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">关闭</button>
+                                    <button type="button" class="btn green" onclick="all_article_upload()">保存</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
     </div>
     <script type="text/JavaScript">
@@ -196,6 +272,53 @@
                 return false
             });
         }
+
+
+        // 批量删除
+        function all_article_upload() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一篇文章，再进行该操作");
+                return false
+            }
+            var formData = new FormData();
+            formData.append('category_type', $("#category_type").val());
+            formData.append('account_type', $("#account_type").val());
+            formData.append('platform_type', $("#platform_type").val());
+            formData.append('info_id_list', info_id_list);
+            {#formData.append('id', {{data["id"]}});#}
+            layer.confirm('是否批量文章上传平台？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.all_article_upload')}}',
+                    type: 'post',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("批量上传文章平台设置成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                            $("input[name='choice_checkbox']:checked").each(function () {
+                                $(this).attr("checked", false);
+                            });
+                        }
+                        else {
+                            layer.msg("批量上传文章平台设置失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        }
+
 
         // 批量删除
         function set_type() {
@@ -315,6 +438,13 @@
         function modify_monitor_data(id) {
             window.location.href = "/modify_article_info?id=" + id;
         }
+
+        function search() {
+            var category_type = $("#category_type").val();
+            window.location.href = "/article_list?category_type="+ category_type;
+
+        }
+            {#window.location.href = "/add_article_info"#}
 
     </script>
 {% endblock %}

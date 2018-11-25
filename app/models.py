@@ -525,6 +525,7 @@ class ArticleUploadManage(db.Model):
     __tablename__ = "article_upload_manage"
     id = db.Column(db.Integer, primary_key=True)
     account_name = db.Column(db.String(64), default="")
+    send_ids = db.Column(db.String(10240), default="")
     article_type = db.Column(db.Integer, default=0)
     category_type = db.Column(db.Integer, default=1)
     platform_type = db.Column(db.Integer, default=1)

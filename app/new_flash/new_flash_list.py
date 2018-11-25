@@ -309,10 +309,14 @@ def account_count_list():
 def article_list():
     try:
         page = request.args.get('page', 1, type=int)
-        pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
-                                                                                             error_out=False)
+        if request.args.__contains__("category_type"):
+            category_type = request.args.get("category_type", type=int)
+            pagination = ArticleManage.query.filter_by(category_type=category_type).order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
+                                                                                                 error_out=False)
+        else:
+            pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
+                                                                                                 error_out=False)
         data = pagination.items
-
         # 账户分类
         platform_category = NewInformationCategory.query
         category_ls = []
@@ -323,7 +327,17 @@ def article_list():
                 dic["category_name"] = x.category_name
                 category_ls.append(dic)
 
-        return render_template('article/article_list.html', data=data, category_ls=category_ls,
+        # 账户平台
+        platform_rows = InformationPlatform.query
+        platform_ls = []
+        if platform_rows:
+            for x in platform_rows:
+                dict = {}
+                dict["id"] = x.id
+                dict["platform_name"] = x.platform_name
+                platform_ls.append(dict)
+
+        return render_template('article/article_list.html', data=data, category_ls=category_ls, platform_ls=platform_ls,
                                pagination=pagination)
     except Exception as e:
         current_app.logger.error(e)
@@ -518,7 +532,28 @@ def article_upload_set():
             {3: "2级非图文原创"}
         ]
 
-        return render_template('article/article_set_list.html', data=data, pagination=pagination)
+        category_ls = []
+        platform_category = NewInformationCategory.query
+        if platform_category:
+            for x in platform_category:
+                dics = {}
+                dics["id"] = x.id
+                dics["category_name"] = x.category_name
+                category_ls.append(dics)
+
+        # 账户平台
+        platform_rows = InformationPlatform.query
+        platform_ls = []
+        if platform_rows:
+            for x in platform_rows:
+                dict = {}
+                dict["id"] = x.id
+                dict["platform_name"] = x.platform_name
+                platform_ls.append(dict)
+
+        return render_template('article/article_set_list.html', data=data, category_ls=category_ls,
+                               platform_ls=platform_ls,
+                               pagination=pagination)
     except Exception as e:
         current_app.logger.error(e)
         return render_template("404.html")
@@ -598,18 +633,30 @@ def modify_article_upload_set():
             dic["article_title"] = info.article_title
             dic["article_content"] = info.article_content
             dic["article_type"] = info.article_type
-        return render_template('article/modify_article_upload_set.html', data=dic)
+
+        # 账户分类
+        platform_category = NewInformationCategory.query
+        category_ls = []
+        if platform_category:
+            for x in platform_category:
+                dics = {}
+                dics["id"] = x.id
+                dics["category_name"] = x.category_name
+                category_ls.append(dics)
+        return render_template('article/modify_article_upload_set.html', data=dic, category_ls=category_ls)
     elif request.method == "POST":
         try:
             id = request.form.get('id')
             article_title = request.form.get('article_title')
             article_content = request.form.get('article_content')
             article_type = request.form.get('article_type')
+            category_type = request.form.get('category_type')
             info = ArticleManage.query.filter_by(id=id).first()
             if info:
                 info.article_title = article_title
                 info.article_content = article_content
                 info.article_type = article_type
+                info.category_type = category_type
                 db.session.add(info)
                 db.session.commit()
             return jsonify({"success": "ok"})
@@ -650,6 +697,29 @@ def set_type():
             info.article_type = article_type
             db.session.add(info)
             db.session.commit()
+        return jsonify({"success": "ok"})
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify({'failed': '修改失败'})
+
+
+# 编辑文章信息
+@new_flash.route("/all_article_upload", methods=['POST'])
+def all_article_upload():
+    try:
+        info_id_list = request.form.get('info_id_list')
+        platform_type = request.form.get('platform_type')
+        account_type = request.form.get('account_type')
+        category_type = request.form.get('category_type')
+        info = ArticleUploadManage(
+            send_ids=info_id_list,
+            article_type=account_type,
+            category_type=category_type,
+            platform_type=platform_type,
+            send_type=0
+        )
+        db.session.add(info)
+        db.session.commit()
         return jsonify({"success": "ok"})
     except Exception as e:
         current_app.logger.error(e)
