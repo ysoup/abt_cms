@@ -1,0 +1,273 @@
+{% extends "/index.html" %}
+{% import 'macro_pagination.html' as macro_pagination %}
+{% block content %}
+    <div class="page-content-wrapper">
+        <!-- BEGIN CONTENT BODY -->
+        <div class="page-content">
+            <div class="row profile">
+                <div class="col-md-12">
+                    <div class="tabbable tabbable-custom tabbable-full-width">
+                        <ul class="nav nav-tabs">
+							<li class="active">
+								<a href="#tab_1_1" data-toggle="tab">
+								发送成功 </a>
+							</li>
+							<li>
+								<a href="#tab_1_3" data-toggle="tab">
+								发送失败 </a>
+							</li>
+						</ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1_1">
+								<div class="row">
+                                    <div class="portlet-body col-lg-12">
+                                        <div class="table-scrollable">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>账户</th>
+                                                    <th>文章标题</th>
+                                                    <th>文章分类</th>
+                                                    <th>文章类型</th>
+                                                    <th>发送状态</th>
+                                                    <th>返回描述</th>
+                                                    <th>创建日期</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for row in success_ls %}
+                                                    <tr id="tr-{{ row['id'] }}">
+                                                        <td>{{ row["id"] }}</td>
+                                                        <td>{{ row["account_name"] }}</td>
+                                                        <td>{{ row["article_title"]}}</td>
+                                                        {% for x in category_ls %}
+                                                            {% if x["id"] == row["article_category"] %}
+                                                                <td id="show_info">{{ x["category_name"] }}</td>
+                                                            {% endif %}
+                                                        {% endfor %}
+
+
+                                                        {% if row["article_type"] == 0 %}
+                                                            <td id="show_info">3级图文原创</td>
+                                                        {% elif row["article_type"] == 1 %}
+                                                            <td id="show_info">2级图文原创</td>
+                                                        {% elif row["article_type"] == 2 %}
+                                                            <td id="show_info">3级非图文原创</td>
+                                                        {% elif row["article_type"] == 3%}
+                                                            <td id="show_info">2级非图文原创</td>
+                                                        {% endif %}
+
+
+                                                        {% if row["send_status"] == 0 %}
+                                                            <td id="show_info">发送失败</td>
+                                                        {% elif row["send_status"] == 1 %}
+                                                            <td id="show_info">发送成功</td>
+                                                        {% endif %}
+
+                                                        <td>{{ row["desc"] }}</td>
+                                                        <td>{{ row["create_time"] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab_1_3">
+                                <div class="row">
+                                    <div class="portlet-body col-lg-12">
+                                        <div class="table-scrollable">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>账户</th>
+                                                    <th>文章标题</th>
+                                                    <th>文章分类</th>
+                                                    <th>文章类型</th>
+                                                    <th>发送状态</th>
+                                                    <th>返回描述</th>
+                                                    <th>创建日期</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for row in failed_ls %}
+                                                    <tr id="tr-{{ row['id'] }}">
+                                                        <td>{{ row["id"] }}</td>
+                                                        <td>{{ row["account_name"] }}</td>
+                                                        <td>{{ row["article_title"]}}</td>
+                                                        {% for x in category_ls %}
+                                                            {% if x["id"] == row["article_category"] %}
+                                                                <td id="show_info">{{ x["category_name"] }}</td>
+                                                            {% endif %}
+                                                        {% endfor %}
+
+
+                                                        {% if row["article_type"] == 0 %}
+                                                            <td id="show_info">3级图文原创</td>
+                                                        {% elif row["article_type"] == 1 %}
+                                                            <td id="show_info">2级图文原创</td>
+                                                        {% elif row["article_type"] == 2 %}
+                                                            <td id="show_info">3级非图文原创</td>
+                                                        {% elif row["article_type"] == 3%}
+                                                            <td id="show_info">2级非图文原创</td>
+                                                        {% endif %}
+
+
+                                                        {% if row["send_status"] == 0 %}
+                                                            <td id="show_info">发送失败</td>
+                                                        {% elif row["send_status"] == 1 %}
+                                                            <td id="show_info">发送成功</td>
+                                                        {% endif %}
+
+                                                        <td>{{ row["desc"] }}</td>
+                                                        <td>{{ row["create_time"] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <input id="hidden_val" type="hidden" value="">
+
+{#                    {% if pagination %}#}
+{#                        {{ macro_pagination.pagination_widget(pagination,'new_flash.upload_details_list') }}#}
+{#                    {% endif %}#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/JavaScript">
+        // 批量删除
+        function all_article_uploads() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一篇文章，再进行该操作");
+                return false
+            }
+            var formData = new FormData();
+            formData.append('category_type', $("#category_type").val());
+            formData.append('account_type', $("#account_type").val());
+            formData.append('platform_type', $("#platform_type").val());
+            formData.append('account_name', $("#account_name").val());
+            formData.append('info_id_list', info_id_list);
+            {#formData.append('id', {{data["id"]}});#}
+            layer.confirm('是否批量文章上传平台？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.all_article_upload')}}',
+                    type: 'post',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("批量上传文章平台设置成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                            $("input[name='choice_checkbox']:checked").each(function () {
+                                $(this).attr("checked", false);
+                            });
+                        }
+                        else {
+                            layer.msg("批量上传文章平台设置失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        };
+        {#$(function() {#}
+        {#    $(".selectpicker").selectpicker({#}
+        {#        noneSelectedText : '请选择'//默认显示内容#}
+        {#    });#}
+        {#{;#}
+
+        function invent() {
+                $("input[name='choice_checkbox']").each(function () {
+                    if ($(this).prop("checked")) {
+                        $(this).attr("checked", false);
+                    }
+                    else {
+                        $(this).prop("checked", true);
+                    }
+                })
+        };
+
+
+        // 批量删除
+        function set_category() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一篇文章，再进行该操作");
+                return false
+            }
+            var formData = new FormData();
+            formData.append('category_type', $("#category_type").val());
+            formData.append('info_id_list', info_id_list);
+            {#formData.append('id', {{data["id"]}});#}
+            layer.confirm('是否批量设置分类？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.set_category')}}',
+                    type: 'post',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("批量设置成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                            $("input[name='choice_checkbox']:checked").each(function () {
+                                $(this).attr("checked", false);
+                            });
+                        }
+                        else {
+                            layer.msg("批量删除失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        };
+
+
+
+
+        function add_monitor_info() {
+            window.location.href = "/add_article_info"
+        }
+
+        function modify_monitor_data(id) {
+            window.location.href = "/modify_article_info?id=" + id;
+        }
+
+        function search() {
+            var category_type = $("#category_type").val();
+            window.location.href = "/article_list?category_type="+ category_type;
+
+        }
+            {#window.location.href = "/add_article_info"#}
+
+    </script>
+{% endblock %}
+

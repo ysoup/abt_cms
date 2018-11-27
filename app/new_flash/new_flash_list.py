@@ -337,8 +337,17 @@ def article_list():
                 dict["platform_name"] = x.platform_name
                 platform_ls.append(dict)
 
+        # 账户列表
+        account_rows = AccountManage.query
+        acclout_ls = []
+        if account_rows:
+            for x in account_rows:
+                dict = {}
+                dict["id"] = x.id
+                dict["account_name"] = x.account_name
+                acclout_ls.append(dict)
         return render_template('article/article_list.html', data=data, category_ls=category_ls, platform_ls=platform_ls,
-                               pagination=pagination)
+                               acclout_ls=acclout_ls, pagination=pagination)
     except Exception as e:
         current_app.logger.error(e)
         return render_template("404.html")
@@ -505,6 +514,8 @@ def modify_article_info():
                 info.article_content = article_content
                 info.article_type = article_type
                 info.category_type = category_type
+                info.is_send = 1
+                info.control_status = 1
                 db.session.add(info)
                 db.session.commit()
             return jsonify({"success": "ok"})
@@ -710,12 +721,14 @@ def all_article_upload():
         info_id_list = request.form.get('info_id_list')
         platform_type = request.form.get('platform_type')
         account_type = request.form.get('account_type')
+        account_name = request.form.get('account_name')
         category_type = request.form.get('category_type')
         info = ArticleUploadManage(
             send_ids=info_id_list,
             article_type=account_type,
             category_type=category_type,
             platform_type=platform_type,
+            account_name=account_name,
             send_type=0
         )
         db.session.add(info)
@@ -724,3 +737,6 @@ def all_article_upload():
     except Exception as e:
         current_app.logger.error(e)
         return jsonify({'failed': '修改失败'})
+
+
+

@@ -73,7 +73,8 @@
                                             <th>文章标题</th>
                                             <th>文章分类</th>
                                             <th>文章类型</th>
-                                            <th>文章状态</th>
+{#                                            <th>文章状态</th>#}
+                                            <th>操作状态</th>
                                             <th>创建日期</th>
                                             <th>操作</th>
                                         </tr>
@@ -103,12 +104,19 @@
                                                     <td id="show_info">2级非图文原创</td>
                                                 {% endif %}
 
-                                                {% if row["is_send"] == 0 %}
-                                                    <td id="show_info">不可发送</td>
-                                                {% elif row["is_send"] == 1 %}
-                                                    <td id="show_info">可发送</td>
-                                                {% elif row["is_send"] == 2 %}
-                                                    <td id="show_info">已发送</td>
+{#                                                {% if row["is_send"] == 0 %}#}
+{#                                                    <td id="show_info">未发布</td>#}
+{#                                                {% elif row["is_send"] == 1 %}#}
+{#                                                    <td id="show_info">可发布</td>#}
+{#                                                {% elif row["is_send"] == 2 %}#}
+{#                                                    <td id="show_info">已发布</td>#}
+{#                                                {% endif %}#}
+
+
+                                                {% if row["control_status"] == 0 %}
+                                                    <td id="show_info">未修改</td>
+                                                {% elif row["control_status"] == 1 %}
+                                                    <td id="show_info">已修改</td>
                                                 {% endif %}
 
                                                 <td>{{ row["create_time"] }}</td>
@@ -167,6 +175,16 @@
                             <form class="form-horizontal" role="form" name="test">
                                 <div class="modal-body">
                                     <div class="form-group">
+                                        <label class="control-label col-md-2">账户选择</label>
+                                        <div class="col-md-4">
+                                            <select placeholder="请选择" class="selectpicker" id="account_name"  multiple="multiple" data-live-search="true">
+                                                {% for x in acclout_ls %}
+                                                    <option value={{ x["id"] }}>{{ x["account_name"] }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="control-label col-md-2">账户类型</label>
                                         <div class="col-md-4">
                                             <select class="form-control input-small" id="account_type">
@@ -209,7 +227,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">关闭</button>
-                                    <button type="button" class="btn green" onclick="all_article_upload()">保存</button>
+                                    <button type="button" class="btn green" onclick="all_article_uploads()">保存</button>
                                 </div>
                             </form>
                         </div>
@@ -218,6 +236,57 @@
             </div>
     </div>
     <script type="text/JavaScript">
+        // 批量删除
+        function all_article_uploads() {
+            var info_id_list = [];
+            $("input[name='choice_checkbox']:checked").each(function () {
+                info_id_list.push($(this).val());
+            });
+            if (info_id_list == "") {
+                layer.msg("请最少选择一篇文章，再进行该操作");
+                return false
+            }
+            var formData = new FormData();
+            formData.append('category_type', $("#category_type").val());
+            formData.append('account_type', $("#account_type").val());
+            formData.append('platform_type', $("#platform_type").val());
+            formData.append('account_name', $("#account_name").val());
+            formData.append('info_id_list', info_id_list);
+            {#formData.append('id', {{data["id"]}});#}
+            layer.confirm('是否批量文章上传平台？', {
+                btn: ['是', '否']
+            }, function () {
+                $.ajax({
+                    url: '{{ url_for('new_flash.all_article_upload')}}',
+                    type: 'post',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (data) {
+                        if (data.success == 'ok') {
+                            layer.msg("批量上传文章平台设置成功！", {time: 2000, icon: 1});
+                            window.location.reload();
+                            $("input[name='choice_checkbox']:checked").each(function () {
+                                $(this).attr("checked", false);
+                            });
+                        }
+                        else {
+                            layer.msg("批量上传文章平台设置失败！", {time: 2000, icon: 5});
+                            return false
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg("已取消", {time: 2000, icon: 2});
+                return false
+            });
+        };
+        {#$(function() {#}
+        {#    $(".selectpicker").selectpicker({#}
+        {#        noneSelectedText : '请选择'//默认显示内容#}
+        {#    });#}
+        {#{;#}
+
         function invent() {
                 $("input[name='choice_checkbox']").each(function () {
                     if ($(this).prop("checked")) {
@@ -227,7 +296,7 @@
                         $(this).prop("checked", true);
                     }
                 })
-            }
+        };
 
 
         // 批量删除
@@ -271,165 +340,10 @@
                 layer.msg("已取消", {time: 2000, icon: 2});
                 return false
             });
-        }
+        };
 
 
-        // 批量删除
-        function all_article_upload() {
-            var info_id_list = [];
-            $("input[name='choice_checkbox']:checked").each(function () {
-                info_id_list.push($(this).val());
-            });
-            if (info_id_list == "") {
-                layer.msg("请最少选择一篇文章，再进行该操作");
-                return false
-            }
-            var formData = new FormData();
-            formData.append('category_type', $("#category_type").val());
-            formData.append('account_type', $("#account_type").val());
-            formData.append('platform_type', $("#platform_type").val());
-            formData.append('info_id_list', info_id_list);
-            {#formData.append('id', {{data["id"]}});#}
-            layer.confirm('是否批量文章上传平台？', {
-                btn: ['是', '否']
-            }, function () {
-                $.ajax({
-                    url: '{{ url_for('new_flash.all_article_upload')}}',
-                    type: 'post',
-                    processData: false,
-                    contentType: false,
-                    data: formData,
-                    success: function (data) {
-                        if (data.success == 'ok') {
-                            layer.msg("批量上传文章平台设置成功！", {time: 2000, icon: 1});
-                            window.location.reload();
-                            $("input[name='choice_checkbox']:checked").each(function () {
-                                $(this).attr("checked", false);
-                            });
-                        }
-                        else {
-                            layer.msg("批量上传文章平台设置失败！", {time: 2000, icon: 5});
-                            return false
-                        }
-                    }
-                });
-            }, function () {
-                layer.msg("已取消", {time: 2000, icon: 2});
-                return false
-            });
-        }
 
-
-        // 批量删除
-        function set_type() {
-            var info_id_list = [];
-            $("input[name='choice_checkbox']:checked").each(function () {
-                info_id_list.push($(this).val());
-            });
-            if (info_id_list == "") {
-                layer.msg("请最少选择一条资讯，再进行该操作");
-                return false
-            }
-            layer.confirm('是否批量删除？', {
-                btn: ['是', '否']
-            }, function () {
-                $.ajax({
-                    url: '{{ url_for('new_flash.set_type')}}',
-                    type: 'post',
-                    data: JSON.stringify(info_id_list),
-                    success: function (data) {
-                        if (data.success == 'ok') {
-                            layser.msg("批量删除成功！", {time: 2000, icon: 1});
-                            window.location.reload();
-                        }
-                        else {
-                            layer.msg("批量删除失败！", {time: 2000, icon: 5});
-                            return false
-                        }
-                    }
-                });
-            }, function () {
-                layer.msg("已取消", {time: 2000, icon: 2});
-                return false
-            });
-        }
-
-
-        {##initUpload("excelFile","excelC.zcUserC.excelInput.do");#}
-							function initUpload(ctrlName,uploadUrl){
-								var control = $("#"+ctrlName);
-								control.fileinput({
-									language:"zh",//设置语言
-									uploadUrl:uploadUrl,//上传的地址
-									uploadAsync:true,//默认异步上传
-									showCaption:true,//是否显示标题
-									showUpload:true,//是否显示上传按钮
-									browseClass:"btn btn-primary",//按钮样式
-									allowedFileExtensions: ["xls", "xlsx", "doc"], //接收的文件后缀
-									maxFileCount: 20,//最大上传文件数限制
-									previewFileIcon:'<i class="glyphicon glyphcion-file"></i>',
-									showPreview: true, //是否显示预览
- 									allowPreviewTypes:null,//是否显示预览
-									previewFileIconSettings:{
-										'docx':'<i class="glyphicon glyphcion-file"></i>',
-										'xlsx':'<i class="glyphicon glyphcion-file"></i>',
-										'pptx':'<i class="glyphicon glyphcion-file"></i>',
-										'jpg':'<i class="glyphicon glyphcion-picture"></i>',
-										'pdf':'<i class="glyphicon glyphcion-file"></i>',
-										'zip':'<i class="glyphicon glyphcion-file"></i>',
-									},
-									uploadExtraData:function(){
-										var account_type = $("#account_type").val();
-										var category_type = $("#category_type").val();
-										return {"account_type": account_type,"category_type":category_type};
-									}
-								});
-							}
-
-							$("#excelFile").on("fileuploaded",function(exevt,data,previewId,index){
-								console.log("data:"+data.response.success);
-// 								alert(data);
-								if(data.response.success == "ok"){
-									alert("导入成功！");
-									$("#excelFile").fileinput("clear");
-									$("#excelFile").fileinput("reset");
-									$("#excelFile").fileinput("refresh");
-									$("#excelFile").fileinput("enable");
-									$(".close").click();
-									$("#reload").click();
-								}else{
-									alert("导入失败:"+data.response.message);
-									$("#excelFile").fileinput("clear");
-									$("#excelFile").fileinput("reset");
-									$("#excelFile").fileinput("refresh");
-									$("#excelFile").fileinput("enable");
-								}
-							});
-
-        //初始化控件initFileInput(id,uploadurl)控件id，与上传路径
-        initUpload("excelFile", "/article_file_upload");
-
-        function insitFileInput(ctrlName, uploadUrl) {
-              var control = $('#' + ctrlName);
-              control.fileinput({
-                resizeImage : true,
-                maxImageWidth : 200,
-                maxImageHeight : 200,
-                resizePreference : 'width',
-                language : 'zh', //设置语言
-                uploadUrl : uploadUrl,
-                uploadAsync : true,
-                allowedFileExtensions : ['xls','xlsx'],//接收的文件后缀
-                showUpload : true, //是否显示上传按钮
-                showCaption : true,//是否显示标题
-                browseClass : "btn btn-primary", //按钮样式
-                previewFileIcon : "<i class='glyphicon glyphicon-king'></i>",
-                maxFileCount : 3,
-                msgFilesTooMany : "选择图片超过了最大数量",
-                maxFileSize : 2000,
-              });
-
-            };
 
         function add_monitor_info() {
             window.location.href = "/add_article_info"

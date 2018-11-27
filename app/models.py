@@ -514,6 +514,7 @@ class ArticleManage(db.Model):
     article_type = db.Column(db.Integer)
     category_type = db.Column(db.Integer)
     is_send = db.Column(db.Integer, default=0)
+    control_status = db.Column(db.Integer, default=0)
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime,
                             default=datetime.datetime.now)
@@ -557,5 +558,23 @@ class NewInformationCategory(db.Model):
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime,
                             default=datetime.datetime.now)
+
+
+class ArticleUploadDetails(db.Model):
+
+    __tablename__ = "article_upload_details"
+    id = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.Integer, default=1)
+    account_name = db.Column(db.String(64), default="")
+    article_id = db.Column(db.Integer, default=1)
+    article_title = db.Column(db.String(128), default="")
+    article_type = db.Column(db.Integer)
+    article_category = db.Column(db.Integer)
+    create_time = db.Column(db.DateTime, default=datetime.datetime.now)
+    send_status = db.Column(db.Integer)
+    upload_id = db.Column(db.Integer)
+    desc = db.Column(db.String(128), default="")
+
+
 
 
