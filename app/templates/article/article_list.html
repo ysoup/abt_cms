@@ -42,20 +42,37 @@
                         </div>
 
                         <div class="row" style="padding-top: 10px">
-                            <div class="col-md-4">
-                             <div class="col-md-4">
+
+                             <div class="col-md-2">
                                 <select class="form-control input-small" id="category_type">
+                                 <option value=888>全部</option>
                                             {% for x in category_ls %}
                                                 <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
                                             {% endfor %}
                                 </select>
                              </div>
-                                <div class="col-md-4">
+                            <div class="col-md-2">
+                                <select class="form-control input-small" id="is_send">
+                                    <option value=888>全部</option>
+                                    <option value=0 >未发布</option>
+                                    <option value=1 >可发布</option>
+                                    <option value=2 >已发布</option>
+                                    <option value=3 >发布失败</option>
+                                </select>
+                             </div>
+                            <div class="col-md-2">
+                                <select class="form-control input-small" id="control_status">
+                                    <option value=888>全部</option>
+                                    <option value=0 >未修改</option>
+                                    <option value=1 >已修改</option>
+                                </select>
+                             </div>
+                            <div class="col-md-2">
                                     <button type="button" class="btn blue btn-circle"
                                             style="margin-left: 10px" onclick="search()">搜索
                                 </button>
-                                </div>
                             </div>
+
                         </div>
 
                         <div class="row">
@@ -73,7 +90,7 @@
                                             <th>文章标题</th>
                                             <th>文章分类</th>
                                             <th>文章类型</th>
-{#                                            <th>文章状态</th>#}
+                                            <th>文章状态</th>
                                             <th>操作状态</th>
                                             <th>创建日期</th>
                                             <th>操作</th>
@@ -104,13 +121,15 @@
                                                     <td id="show_info">2级非图文原创</td>
                                                 {% endif %}
 
-{#                                                {% if row["is_send"] == 0 %}#}
-{#                                                    <td id="show_info">未发布</td>#}
-{#                                                {% elif row["is_send"] == 1 %}#}
-{#                                                    <td id="show_info">可发布</td>#}
-{#                                                {% elif row["is_send"] == 2 %}#}
-{#                                                    <td id="show_info">已发布</td>#}
-{#                                                {% endif %}#}
+                                                {% if row["is_send"] == 0 %}
+                                                    <td id="show_info">未发布</td>
+                                                {% elif row["is_send"] == 1 %}
+                                                    <td id="show_info">可发布</td>
+                                                {% elif row["is_send"] == 2 %}
+                                                    <td id="show_info">已发布</td>
+                                                {% elif row["is_send"] == 3 %}
+                                                    <td id="show_info">发布失败</td>
+                                                {% endif %}
 
 
                                                 {% if row["control_status"] == 0 %}
@@ -179,13 +198,18 @@
                                         <div class="col-md-4">
                                             <select placeholder="请选择" class="selectpicker" id="account_name"  multiple="multiple" data-live-search="true">
                                                 {% for x in acclout_ls %}
-                                                    <option value={{ x["id"] }}>{{ x["account_name"] }}</option>
+                                                    <optgroup label={{ x["type_name"] }}>
+                                                    {% for y in x["ls"] %}
+                                                        <option value={{ y["id"] }}>{{ y["account_name"] }}</option>
+                                                    {% endfor %}
+                                                    </optgroup>
+
                                                 {% endfor %}
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="control-label col-md-2">账户类型</label>
+                                        <label class="control-label col-md-2">类型</label>
                                         <div class="col-md-4">
                                             <select class="form-control input-small" id="account_type">
                                                 <option value=0>3级图文原创</option>
@@ -354,8 +378,10 @@
         }
 
         function search() {
+            var is_send = $("#is_send").val();
+            var control_status = $("#control_status").val();
             var category_type = $("#category_type").val();
-            window.location.href = "/article_list?category_type="+ category_type;
+            window.location.href = "/article_list?category_type="+ category_type+"&is_send="+ is_send +"&control_status=" + control_status
 
         }
             {#window.location.href = "/add_article_info"#}

@@ -2,7 +2,8 @@
 from flask_login import login_required
 from flask import request, render_template, jsonify, make_response,flash, abort, url_for, redirect, session, Flask, g, current_app
 from . import new_flash
-from app.models import AccountManage, ArticleManage, ArticleUploadManage, InformationPlatform, NewInformationCategory
+from app.models import AccountManage, ArticleManage, ArticleUploadManage, InformationPlatform, NewInformationCategory, \
+    ArticleUploadDetails
 from cms_server import db, redis_store
 import time, copy
 from common import push_service
@@ -311,8 +312,43 @@ def article_list():
         page = request.args.get('page', 1, type=int)
         if request.args.__contains__("category_type"):
             category_type = request.args.get("category_type", type=int)
-            pagination = ArticleManage.query.filter_by(category_type=category_type).order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
-                                                                                                 error_out=False)
+            is_send = request.args.get("is_send", type=int)
+            control_status = request.args.get("control_status", type=int)
+            if category_type != 888 and is_send != 888 and control_status != 888:
+                pagination = ArticleManage.query.filter_by(category_type=category_type,
+                                                           is_send=is_send,
+                                                           control_status=control_status).\
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type == 888 and is_send != 888 and control_status != 888:
+                pagination = ArticleManage.query.filter_by(
+                                                           is_send=is_send,
+                                                           control_status=control_status). \
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type == 888 and is_send == 888 and control_status != 888:
+                pagination = ArticleManage.query.filter_by(
+                    control_status=control_status). \
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type != 888 and is_send == 888 and control_status != 888:
+                pagination = ArticleManage.query.filter_by(category_type=category_type,
+                                                           control_status=control_status). \
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type != 888 and is_send != 888 and control_status == 888:
+                pagination = ArticleManage.query.filter_by(category_type=category_type,
+                                                           is_send=is_send,
+                                                           ). \
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type != 888 and is_send == 888 and control_status == 888:
+                pagination = ArticleManage.query.filter_by(category_type=category_type). \
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type == 888 and is_send != 888 and control_status == 888:
+                pagination = ArticleManage.query.filter_by(is_send=is_send).\
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            elif category_type == 888 and is_send == 888 and control_status != 888:
+                pagination = ArticleManage.query.filter_by(control_status=control_status). \
+                    order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
+            else:
+                pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
+                                                                                                     error_out=False)
         else:
             pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
                                                                                                  error_out=False)
@@ -339,13 +375,45 @@ def article_list():
 
         # 账户列表
         account_rows = AccountManage.query
-        acclout_ls = []
+        acclout_ls_0 = {
+            "type_name": "3级图文原创",
+            "type_id": 0,
+            "ls": []
+        }
+        acclout_ls_1 = {
+            "type_name": "2级图文原创",
+            "type_id": 0,
+            "ls": []
+        }
+        acclout_ls_2 = {
+            "type_name": "3级非图文原创",
+            "type_id": 0,
+            "ls": []
+        }
+        acclout_ls_3 = {
+            "type_name": "2级非图文原创",
+            "type_id": 0,
+            "ls": []
+        }
+        dat = datetime.date.today()
         if account_rows:
             for x in account_rows:
-                dict = {}
-                dict["id"] = x.id
-                dict["account_name"] = x.account_name
-                acclout_ls.append(dict)
+                # 判断该账户发送文章次数
+                workorders = ArticleUploadDetails.query.filter(
+                    db.cast(ArticleUploadDetails.create_time, db.DATE) == dat).filter(ArticleUploadDetails.account_id==x.id).all()
+                if len(workorders) ==2: continue
+                dics = {}
+                dics["id"] = x.id
+                dics["account_name"] = x.account_name
+                if x.account_type == 0:
+                    acclout_ls_0["ls"].append(dics)
+                elif x.account_type == 1:
+                    acclout_ls_1["ls"].append(dics)
+                elif x.account_type == 2:
+                    acclout_ls_2["ls"].append(dics)
+                else:
+                    acclout_ls_3["ls"].append(dics)
+        acclout_ls = [acclout_ls_0, acclout_ls_1, acclout_ls_2, acclout_ls_3]
         return render_template('article/article_list.html', data=data, category_ls=category_ls, platform_ls=platform_ls,
                                acclout_ls=acclout_ls, pagination=pagination)
     except Exception as e:

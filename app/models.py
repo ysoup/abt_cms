@@ -564,7 +564,7 @@ class ArticleUploadDetails(db.Model):
 
     __tablename__ = "article_upload_details"
     id = db.Column(db.Integer, primary_key=True)
-    account_id = db.Column(db.Integer, default=1)
+    account_id = db.Column(db.Integer)
     account_name = db.Column(db.String(64), default="")
     article_id = db.Column(db.Integer, default=1)
     article_title = db.Column(db.String(128), default="")

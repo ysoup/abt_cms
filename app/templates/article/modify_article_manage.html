@@ -73,7 +73,7 @@
                                         <div class="col-md-10">
                                             <select class="form-control input-small" id="category_type">
                                                 {% for x in category_ls %}
-                                                    {% if data["account_type"] == x["id"] %}
+                                                    {% if data["category_type"] == x["id"] %}
                                                         <option value={{ x["id"] }} selected>{{ x["category_name"] }}</option>
                                                     {% else %}
                                                         <option value={{ x["id"] }}>{{ x["category_name"] }}</option>
@@ -104,45 +104,45 @@
     </div>
     <script type="text/JavaScript">
 
-        $(function () {
-            $("#title_img").click(function () {
-                $("#uploadfile_input").trigger("click");
-            });
-            $("#uploadfile_input").change(function () {
-
-                var file = $("#uploadfile_input").val();
-                if (!/.(jpg|jpeg|png|JPG)$/.test(file)) {
-                    layer.msg("图片类型必须是.jpeg,jpg,png中的一种", {time: 2000, icon: 2});
-                    return false;
-                } else {
-                    var image = $("#uploadfile_input")[0].files[0];
+        {#$(function () {#}
+        {#    $("#title_img").click(function () {#}
+        {#        $("#uploadfile_input").trigger("click");#}
+        {#    });#}
+        {#    $("#uploadfile_input").change(function () {#}
+        {##}
+        {#        var file = $("#uploadfile_input").val();#}
+        {#        if (!/.(jpg|jpeg|png|JPG)$/.test(file)) {#}
+        {#            layer.msg("图片类型必须是.jpeg,jpg,png中的一种", {time: 2000, icon: 2});#}
+        {#            return false;#}
+        {#        } else {#}
+        {#            var image = $("#uploadfile_input")[0].files[0];#}
                     {#                        filesize = image.size;#}
                     {#                        console.log(filesize);#}
                     {#                        if (filesize > 102400) {#}
                     {#                            layer.msg('请选择100K大小以内的图片', {time: 2000, icon: 2});#}
                     {#                            return false;#}
                     {#                        }#}
-                }
-                layer.msg("图片通过", {time: 2000, icon: 6});
-
-                var img_src = $("#uploadfile_input").val();
-                var formData = new FormData();
-                formData.append("file", image);
-                formData.append('base_pic_url', $('#title_img').attr("src"));
-                formData.append('img_url', img_src);
-                $.ajax({
-                    url: "{{ url_for("new_flash.get_info_img_url") }}",
-                    type: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (data) {
-                        $('#title_img').attr("src", data['base_pic_url']);
-                        $('#base_pic').attr("class", data['img_url']);
-                    }
-                })
-            });
-        });
+        {#        }#}
+        {#        layer.msg("图片通过", {time: 2000, icon: 6});#}
+        {##}
+        {#        var img_src = $("#uploadfile_input").val();#}
+        {#        var formData = new FormData();#}
+        {#        formData.append("file", image);#}
+        {#        formData.append('base_pic_url', $('#title_img').attr("src"));#}
+        {#        formData.append('img_url', img_src);#}
+        {#        $.ajax({#}
+        {#            url: "{{ url_for("new_flash.get_info_img_url") }}",#}
+        {#            type: "POST",#}
+        {#            data: formData,#}
+        {#            contentType: false,#}
+        {#            processData: false,#}
+        {#            success: function (data) {#}
+        {#                $('#title_img').attr("src", data['base_pic_url']);#}
+        {#                $('#base_pic').attr("class", data['img_url']);#}
+        {#            }#}
+        {#        })#}
+        {#    });#}
+        {#{);#}
 
         function modify_information_content() {
             var formData = new FormData();
