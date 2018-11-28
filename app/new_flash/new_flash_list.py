@@ -317,40 +317,40 @@ def article_list():
             if category_type != 888 and is_send != 888 and control_status != 888:
                 pagination = ArticleManage.query.filter_by(category_type=category_type,
                                                            is_send=is_send,
-                                                           control_status=control_status).\
+                                                           control_status=control_status, is_delete=0).\
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type == 888 and is_send != 888 and control_status != 888:
                 pagination = ArticleManage.query.filter_by(
                                                            is_send=is_send,
-                                                           control_status=control_status). \
+                                                           control_status=control_status, is_delete=0). \
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type == 888 and is_send == 888 and control_status != 888:
                 pagination = ArticleManage.query.filter_by(
-                    control_status=control_status). \
+                    control_status=control_status, is_delete=0). \
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type != 888 and is_send == 888 and control_status != 888:
                 pagination = ArticleManage.query.filter_by(category_type=category_type,
-                                                           control_status=control_status). \
+                                                           control_status=control_status, is_delete=0). \
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type != 888 and is_send != 888 and control_status == 888:
                 pagination = ArticleManage.query.filter_by(category_type=category_type,
-                                                           is_send=is_send,
+                                                           is_send=is_send, is_delete=0
                                                            ). \
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type != 888 and is_send == 888 and control_status == 888:
-                pagination = ArticleManage.query.filter_by(category_type=category_type). \
+                pagination = ArticleManage.query.filter_by(category_type=category_type, is_delete=0). \
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type == 888 and is_send != 888 and control_status == 888:
-                pagination = ArticleManage.query.filter_by(is_send=is_send).\
+                pagination = ArticleManage.query.filter_by(is_send=is_send, is_delete=0).\
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             elif category_type == 888 and is_send == 888 and control_status != 888:
-                pagination = ArticleManage.query.filter_by(control_status=control_status). \
+                pagination = ArticleManage.query.filter_by(control_status=control_status, is_delete=0). \
                     order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30, error_out=False)
             else:
-                pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
+                pagination = ArticleManage.query.filter_by(is_delete=0).order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
                                                                                                      error_out=False)
         else:
-            pagination = ArticleManage.query.order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
+            pagination = ArticleManage.query.filter_by(is_delete=0).order_by(ArticleManage.create_time.desc()).paginate(page, per_page=30,
                                                                                                  error_out=False)
         data = pagination.items
         # 账户分类
@@ -805,6 +805,22 @@ def all_article_upload():
     except Exception as e:
         current_app.logger.error(e)
         return jsonify({'failed': '修改失败'})
+
+
+# 删除资讯
+@new_flash.route("/delete_information", methods=['GET', 'POST'])
+@login_required
+def delete_information():
+    if request.method == "POST":
+        try:
+            info = ArticleManage.query.filter_by(id=request.form['id']).first()
+            info.is_delete = 1
+            db.session.commit()
+            return jsonify({'success': 'ok'})
+        except Exception as e:
+            current_app.logger.error(e)
+            db.session.rollback()
+        return jsonify({'failed': 'ok'})
 
 
 
