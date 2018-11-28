@@ -211,7 +211,7 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-2">类型</label>
                                         <div class="col-md-4">
-                                            <select class="form-control input-small" id="account_type">
+                                            <select class="form-control input-small" id="account_typess">
                                                 <option value=0>3级图文原创</option>
                                                 <option value=1>2级图文原创</option>
                                                 <option value=2>3级非图文原创</option>
@@ -272,7 +272,7 @@
             }
             var formData = new FormData();
             formData.append('category_type', $("#category_type").val());
-            formData.append('account_type', $("#account_type").val());
+            formData.append('account_type', $("#account_typess").val());
             formData.append('platform_type', $("#platform_type").val());
             formData.append('account_name', $("#account_name").val());
             formData.append('info_id_list', info_id_list);
