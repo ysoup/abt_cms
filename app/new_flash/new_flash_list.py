@@ -52,13 +52,29 @@ def redirect_uri():
         return render_template("404.html")
 
 
+# 删除资讯
+@new_flash.route("/delete_account", methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    if request.method == "POST":
+        try:
+            info = AccountManage.query.filter_by(id=request.form['id']).first()
+            info.is_delete = 1
+            db.session.commit()
+            return jsonify({'success': 'ok'})
+        except Exception as e:
+            current_app.logger.error(e)
+            db.session.rollback()
+        return jsonify({'failed': 'ok'})
+
+
 # 账户列表页
 @new_flash.route('/account_manage_list', methods=['GET'])
 @login_required
 def account_manage_list():
     try:
         page = request.args.get('page', 1, type=int)
-        pagination = AccountManage.query.order_by(AccountManage.create_time.desc()).paginate(page, per_page=10,
+        pagination = AccountManage.query.filter_by(is_delete=0).order_by(AccountManage.create_time.desc()).paginate(page, per_page=10,
                                                                                              error_out=False)
         data = pagination.items
         # 账户类型
@@ -153,7 +169,8 @@ def add_account_info():
                 nick_name=nick_name,
                 credit_score=credit_score,
                 platform_type=platform_type,
-                category_type=category_type
+                category_type=category_type,
+                is_delete=0
             )
             db.session.add(info)
             db.session.commit()

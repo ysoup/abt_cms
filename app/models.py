@@ -500,6 +500,7 @@ class AccountManage(db.Model):
     platform_type = db.Column(db.Integer)
     category_type = db.Column(db.Integer)
     credit_score = db.Column(db.Integer)
+    is_delete = db.Column(db.Integer)
     create_time = db.Column(db.DateTime, default=datetime.datetime.now)
     update_time = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
