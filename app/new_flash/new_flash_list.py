@@ -417,7 +417,8 @@ def article_list():
             for x in account_rows:
                 # 判断该账户发送文章次数
                 workorders = ArticleUploadDetails.query.filter(
-                    db.cast(ArticleUploadDetails.create_time, db.DATE) == dat).filter(ArticleUploadDetails.account_id==x.id).all()
+                    db.cast(ArticleUploadDetails.create_time, db.DATE) == dat).filter(
+                    ArticleUploadDetails.account_id==x.id, ArticleUploadDetails.send_status==1).all()
                 if len(workorders) ==2: continue
                 dics = {}
                 dics["id"] = x.id
